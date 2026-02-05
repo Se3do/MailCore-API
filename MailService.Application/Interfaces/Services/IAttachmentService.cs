@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MailService.Application.DTOs.Attachment;
 
 namespace MailService.Application.Interfaces.Services
 {
-    internal interface IAttachmentReository
+    public interface IAttachmentService
     {
+        Task<AttachmentDto?> GetByIdAsync(Guid attachmentId, CancellationToken cancellationToken = default);
+        Task<Guid> UploadAsync(Guid emailId, AttachmentCreateDto attachment, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid attachmentId, CancellationToken cancellationToken = default);
     }
 }

@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MailService.Application.DTOs.User;
 
 namespace MailService.Application.Interfaces.Services
 {
-    internal interface IUserService
+    public interface IUserService
     {
+        Task<UserDto> RegisterAsync(UserCreateDto user, CancellationToken cancellationToken = default);
+        Task<UserDto?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+        Task<UserDto?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default);
+        Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
+        Task<bool> ExistsByUserNameAsync(string userName, CancellationToken cancellationToken = default);
     }
 }

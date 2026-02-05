@@ -4,8 +4,7 @@ namespace MailService.Domain.Entities
 {
     public class MailRecipient
     {
-        public Guid Id;
-
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
         public Guid EmailId { get; set; }

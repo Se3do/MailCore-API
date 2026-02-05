@@ -1,19 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MailService.Infrastructure;
+using MailService.Application;
 
-namespace MailService.Application
+namespace MailService.API
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddAppDI(this IServiceCollection services)
+        public static IServiceCollection AddAppDI(this IServiceCollection services, IConfiguration configuration)
         {
             // Application service registrations go here
             services.AddApplicationDI().
-                AddInfrastructureDI();
+                AddInfrastructureDI(configuration);
             return services;
         }
     }

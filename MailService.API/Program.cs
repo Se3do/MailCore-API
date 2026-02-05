@@ -5,8 +5,7 @@ using MailService.Application;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<MailServiceDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddAppDI(builder.Configuration);
 
 builder.Services.AddControllers();
 

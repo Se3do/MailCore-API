@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MailService.Application.DTOs.Recipient;
 
 namespace MailService.Application.Interfaces.Services
 {
-    internal interface IMailRecipientService
+    public interface IMailRecipientService
     {
+        Task<RecipientDto?> GetByIdAsync(Guid userId, Guid mailId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<RecipientDto>> GetInboxAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<RecipientDto>> GetUnreadAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<RecipientDto>> GetStarredAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<RecipientDto>> GetByLabelAsync(Guid userId, Guid labelId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<RecipientDto>> GetDeletedAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task AddAsync(MailRecipientCreateDto recipient, CancellationToken cancellationToken = default);
     }
 }

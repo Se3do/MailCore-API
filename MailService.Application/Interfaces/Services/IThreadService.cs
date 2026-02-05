@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MailService.Application.DTOs.Thread;
 
 namespace MailService.Application.Interfaces.Services
 {
-    internal interface IThreadService
+    public interface IThreadService
     {
+        Task<ThreadDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<ThreadDto>> GetByUserAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }
