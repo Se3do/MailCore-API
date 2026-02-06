@@ -1,13 +1,11 @@
-using MailService.Application.DTOs.Label;
+using MailService.Application.DTOs.Labels;
 
-namespace MailService.Application.Interfaces.Services
+namespace MailService.Application.Services.Interfaces;
+
+public interface ILabelService
 {
-    public interface ILabelService
-    {
-        Task<Guid> CreateAsync(LabelCreateDto label, CancellationToken cancellationToken = default);
-        Task UpdateAsync(Guid id, LabelUpdateDto label, CancellationToken cancellationToken = default);
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<LabelDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<IReadOnlyList<LabelDto>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
-    }
+    Task<IReadOnlyList<LabelDto>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<LabelDto> CreateAsync(Guid userId, CreateLabelRequest request, CancellationToken cancellationToken = default);
+    Task<LabelDto> UpdateAsync(Guid userId, Guid labelId, UpdateLabelRequest request, CancellationToken cancellationToken = default);
+    Task<bool> DeleteAsync(Guid userId, Guid labelId, CancellationToken cancellationToken = default);
 }

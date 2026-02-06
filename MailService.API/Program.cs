@@ -1,6 +1,4 @@
-﻿using MailService.Infrastructure.Data.Context;
-using Microsoft.EntityFrameworkCore;
-using MailService.Application;
+﻿using MailService.API;
 
 var builder = WebApplication.CreateBuilder(args);
 

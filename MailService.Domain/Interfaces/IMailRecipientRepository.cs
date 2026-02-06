@@ -11,7 +11,7 @@ namespace MailService.Domain.Interfaces
         Task<IReadOnlyList<MailRecipient>> GetUnreadAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetStarredAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetByLabelAsync(Guid userId, Guid labelId, CancellationToken cancellationToken = default);
-        Task<IReadOnlyList<MailRecipient>> GetDeleted(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<MailRecipient>> GetDeletedAsync(Guid userId, CancellationToken cancellationToken = default);
         Task AddAsync(MailRecipient mailRecipient, CancellationToken cancellationToken = default);
     }
 }

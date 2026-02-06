@@ -26,7 +26,7 @@ namespace MailService.Infrastructure.Repositories
                 .Where(mr => mr.UserId == userId && mr.Labels.Any(l => l.LabelId == labelId))
                 .ToListAsync(cancellationToken);
         }
-        public async Task<IReadOnlyList<MailRecipient>> GetDeleted(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<MailRecipient>> GetDeletedAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await _context.MailRecipients
                 .Where(mr => mr.UserId == userId && mr.DeletedAt != null)
