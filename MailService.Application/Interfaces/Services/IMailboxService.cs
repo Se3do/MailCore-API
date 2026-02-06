@@ -21,7 +21,4 @@ public interface IMailboxService
     Task<bool> UnspamAsync(Guid userId, Guid mailRecipientId, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(Guid userId, Guid mailRecipientId, CancellationToken cancellationToken = default);
     Task<bool> RestoreAsync(Guid userId, Guid mailRecipientId, CancellationToken cancellationToken = default);
-
-    Task<bool> AddLabelAsync(Guid userId, Guid mailRecipientId, Guid labelId, CancellationToken cancellationToken = default);
-    Task<bool> RemoveLabelAsync(Guid userId, Guid mailRecipientId, Guid labelId, CancellationToken cancellationToken = default);
 }

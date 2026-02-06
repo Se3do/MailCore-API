@@ -13,13 +13,12 @@ namespace MailService.Infrastructure.Repositories
         {
             _context = context;
         }
-
-        public async Task<User> AddAsync(User user, CancellationToken cancellationToken = default)
+        public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            await _context.Users.AddAsync(user, cancellationToken);
-            return user;
+            return _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
         }
-
         public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             return _context.Users
@@ -47,6 +46,10 @@ namespace MailService.Infrastructure.Repositories
                 .AsNoTracking()
                 .AnyAsync(u => u.Name == userName, cancellationToken);
         }
-
+        public async Task<User> AddAsync(User user, CancellationToken cancellationToken = default)
+        {
+            await _context.Users.AddAsync(user, cancellationToken);
+            return user;
+        }
     }
 }

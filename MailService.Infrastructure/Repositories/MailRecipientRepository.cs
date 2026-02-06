@@ -50,5 +50,12 @@ namespace MailService.Infrastructure.Repositories
                 .Where(mr => mr.UserId == userId && !mr.IsRead)
                 .ToListAsync(cancellationToken);
         }
+        public async Task<MailRecipient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return await _context.MailRecipients
+                .Include(mr => mr.Labels)
+                    .ThenInclude(l => l.Label)
+                .FirstOrDefaultAsync(mr => mr.Id == id, cancellationToken);
+        }
     }
 }

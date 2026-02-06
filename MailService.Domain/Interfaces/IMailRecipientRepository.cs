@@ -6,6 +6,7 @@ namespace MailService.Domain.Interfaces
     {
         // TODO: Add pagination to methods that return lists
         // TODO: Add Filter By Type (To, Cc, Bcc) where applicable
+        Task<MailRecipient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<MailRecipient?> GetByUserAndEmailAsync(Guid UserId, Guid MailId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetInboxAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetUnreadAsync(Guid userId, CancellationToken cancellationToken = default);
