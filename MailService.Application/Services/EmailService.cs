@@ -12,14 +12,16 @@ namespace MailService.Application.Services
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMailRecipientRepository _mailRecipientRepository;
+        private readonly IThreadRepository _threadRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public EmailService(IEmailRepository emailRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, IMailRecipientRepository mailRecipientRepository)
+        public EmailService(IEmailRepository emailRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, IMailRecipientRepository mailRecipientRepository, IThreadRepository threadRepository)
         {
             _emailRepository = emailRepository;
             _unitOfWork = unitOfWork;
             _userRepository = userRepository;
             _mailRecipientRepository = mailRecipientRepository;
+            _threadRepository = threadRepository;
         }
 
         public async Task<EmailDto> SendAsync(Guid userId, SendEmailRequest request, CancellationToken cancellationToken = default)
@@ -36,14 +38,21 @@ namespace MailService.Application.Services
             }
 
             var now = DateTime.UtcNow;
-            var thread = request.ThreadId.HasValue
-                ? null
+            Domain.Entities.Thread? thread = request.ThreadId.HasValue
+                ? await _threadRepository.GetByIdAsync(request.ThreadId.Value, cancellationToken)
                 : new Domain.Entities.Thread
                 {
                     Id = Guid.NewGuid(),
                     CreatedAt = now,
                     LastMessageAt = now
                 };
+
+            if (thread is null)
+            {
+                throw new KeyNotFoundException("Thread not found.");
+            }
+
+            thread.LastMessageAt = now;
 
             var email = new Email
             {
@@ -53,8 +62,8 @@ namespace MailService.Application.Services
                 Subject = request.Subject,
                 Body = request.Body,
                 CreatedAt = now,
-                ThreadId = request.ThreadId ?? thread!.Id,
-                Thread = thread,
+                ThreadId = thread.Id,
+                Thread = request.ThreadId.HasValue ? null : thread,
                 HasAttachments = request.Attachments?.Count > 0
             };
 
@@ -99,6 +108,14 @@ namespace MailService.Application.Services
             }
 
             var now = DateTime.UtcNow;
+            Domain.Entities.Thread? thread = await _threadRepository.GetByIdAsync(original.ThreadId, cancellationToken);
+            if (thread is null)
+            {
+                throw new KeyNotFoundException("Thread not found.");
+            }
+
+            thread.LastMessageAt = now;
+
             var email = new Email
             {
                 Id = Guid.NewGuid(),
@@ -109,7 +126,7 @@ namespace MailService.Application.Services
                     : $"Re: {original.Subject}",
                 Body = request.Body,
                 CreatedAt = now,
-                ThreadId = original.ThreadId,
+                ThreadId = thread.Id,
                 HasAttachments = request.Attachments?.Count > 0
             };
 

@@ -6,7 +6,7 @@ namespace MailService.Infrastructure.Data.Configuration
 {
     public class MailRecipientLabelConfiguration : IEntityTypeConfiguration<MailRecipientLabel>
     {
-        public void Configure(EntityTypeBuilder<MailRecipientLabel> builder) 
+        public void Configure(EntityTypeBuilder<MailRecipientLabel> builder)
         {
             builder.HasKey(x => new { x.MailRecipientId, x.LabelId });
 

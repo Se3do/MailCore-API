@@ -20,7 +20,9 @@ namespace MailService.Infrastructure.Repositories
         {
             return await _context.Emails
                 .AsNoTracking()
+                .Include(e => e.Sender)
                 .Include(e => e.Recipients)
+                    .ThenInclude(r => r.User)
                 .Include(e => e.Attachments)
                 .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         }
@@ -28,6 +30,9 @@ namespace MailService.Infrastructure.Repositories
         {
             return _context.Emails
                 .AsNoTracking()
+                .Include(e => e.Sender)
+                .Include(e => e.Recipients)
+                    .ThenInclude(r => r.User)
                 .Where(e => e.SenderId == userId)
                 .ToListAsync(cancellationToken);
         }

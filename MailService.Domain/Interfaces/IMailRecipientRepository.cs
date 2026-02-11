@@ -8,9 +8,11 @@ namespace MailService.Domain.Interfaces
         // TODO: Add Filter By Type (To, Cc, Bcc) where applicable
         Task<MailRecipient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<MailRecipient?> GetByUserAndEmailAsync(Guid UserId, Guid MailId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<MailRecipient>> GetByThreadAsync(Guid userId, Guid threadId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetInboxAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetUnreadAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetStarredAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<MailRecipient>> GetSpamAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetByLabelAsync(Guid userId, Guid labelId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetDeletedAsync(Guid userId, CancellationToken cancellationToken = default);
         Task AddAsync(MailRecipient mailRecipient, CancellationToken cancellationToken = default);

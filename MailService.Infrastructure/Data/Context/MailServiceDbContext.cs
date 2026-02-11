@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MailService.Infrastructure.Data.Context
 {
-    public class MailServiceDbContext: DbContext
+    public class MailServiceDbContext : DbContext
     {
-        public MailServiceDbContext(DbContextOptions<MailServiceDbContext> options) : base(options) {}
+        public MailServiceDbContext(DbContextOptions<MailServiceDbContext> options) : base(options) { }
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Email> Emails => Set<Email>();

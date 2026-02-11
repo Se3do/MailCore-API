@@ -15,7 +15,7 @@ namespace MailService.Infrastructure.Data.Configuration
             .HasForeignKey(a => a.EmailId)
             .OnDelete(DeleteBehavior.Cascade);
         }
-        
+
     }
     //TODO : Add other entity configurations here
 }

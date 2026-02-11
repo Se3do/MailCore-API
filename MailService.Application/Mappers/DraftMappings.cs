@@ -11,9 +11,6 @@ public static class DraftMappings
             draft.Id,
             draft.Subject,
             draft.Body,
-            Array.Empty<string>(),
-            null,
-            null,
             draft.ThreadId,
             new DateTimeOffset(draft.UpdatedAt));
     }

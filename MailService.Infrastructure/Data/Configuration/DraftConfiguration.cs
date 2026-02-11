@@ -20,6 +20,6 @@ namespace MailService.Infrastructure.Data.Configuration
             .HasForeignKey(d => d.ThreadId)
             .OnDelete(DeleteBehavior.SetNull);
         }
-    }   
+    }
     //TODO : Add other entity configurations here
 }

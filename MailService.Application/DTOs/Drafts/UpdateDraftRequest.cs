@@ -2,8 +2,5 @@
 
 public sealed record UpdateDraftRequest(
     string Subject,
-    string Body,
-    IReadOnlyList<string> To,
-    IReadOnlyList<string>? Cc,
-    IReadOnlyList<string>? Bcc
+    string Body
 );

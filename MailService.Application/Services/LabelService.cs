@@ -71,7 +71,7 @@ namespace MailService.Application.Services
                 return false;
             }
 
-            var mailRecipient = await mailRecipientRepository.GetByUserAndEmailAsync(userId, mailId, cancellationToken);
+            var mailRecipient = await mailRecipientRepository.GetByIdAsync(mailId, cancellationToken);
             if (mailRecipient == null || mailRecipient.UserId != userId)
             {
                 return false;
@@ -94,7 +94,7 @@ namespace MailService.Application.Services
 
         public async Task<bool> UnassignLabelAsync(Guid userId, Guid mailId, Guid labelId, CancellationToken cancellationToken = default)
         {
-            var mailRecipient = await mailRecipientRepository.GetByUserAndEmailAsync(userId, mailId, cancellationToken);
+            var mailRecipient = await mailRecipientRepository.GetByIdAsync(mailId, cancellationToken);
             if (mailRecipient == null || mailRecipient.UserId != userId)
             {
                 return false;

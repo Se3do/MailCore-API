@@ -10,8 +10,9 @@ public interface IMailboxService
     Task<IReadOnlyList<MailboxItemDto>> GetStarredAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<MailboxItemDto>> GetSpamAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<MailboxItemDto>> GetTrashAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<MailboxItemDto>> GetByThreadAsync(Guid userId, Guid threadId, CancellationToken cancellationToken = default);
 
-    Task<MailboxDetailDto?> GetByMailIdAsync(Guid userId, Guid mailRecipientId, CancellationToken cancellationToken = default);
+    Task<MailboxDetailDto?> GetMailByIdAsync(Guid userId, Guid mailRecipientId, CancellationToken cancellationToken = default);
 
     Task<bool> MarkReadAsync(Guid userId, Guid mailRecipientId, CancellationToken cancellationToken = default);
     Task<bool> MarkUnreadAsync(Guid userId, Guid mailRecipientId, CancellationToken cancellationToken = default);

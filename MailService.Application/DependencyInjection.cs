@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MailService.Application.Services;
+using MailService.Application.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MailService.Application
 {
@@ -11,7 +8,11 @@ namespace MailService.Application
     {
         public static IServiceCollection AddApplicationDI(this IServiceCollection services)
         {
-            // Application service registrations go here
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IDraftService, DraftService>();
+            services.AddScoped<IMailboxService, MailboxService>();
+            services.AddScoped<ILabelService, LabelService>();
+
             return services;
         }
     }
