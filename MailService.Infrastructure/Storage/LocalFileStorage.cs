@@ -10,17 +10,15 @@ public sealed class LocalFileStorage : IFileStorage
         Directory.CreateDirectory(_rootPath);
     }
 
-    public async Task<string> SaveAsync(
-        byte[] content,
-        string fileName,
-        string contentType,
-        CancellationToken cancellationToken = default)
+    public async Task<string> SaveAsync(Stream content, string fileName, string contentType, CancellationToken cancellationToken = default)
     {
         var extension = Path.GetExtension(fileName);
-        var storageKey = $"{Guid.NewGuid()}{extension}";
+        var storageKey = $"{Guid.NewGuid():N}{extension}";
         var fullPath = Path.Combine(_rootPath, storageKey);
 
-        await File.WriteAllBytesAsync(fullPath, content, cancellationToken);
+        await using var fs = File.Create(fullPath);
+        await content.CopyToAsync(fs, cancellationToken);
+
         return storageKey;
     }
 
@@ -34,5 +32,10 @@ public sealed class LocalFileStorage : IFileStorage
         }
 
         return Task.CompletedTask;
+    }
+
+    public Task<Stream> GetAsync(string storageKey, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
     }
 }

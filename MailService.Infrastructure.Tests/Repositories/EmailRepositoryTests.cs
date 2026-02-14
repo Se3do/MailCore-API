@@ -84,8 +84,8 @@ public class EmailRepositoryTests : RepositoryTestBase
             FileName = "doc.pdf",
             ContentType = "application/pdf",
             FileSize = 1024,
-            FilePath = "/files/doc.pdf",
-            UploadedAt = FixedNow
+            StorageKey = "files/doc.pdf",
+            CreatedAt = FixedNow
         });
         await SaveAndDetachAsync();
 

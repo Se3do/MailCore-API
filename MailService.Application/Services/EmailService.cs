@@ -1,9 +1,11 @@
 ﻿using MailService.Application.DTOs.Emails;
+using MailService.Application.Interfaces.Services;
 using MailService.Application.Mappers;
 using MailService.Application.Services.Interfaces;
 using MailService.Domain.Entities;
 using MailService.Domain.Enums;
 using MailService.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace MailService.Application.Services
 {
@@ -13,15 +15,17 @@ namespace MailService.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IMailRecipientRepository _mailRecipientRepository;
         private readonly IThreadRepository _threadRepository;
+        private readonly IAttachmentService _attachmentService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public EmailService(IEmailRepository emailRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, IMailRecipientRepository mailRecipientRepository, IThreadRepository threadRepository)
+        public EmailService(IEmailRepository emailRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, IMailRecipientRepository mailRecipientRepository, IThreadRepository threadRepository, IAttachmentService attachmentService)
         {
             _emailRepository = emailRepository;
             _unitOfWork = unitOfWork;
             _userRepository = userRepository;
             _mailRecipientRepository = mailRecipientRepository;
             _threadRepository = threadRepository;
+            _attachmentService = attachmentService;
         }
 
         public async Task<EmailDto> SendAsync(Guid userId, SendEmailRequest request, CancellationToken cancellationToken = default)
@@ -64,10 +68,11 @@ namespace MailService.Application.Services
                 CreatedAt = now,
                 ThreadId = thread.Id,
                 Thread = request.ThreadId.HasValue ? null : thread,
-                HasAttachments = request.Attachments?.Count > 0
             };
 
             await _emailRepository.AddAsync(email, cancellationToken);
+
+            await HandleAttachmentsAsync(email, request.Attachments, cancellationToken);
 
             await AddRecipientsAsync(email, request.To, RecipientType.To, now, cancellationToken);
             if (request.Cc is { Count: > 0 })
@@ -127,10 +132,11 @@ namespace MailService.Application.Services
                 Body = request.Body,
                 CreatedAt = now,
                 ThreadId = thread.Id,
-                HasAttachments = request.Attachments?.Count > 0
             };
 
             await _emailRepository.AddAsync(email, cancellationToken);
+
+            await HandleAttachmentsAsync(email, request.Attachments, cancellationToken);
 
             await AddRecipientsAsync(email, toList, RecipientType.To, now, cancellationToken);
             if (request.Cc is { Count: > 0 })
@@ -186,10 +192,11 @@ namespace MailService.Application.Services
                 CreatedAt = now,
                 ThreadId = thread.Id,
                 Thread = thread,
-                HasAttachments = request.Attachments?.Count > 0
             };
 
             await _emailRepository.AddAsync(email, cancellationToken);
+
+            await HandleAttachmentsAsync(email, request.Attachments, cancellationToken);
 
             await AddRecipientsAsync(email, request.To, RecipientType.To, now, cancellationToken);
             if (request.Cc is { Count: > 0 })
@@ -239,5 +246,15 @@ namespace MailService.Application.Services
                 });
             }
         }
+
+        private async Task HandleAttachmentsAsync(Email email, IReadOnlyCollection<IFormFile>? attachments, CancellationToken cancellationToken)
+        {
+            if (attachments is not { Count: > 0 })
+                return;
+
+            await _attachmentService.AddAsync(email, attachments, cancellationToken);
+            email.HasAttachments = true;
+        }
+
     }
 }
