@@ -4,6 +4,7 @@ using MailService.Domain.Entities;
 using MailService.Domain.Enums;
 using MailService.Domain.Interfaces;
 using Moq;
+using MailService.Application.Interfaces.Services;
 
 namespace MailService.Application.Tests.Services;
 
@@ -15,6 +16,7 @@ public class EmailServiceTests
     private readonly Mock<IMailRecipientRepository> _mailRecipientRepo = new();
     private readonly Mock<IThreadRepository> _threadRepo = new();
     private readonly Mock<IUnitOfWork> _unitOfWork = new();
+    private readonly Mock<IAttachmentService> _attachmentService = new();
     private readonly EmailService _sut;
 
     private static readonly Guid SenderId = Guid.NewGuid();
@@ -41,10 +43,11 @@ public class EmailServiceTests
     {
         _sut = new EmailService(
             _emailRepo.Object,
-         _unitOfWork.Object,
-    _userRepo.Object,
-   _mailRecipientRepo.Object,
-      _threadRepo.Object);
+            _unitOfWork.Object,
+            _userRepo.Object,
+            _mailRecipientRepo.Object,
+            _threadRepo.Object,
+            _attachmentService.Object);
     }
 
     [Fact]
