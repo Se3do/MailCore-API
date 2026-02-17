@@ -1,4 +1,5 @@
-﻿using MailService.Domain.Entities;
+﻿using MailService.Domain.Common;
+using MailService.Domain.Entities;
 
 namespace MailService.Domain.Interfaces
 {
@@ -9,5 +10,7 @@ namespace MailService.Domain.Interfaces
         Task DeleteAsync(Guid Id, CancellationToken cancellationToken = default);
         Task<Draft?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<Draft>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<Draft>> GetAllPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
     }
 }

@@ -1,4 +1,5 @@
-﻿using MailService.Domain.Entities;
+﻿using MailService.Domain.Common;
+using MailService.Domain.Entities;
 using MailService.Domain.Interfaces;
 using MailService.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,25 @@ namespace MailService.Infrastructure.Repositories
                 .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
                 .Where(e => e.SenderId == userId)
+                .ToListAsync(cancellationToken);
+        }
+        public async Task<List<Email>> GetSentPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
+        {
+            return await _context.Emails
+                .AsNoTracking()
+                .Include(e => e.Sender)
+                .Include(e => e.Recipients)
+                    .ThenInclude(r => r.User)
+                .Where(e =>
+                    e.SenderId == userId &&
+                    (
+                        e.CreatedAt < cursor.Timestamp ||
+                        (e.CreatedAt == cursor.Timestamp && e.Id.CompareTo(cursor.Id) < 0)
+                    )
+                )
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
+                .Take(pageSize + 1)
                 .ToListAsync(cancellationToken);
         }
     }

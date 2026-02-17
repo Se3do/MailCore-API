@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using MailService.Domain.Common;
 using MailService.Domain.Entities;
 using MailService.Domain.Interfaces;
 using MailService.Infrastructure.Data.Context;
@@ -55,6 +51,22 @@ namespace MailService.Infrastructure.Repositories
             return await _context.Drafts
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+        }
+        public async Task<IReadOnlyList<Draft>> GetAllPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
+        {
+            return await _context.Drafts
+                .AsNoTracking()
+                .Where(d =>
+                    d.UserId == userId &&
+                    (
+                        d.UpdatedAt < cursor.Timestamp ||
+                        (d.UpdatedAt == cursor.Timestamp && d.Id.CompareTo(cursor.Id) < 0)
+                    )
+                )
+                .OrderByDescending(d => d.UpdatedAt)
+                .ThenByDescending(d => d.Id)
+                .Take(pageSize + 1)
+                .ToListAsync(cancellationToken);
         }
     }
 }
