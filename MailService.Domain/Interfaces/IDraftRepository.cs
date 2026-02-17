@@ -11,6 +11,6 @@ namespace MailService.Domain.Interfaces
         Task<Draft?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<Draft>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyList<Draft>> GetAllPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
+        Task<IReadOnlyList<Draft>> GetAllPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default);
     }
 }
