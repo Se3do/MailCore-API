@@ -88,7 +88,6 @@ namespace MailService.Application.Services
 
             return email.ToDto();
         }
-
         public async Task<EmailDto> ReplyAsync(Guid userId, Guid emailId, ReplyEmailRequest request, CancellationToken cancellationToken = default)
         {
             var original = await _emailRepository.GetByIdAsync(emailId, cancellationToken);
@@ -152,7 +151,6 @@ namespace MailService.Application.Services
 
             return email.ToDto();
         }
-
         public async Task<EmailDto> ForwardAsync(Guid userId, Guid emailId, ForwardEmailRequest request, CancellationToken cancellationToken = default)
         {
             var original = await _emailRepository.GetByIdAsync(emailId, cancellationToken);
@@ -212,7 +210,7 @@ namespace MailService.Application.Services
 
             return email.ToDto();
         }
-
+        
         private async Task<IReadOnlyList<string>> GetDefaultReplyRecipientsAsync(Email original, CancellationToken cancellationToken)
         {
             var originalSender = await _userRepository.GetByIdAsync(original.SenderId, cancellationToken);
@@ -246,7 +244,6 @@ namespace MailService.Application.Services
                 });
             }
         }
-
         private async Task HandleAttachmentsAsync(Email email, IReadOnlyCollection<IFormFile>? attachments, CancellationToken cancellationToken)
         {
             if (attachments is not { Count: > 0 })

@@ -1,6 +1,8 @@
-﻿using MailService.Application.DTOs.Drafts;
+﻿using MailService.Application.Common.Pagination;
+using MailService.Application.DTOs.Drafts;
 using MailService.Application.Mappers;
 using MailService.Application.Services.Interfaces;
+using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
 
 namespace MailService.Application.Services
@@ -75,6 +77,22 @@ namespace MailService.Application.Services
             }
 
             return draft.ToDto();
+        }
+
+        public async Task<CursorPagedResult<DraftDto>> GetAllPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
+        {
+            var cursor = query.ToCursor();
+            var pageSize = query.PageSize;
+
+            var drafts = await _draftRepository
+                .GetAllPagedAsync(userId, cursor, pageSize, cancellationToken);
+
+            return CursorPaginationHelper.Build(
+                drafts,
+                pageSize,
+                d => new Cursor(d.UpdatedAt, d.Id),
+                d => d.ToDto()
+            );
         }
     }
 }

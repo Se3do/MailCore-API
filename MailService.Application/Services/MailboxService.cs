@@ -1,6 +1,8 @@
-﻿using MailService.Application.DTOs.Mailbox;
+﻿using MailService.Application.Common.Pagination;
+using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
 using MailService.Application.Services.Interfaces;
+using MailService.Domain.Common;
 using MailService.Domain.Entities;
 using MailService.Domain.Interfaces;
 namespace MailService.Application.Services
@@ -10,7 +12,7 @@ namespace MailService.Application.Services
         private readonly IEmailRepository _emailRepository;
         private readonly IMailRecipientRepository _mailRecipientRepository;
         private readonly IUnitOfWork _unitOfWork;
-        public MailboxService(IMailRecipientRepository mailRecipientRepository, IUnitOfWork unitOfWork, IEmailRepository emailRepository)
+        public MailboxService(IEmailRepository emailRepository, IMailRecipientRepository mailRecipientRepository, IUnitOfWork unitOfWork)
         {
             _mailRecipientRepository = mailRecipientRepository;
             _unitOfWork = unitOfWork;
@@ -172,6 +174,103 @@ namespace MailService.Application.Services
         {
             var mails = await _mailRecipientRepository.GetByThreadAsync(userId, threadId, cancellationToken);
             return mails.Select(m => m.ToMailboxItemDto()).ToList();
+        }
+
+        public async Task<CursorPagedResult<MailboxItemDto>> GetInboxPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
+        {
+            var cursor = query.ToCursor();
+            var pageSize = query.PageSize;
+
+            var emails = await _mailRecipientRepository.GetInboxPagedAsync(userId, cursor, pageSize, cancellationToken);
+            return CursorPaginationHelper.Build(emails, pageSize,
+                e => new Cursor(e.ReceivedAt, e.Id),
+                e => e.ToMailboxItemDto());
+        }
+
+        public async Task<CursorPagedResult<MailboxItemDto>> GetUnreadPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
+        {
+            var cursor = query.ToCursor();
+            var pageSize = query.PageSize;
+
+            var emails = await _mailRecipientRepository
+                .GetUnreadPagedAsync(userId, cursor, pageSize, cancellationToken);
+
+            return CursorPaginationHelper.Build(
+                emails,
+                pageSize,
+                e => new Cursor(e.ReceivedAt, e.Id),
+                e => e.ToMailboxItemDto());
+        }
+
+        public async Task<CursorPagedResult<MailboxItemDto>> GetStarredPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
+        {
+            var cursor = query.ToCursor();
+            var pageSize = query.PageSize;
+
+            var emails = await _mailRecipientRepository
+                .GetStarredPagedAsync(userId, cursor, pageSize, cancellationToken);
+
+            return CursorPaginationHelper.Build(
+                emails,
+                pageSize,
+                e => new Cursor(e.ReceivedAt, e.Id),
+                e => e.ToMailboxItemDto());
+        }
+
+        public async Task<CursorPagedResult<MailboxItemDto>> GetSpamPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
+        {
+            var cursor = query.ToCursor();
+            var pageSize = query.PageSize;
+
+            var emails = await _mailRecipientRepository
+                .GetSpamPagedAsync(userId, cursor, pageSize, cancellationToken);
+
+            return CursorPaginationHelper.Build(
+                emails,
+                pageSize,
+                e => new Cursor(e.ReceivedAt, e.Id),
+                e => e.ToMailboxItemDto());
+        }
+
+        public async Task<CursorPagedResult<MailboxItemDto>> GetTrashPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
+        {
+            var cursor = query.ToCursor();
+            var pageSize = query.PageSize;
+
+            var emails = await _mailRecipientRepository
+                .GetDeletedPagedAsync(userId, cursor, pageSize, cancellationToken);
+
+            return CursorPaginationHelper.Build(
+                emails,
+                pageSize,
+                e => new Cursor(e.ReceivedAt, e.Id),
+                e => e.ToMailboxItemDto());
+        }
+
+        public async Task<CursorPagedResult<MailboxItemDto>> GetSentPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
+        {
+            var cursor = query.ToCursor();
+            var pageSize = query.PageSize;
+
+            var emails = await _emailRepository.GetSentPagedAsync(userId, cursor, pageSize, cancellationToken);
+            return CursorPaginationHelper.Build(emails, pageSize,
+                e => new Cursor(e.CreatedAt, e.Id),
+                e => ToSentMailboxItem(e));
+        }
+
+        public async Task<CursorPagedResult<MailboxItemDto>> GetByThreadPagedAsync(Guid userId, Guid threadId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
+        {
+            var cursor = query.ToCursor();
+            var pageSize = query.PageSize;
+
+            var emails = await _mailRecipientRepository
+                .GetByThreadPagedAsync(userId, threadId, cursor, pageSize, cancellationToken);
+
+            return CursorPaginationHelper.Build(
+                emails,
+                pageSize,
+                e => new Cursor(e.ReceivedAt, e.Id),
+                e => e.ToMailboxItemDto());
         }
 
         private static MailboxItemDto ToSentMailboxItem(Email email)
