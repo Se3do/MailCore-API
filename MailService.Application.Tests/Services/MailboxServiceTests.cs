@@ -19,7 +19,7 @@ public class MailboxServiceTests
 
     public MailboxServiceTests()
     {
-        _sut = new MailboxService(_mailRecipientRepo.Object, _unitOfWork.Object, _emailRepo.Object);
+        _sut = new MailboxService(_emailRepo.Object, _mailRecipientRepo.Object, _unitOfWork.Object);
     }
 
     [Fact]
