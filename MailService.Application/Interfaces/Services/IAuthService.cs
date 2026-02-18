@@ -6,6 +6,6 @@ namespace MailService.Application.Interfaces.Services
     {
         Task<AuthResultDto?> LoginAsync(string email, string password, CancellationToken cancellationToken);
 
-        Task<AuthResultDto> RegisterAsync(string email, string password, CancellationToken cancellationToken);
+        Task<AuthResultDto> RegisterAsync(string name, string email, string password, CancellationToken cancellationToken);
     }
 }

@@ -1,4 +1,5 @@
-﻿using MailService.Application.Services;
+﻿using MailService.Application.Interfaces.Services;
+using MailService.Application.Services;
 using MailService.Application.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ namespace MailService.Application
             services.AddScoped<IDraftService, DraftService>();
             services.AddScoped<IMailboxService, MailboxService>();
             services.AddScoped<ILabelService, LabelService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAttachmentService, AttachmentService>();
 
             return services;
         }

@@ -9,11 +9,13 @@ namespace MailService.Application.Services
     public class AuthService : IAuthService
     {
         IUserRepository _userRepository;
+        IUnitOfWork _unitOfWork;
         ITokenGenerator _tokenGenerator;
 
-        public AuthService(IUserRepository userRepository, ITokenGenerator tokenGenerator)
+        public AuthService(IUserRepository userRepository, IUnitOfWork unitOfWork, ITokenGenerator tokenGenerator)
         {
             _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
             _tokenGenerator = tokenGenerator;
         }
 
@@ -32,12 +34,12 @@ namespace MailService.Application.Services
             return new AuthResultDto(user.Id, token);
         }
 
-        public async Task<AuthResultDto> RegisterAsync(string email, string password, CancellationToken cancellationToken)
+        public async Task<AuthResultDto> RegisterAsync(string name, string email, string password, CancellationToken cancellationToken)
         {
-            var user = User.Create(email, password);
+            var user = User.Create(name, email, password);
 
             await _userRepository.AddAsync(user, cancellationToken);
-
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             var token = _tokenGenerator.Generate(user);
 
             return new AuthResultDto(user.Id, token);

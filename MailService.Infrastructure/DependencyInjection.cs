@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using MailService.Application.Interfaces.Persistence;
+﻿using MailService.Application.Interfaces.Persistence;
+using MailService.Application.Interfaces.Security;
 using MailService.Domain.Interfaces;
 using MailService.Infrastructure.Data.Context;
 using MailService.Infrastructure.Repositories;
+using MailService.Infrastructure.Security;
 using MailService.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +28,8 @@ namespace MailService.Infrastructure
             services.AddScoped<IMailRecipientRepository, MailRecipientRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IThreadRepository, ThreadRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
 
             // read file storage options from configuration without Binder dependency
             var useProjectDirStr = configuration["FileStorage:UseProjectDirectory"];

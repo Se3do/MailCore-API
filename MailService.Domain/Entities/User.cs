@@ -15,12 +15,14 @@ namespace MailService.Domain.Entities
         public ICollection<Label> Labels { get; set; } = new List<Label>();
         public ICollection<Draft> Drafts { get; set; } = new List<Draft>();
 
-        public static User Create(string email, string password)
+        public static User Create(string name, string email, string password)
         {
             return new User
             {
+                Name = name,
                 Email = email,
-                PasswordHash = PasswordHasher.Hash(password)
+                PasswordHash = PasswordHasher.Hash(password),
+                CreatedAt = DateTime.UtcNow
             };
         }
 
