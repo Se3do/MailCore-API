@@ -1,8 +1,6 @@
 ﻿using MailService.API.Contracts.Requests;
 using MailService.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MailService.API.Controllers
