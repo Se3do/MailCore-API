@@ -42,32 +42,39 @@ namespace MailService.Application.Services
             }
 
             var now = DateTime.UtcNow;
-            Domain.Entities.Thread? thread = request.ThreadId.HasValue
-                ? await _threadRepository.GetByIdAsync(request.ThreadId.Value, cancellationToken)
-                : new Domain.Entities.Thread
+            Domain.Entities.Thread? thread;
+
+            if (request.ThreadId.HasValue)
+            {
+                thread = await _threadRepository.GetByIdAsync(request.ThreadId.Value, cancellationToken);
+                if (thread is null)
+                {
+                    throw new KeyNotFoundException("Thread not found.");
+                }
+                thread.LastMessageAt = now;
+            }
+            else
+            {
+                thread = new Domain.Entities.Thread
                 {
                     Id = Guid.NewGuid(),
                     CreatedAt = now,
                     LastMessageAt = now
                 };
-
-            if (thread is null)
-            {
-                throw new KeyNotFoundException("Thread not found.");
+                // Persist the new thread before referencing it in the email
+                await _threadRepository.AddAsync(thread, cancellationToken);
             }
-
-            thread.LastMessageAt = now;
 
             var email = new Email
             {
                 Id = Guid.NewGuid(),
                 SenderId = userId,
-                Sender = sender,
+                //Sender = sender,
                 Subject = request.Subject,
                 Body = request.Body,
                 CreatedAt = now,
                 ThreadId = thread.Id,
-                Thread = request.ThreadId.HasValue ? null : thread,
+                //Thread = request.ThreadId.HasValue ? null : thread
             };
 
             await _emailRepository.AddAsync(email, cancellationToken);
@@ -86,7 +93,9 @@ namespace MailService.Application.Services
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return email.ToDto();
+            var savedEmail = await _emailRepository.GetByIdAsync(email.Id, cancellationToken);
+
+            return savedEmail.ToDto();
         }
         public async Task<EmailDto> ReplyAsync(Guid userId, Guid emailId, ReplyEmailRequest request, CancellationToken cancellationToken = default)
         {
@@ -234,7 +243,7 @@ namespace MailService.Application.Services
                 {
                     Id = Guid.NewGuid(),
                     UserId = user.Id,
-                    User = user,
+                    //User = user,
                     EmailId = email.Id,
                     Type = type,
                     IsRead = false,

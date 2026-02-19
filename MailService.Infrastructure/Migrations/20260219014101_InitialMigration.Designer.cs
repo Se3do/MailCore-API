@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MailService.Infrastructure.Migrations
 {
     [DbContext(typeof(MailServiceDbContext))]
-    [Migration("20260202141246_InitialMigration")]
+    [Migration("20260219014101_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -35,6 +35,9 @@ namespace MailService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("EmailId")
                         .HasColumnType("uniqueidentifier");
 
@@ -42,15 +45,12 @@ namespace MailService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
