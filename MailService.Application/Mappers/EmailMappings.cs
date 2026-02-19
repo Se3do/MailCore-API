@@ -48,7 +48,7 @@ public static class EmailMappings
     {
         var values = recipients
             .Where(r => r.Type == type)
-            .Select(r => r.User.Email)
+            .Select(r => r.User?.Email)
             .Where(email => !string.IsNullOrWhiteSpace(email))
             .ToList();
 
