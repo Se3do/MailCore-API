@@ -1,5 +1,7 @@
 ﻿using MailService.API.Extensions;
+using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Emails;
+using MailService.Application.Services;
 using MailService.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +43,24 @@ namespace MailService.API.Controllers
             await _emailService.ReplyAsync(userId, emailId, request, ct);
             return NoContent();
 
+        }
+
+        [HttpGet("sent")]
+        public async Task<IActionResult> GetSent([FromQuery] CursorPaginationQuery query, CancellationToken ct)
+        {
+            var userId = User.GetUserId();
+            var result = await _emailService.GetSentPagedAsync(userId, query, ct);
+            return Ok(result);
+        }
+
+        [HttpGet("sent/{emailId}")]
+        public async Task<IActionResult> GetSentDetail(Guid emailId, CancellationToken ct)
+        {
+            var userId = User.GetUserId();
+            var result = await _emailService.GetSentByIdAsync(userId, emailId, ct);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
     }
 }

@@ -48,7 +48,7 @@ namespace MailService.API.Controllers
         {
             var userId = User.GetUserId();
             var updated = await _draftService.UpdateAsync(userId, id, request, ct);
-            return updated is null ? NotFound() : NoContent();
+            return updated is false ? NotFound() : NoContent();
         }
 
         [HttpDelete("{id}")]
