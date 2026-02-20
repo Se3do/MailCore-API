@@ -1,4 +1,6 @@
-﻿namespace MailService.Application.Commands.Labels.DeleteLabel
+﻿using MediatR;
+
+namespace MailService.Application.Commands.Labels.DeleteLabel
 {
-    public record DeleteLabelCommand(Guid UserId, Guid LabelId);
+    public record DeleteLabelCommand(Guid UserId, Guid LabelId) : IRequest<bool>;
 }

@@ -1,8 +1,9 @@
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Mailbox.MarkSpam
 {
-    public class MarkMailSpamCommandHandler
+    public class MarkMailSpamCommandHandler: IRequestHandler<MarkMailSpamCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
         private readonly IUnitOfWork _uow;

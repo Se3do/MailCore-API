@@ -1,8 +1,9 @@
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Mailbox.MarkUnread
 {
-    public class MarkMailUnreadCommandHandler
+    public class MarkMailUnreadCommandHandler: IRequestHandler<MarkMailUnreadCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
         private readonly IUnitOfWork _uow;

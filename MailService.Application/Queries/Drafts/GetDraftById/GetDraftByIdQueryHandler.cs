@@ -2,10 +2,11 @@
 using MailService.Application.Mappers;
 using MailService.Domain.Entities;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Drafts.GetDraftById
 {
-    public class GetDraftByIdQueryHandler
+    public class GetDraftByIdQueryHandler: IRequestHandler<GetDraftByIdQuery, DraftDto?>
     {
         private readonly IDraftRepository _draftRepository;
 

@@ -2,10 +2,11 @@
 using MailService.Domain.Entities;
 using MailService.Domain.Enums;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Emails.ForwardEmail
 {
-    public class ForwardEmailCommandHandler
+    public class ForwardEmailCommandHandler : IRequestHandler<ForwardEmailCommand>
     {
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;
@@ -27,7 +28,7 @@ namespace MailService.Application.Commands.Emails.ForwardEmail
             _composer = composer;
         }
 
-        public async Task Handle(ForwardEmailCommand command, CancellationToken ct = default)
+        public async Task Handle(ForwardEmailCommand command, CancellationToken ct)
         {
             var original = await _emailRepository.GetByIdAsync(command.EmailId, ct)
                            ?? throw new KeyNotFoundException("Email not found.");

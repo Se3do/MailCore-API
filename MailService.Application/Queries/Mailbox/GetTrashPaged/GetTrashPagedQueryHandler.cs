@@ -1,13 +1,13 @@
 using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
-using MailService.Application.Queries.Mailbox.GetTrashPaged;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Mailbox.GetTrashPaged
 {
-    public class GetTrashPagedQueryHandler
+    public class GetTrashPagedQueryHandler : IRequestHandler<GetTrashPagedQuery, CursorPagedResult<MailboxItemDto>>
     {
         private readonly IMailRecipientRepository _repo;
 

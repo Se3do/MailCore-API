@@ -1,15 +1,9 @@
-﻿using MailService.Domain.Entities;
-using MailService.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Labels.DeleteLabel
 {
-    public class DeleteLabelCommandHandler
+    public class DeleteLabelCommandHandler : IRequestHandler<DeleteLabelCommand, bool>
     {
         private readonly ILabelRepository _labelRepository;
         private readonly IUnitOfWork _unitOfWork;

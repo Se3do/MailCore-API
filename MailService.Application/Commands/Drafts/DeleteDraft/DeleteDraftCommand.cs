@@ -1,4 +1,6 @@
-﻿namespace MailService.Application.Commands.Drafts.DeleteDraft
+﻿using MediatR;
+
+namespace MailService.Application.Commands.Drafts.DeleteDraft
 {
-    public record DeleteDraftCommand(Guid UserId, Guid DraftId);
+    public record DeleteDraftCommand(Guid UserId, Guid DraftId) : IRequest<bool>;
 }

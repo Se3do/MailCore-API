@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace MailService.Application.Commands.Labels.UpdateLabel
 {
-    public class UpdateLabelCommandHandler
+    public class UpdateLabelCommandHandler : IRequestHandler<UpdateLabelCommand, bool>
     {
         private readonly ILabelRepository _labelRepository;
         private readonly IUnitOfWork _unitOfWork;

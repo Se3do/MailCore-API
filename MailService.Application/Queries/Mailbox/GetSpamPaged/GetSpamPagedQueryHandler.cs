@@ -1,13 +1,13 @@
 using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
-using MailService.Application.Queries.Mailbox.GetSpamPaged;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Mailbox.GetSpamPaged
 {
-    public class GetSpamPagedQueryHandler
+    public class GetSpamPagedQueryHandler : IRequestHandler<GetSpamPagedQuery, CursorPagedResult<MailboxItemDto>>
     {
         private readonly IMailRecipientRepository _repo;
 

@@ -1,8 +1,9 @@
 ﻿using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Drafts.DeleteDraft
 {
-    public class DeleteDraftCommandHandler
+    public class DeleteDraftCommandHandler : IRequestHandler<DeleteDraftCommand, bool>
     {
         private readonly IDraftRepository _draftRepository;
         private readonly IUnitOfWork _unitOfWork;

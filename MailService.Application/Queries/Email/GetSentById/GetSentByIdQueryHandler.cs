@@ -1,10 +1,11 @@
 ﻿using MailService.Application.DTOs.Emails;
 using MailService.Application.Mappers;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Email.GetSentById
 {
-    public class GetSentByIdQueryHandler
+    public class GetSentByIdQueryHandler: IRequestHandler<GetSentByIdQuery, EmailDto?>
     {
         private readonly IEmailRepository _emailRepository;
         public GetSentByIdQueryHandler(IEmailRepository emailRepository)

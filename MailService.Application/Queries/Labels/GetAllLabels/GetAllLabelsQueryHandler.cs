@@ -1,17 +1,11 @@
 ﻿using MailService.Application.DTOs.Labels;
 using MailService.Application.Mappers;
-using MailService.Domain.Entities;
 using MailService.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using MediatR;
 
 namespace MailService.Application.Queries.Labels.GetAllLabels
 {
-    public class GetAllLabelsQueryHandler
+    public class GetAllLabelsQueryHandler: IRequestHandler<GetAllLabelsQuery, IReadOnlyList<LabelDto>>
     {
         private readonly ILabelRepository _labelRepository;
 

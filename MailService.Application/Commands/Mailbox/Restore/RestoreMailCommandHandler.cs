@@ -1,8 +1,9 @@
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Mailbox.Restore
 {
-    public class RestoreMailCommandHandler
+    public class RestoreMailCommandHandler: IRequestHandler<RestoreMailCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
         private readonly IUnitOfWork _uow;

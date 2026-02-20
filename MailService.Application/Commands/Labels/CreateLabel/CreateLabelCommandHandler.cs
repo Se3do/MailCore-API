@@ -1,13 +1,9 @@
-﻿using MailService.Application.Mappers;
-using MailService.Domain.Entities;
-using MailService.Domain.Interfaces;
+﻿using MailService.Domain.Interfaces;
 using MediatR;
-using System.Reflection.Metadata;
-using System.Threading;
 
 namespace MailService.Application.Commands.Labels.CreateLabel
 {
-    public class CreateLabelCommandHandler
+    public class CreateLabelCommandHandler : IRequestHandler<CreateLabelCommand, Guid>
     {
         private readonly ILabelRepository _labelRepository;
         private readonly IUnitOfWork _unitOfWork;

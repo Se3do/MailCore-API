@@ -2,10 +2,11 @@
 using MailService.Domain.Entities;
 using MailService.Domain.Enums;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Emails.ReplyEmail
 {
-    public class ReplyEmailCommandHandler
+    public class ReplyEmailCommandHandler: IRequestHandler<ReplyEmailCommand>
     {
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;
@@ -27,23 +28,20 @@ namespace MailService.Application.Commands.Emails.ReplyEmail
             _composer = composer;
         }
 
-        public async Task Handle(ReplyEmailCommand command, CancellationToken ct = default)
+        public async Task Handle(ReplyEmailCommand command, CancellationToken ct)
         {
             var original = await _emailRepository.GetByIdAsync(command.EmailId, ct)
-                           ?? throw new KeyNotFoundException("Email not found.");
-
-            var sender = await _userRepository.GetByIdAsync(command.UserId, ct)
-                         ?? throw new KeyNotFoundException("Sender not found.");
+                ?? throw new Exception("Email not found.");
 
             var toList = command.Request.To is { Count: > 0 }
                 ? command.Request.To
                 : await GetDefaultReplyRecipientsAsync(original, ct);
 
             if (toList.Count == 0)
-                throw new ArgumentException("At least one recipient is required.");
+                throw new Exception("At least one recipient is required.");
 
             var thread = await _threadRepository.GetByIdAsync(original.ThreadId, ct)
-                         ?? throw new KeyNotFoundException("Thread not found.");
+                ?? throw new Exception("Thread not found.");
 
             var now = DateTime.UtcNow;
             thread.LastMessageAt = now;
@@ -52,9 +50,7 @@ namespace MailService.Application.Commands.Emails.ReplyEmail
             {
                 Id = Guid.NewGuid(),
                 SenderId = command.UserId,
-                Subject = original.Subject.StartsWith("Re:", StringComparison.OrdinalIgnoreCase)
-                    ? original.Subject
-                    : $"Re: {original.Subject}",
+                Subject = BuildReplySubject(original.Subject),
                 Body = command.Request.Body,
                 CreatedAt = now,
                 ThreadId = thread.Id
@@ -83,5 +79,10 @@ namespace MailService.Application.Commands.Emails.ReplyEmail
                 ? new[] { sender.Email }
                 : Array.Empty<string>();
         }
+
+        private static string BuildReplySubject(string subject)
+            => subject.StartsWith("Re:", StringComparison.OrdinalIgnoreCase)
+                ? subject
+                : $"Re: {subject}";
     }
 }

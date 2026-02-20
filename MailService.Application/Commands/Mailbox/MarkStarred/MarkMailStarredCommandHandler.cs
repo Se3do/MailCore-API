@@ -1,8 +1,9 @@
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Mailbox.MarkStarred
 {
-    public class MarkMailStarredCommandHandler
+    public class MarkMailStarredCommandHandler: IRequestHandler<MarkMailStarredCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
         private readonly IUnitOfWork _uow;

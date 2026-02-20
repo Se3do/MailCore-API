@@ -1,8 +1,9 @@
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Mailbox.Unspam
 {
-    public class UnspamMailCommandHandler
+    public class UnspamMailCommandHandler: IRequestHandler<UnspamMailCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
         private readonly IUnitOfWork _uow;

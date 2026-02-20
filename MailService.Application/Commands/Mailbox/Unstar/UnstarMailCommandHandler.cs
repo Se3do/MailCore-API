@@ -1,8 +1,9 @@
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Mailbox.Unstar
 {
-    public class UnstarMailCommandHandler
+    public class UnstarMailCommandHandler: IRequestHandler<UnstarMailCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
         private readonly IUnitOfWork _uow;

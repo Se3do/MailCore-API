@@ -1,8 +1,9 @@
 ﻿using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Drafts.UpdateDraft
 {
-    public class UpdateDraftCommandHandler
+    public class UpdateDraftCommandHandler : IRequestHandler<UpdateDraftCommand, bool>
     {
         private readonly IDraftRepository _draftRepository;
         private readonly IUnitOfWork _unitOfWork;

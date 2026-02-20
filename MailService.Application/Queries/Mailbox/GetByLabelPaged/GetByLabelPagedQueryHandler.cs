@@ -3,15 +3,11 @@ using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediatR;
 
 namespace MailService.Application.Queries.Mailbox.GetByLabelPaged
 {
-    public class GetByLabelPagedQueryHandler
+    public class GetByLabelPagedQueryHandler : IRequestHandler<GetByLabelPagedQuery, CursorPagedResult<MailboxItemDto>>
     {
         private readonly IMailRecipientRepository _mailRecipientRepository;
 

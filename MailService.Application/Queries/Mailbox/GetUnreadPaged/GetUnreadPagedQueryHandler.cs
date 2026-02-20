@@ -1,13 +1,13 @@
 using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
-using MailService.Application.Queries.Mailbox.GetUnreadPaged;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Mailbox.GetUnreadPaged
 {
-    public class GetUnreadPagedQueryHandler
+    public class GetUnreadPagedQueryHandler : IRequestHandler<GetUnreadPagedQuery, CursorPagedResult<MailboxItemDto>>
     {
         private readonly IMailRecipientRepository _repo;
 

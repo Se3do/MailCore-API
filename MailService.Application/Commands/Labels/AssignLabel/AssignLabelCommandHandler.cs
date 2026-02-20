@@ -1,15 +1,12 @@
 ﻿using MailService.Application.Services.Interfaces;
 using MailService.Domain.Entities;
 using MailService.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MediatR;
+using System.Threading;
 
 namespace MailService.Application.Commands.Labels.AssignLabel
 {
-    public class AssignLabelCommandHandler
+    public class AssignLabelCommandHandler : IRequestHandler<AssignLabelCommand, bool>
     {
         private readonly ILabelRepository _labelRepository;
         private readonly IMailRecipientRepository _mailRecipientRepository;

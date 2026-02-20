@@ -1,13 +1,13 @@
 using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
-using MailService.Application.Queries.Mailbox.GetStarredPaged;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Mailbox.GetStarredPaged
 {
-    public class GetStarredPagedQueryHandler
+    public class GetStarredPagedQueryHandler : IRequestHandler<GetStarredPagedQuery, CursorPagedResult<MailboxItemDto>>
     {
         private readonly IMailRecipientRepository _repo;
 

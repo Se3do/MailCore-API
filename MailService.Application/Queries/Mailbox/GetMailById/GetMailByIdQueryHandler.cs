@@ -1,10 +1,11 @@
 using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Mailbox.GetMailById
 {
-    public class GetMailByIdQueryHandler
+    public class GetMailByIdQueryHandler : IRequestHandler<GetMailByIdQuery, MailboxDetailDto?>
     {
         private readonly IMailRecipientRepository _mailRecipientRepository;
 

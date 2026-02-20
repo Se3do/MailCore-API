@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MailService.Application.DTOs.Labels;
+using MediatR;
 
 namespace MailService.Application.Queries.Labels.GetAllLabels
 {
-    public record GetAllLabelsQuery(Guid UserId);
+    public record GetAllLabelsQuery(Guid UserId): IRequest<List<LabelDto>>;
 }

@@ -1,9 +1,10 @@
 ﻿using MailService.Domain.Entities;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Drafts.CreateDraft
 {
-    public class CreateDraftCommandHandler
+    public class CreateDraftCommandHandler : IRequestHandler<CreateDraftCommand, Guid>
     {
         private readonly IDraftRepository _draftRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -31,5 +32,4 @@ namespace MailService.Application.Commands.Drafts.CreateDraft
             return draft.Id;
         }
     }
-
 }

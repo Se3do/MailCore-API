@@ -1,13 +1,13 @@
 using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
-using MailService.Application.Services.Interfaces;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Mailbox.GetByThreadPaged
 {
-    public class GetByThreadPagedQueryHandler
+    public class GetByThreadPagedQueryHandler : IRequestHandler<GetByThreadPagedQuery, CursorPagedResult<MailboxItemDto>>
     {
         private readonly IMailRecipientRepository _mailRecipientRepository;
 

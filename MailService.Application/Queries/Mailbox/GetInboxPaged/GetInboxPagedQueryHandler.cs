@@ -3,10 +3,11 @@ using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Mailbox.GetInboxPaged
 {
-    public class GetInboxPagedQueryHandler
+    public class GetInboxPagedQueryHandler: IRequestHandler<GetInboxPagedQuery, CursorPagedResult<MailboxItemDto>>
     {
         private readonly IMailRecipientRepository _mailRecipientRepository;
 

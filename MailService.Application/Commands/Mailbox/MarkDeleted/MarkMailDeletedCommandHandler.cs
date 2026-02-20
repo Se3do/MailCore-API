@@ -1,8 +1,9 @@
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Mailbox.MarkDeleted
 {
-    public class MarkMailDeletedCommandHandler
+    public class MarkMailDeletedCommandHandler: IRequestHandler<MarkMailDeletedCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
         private readonly IUnitOfWork _uow;

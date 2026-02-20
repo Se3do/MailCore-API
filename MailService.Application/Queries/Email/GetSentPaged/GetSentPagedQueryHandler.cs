@@ -4,10 +4,11 @@ using MailService.Application.DTOs.Mailbox;
 using MailService.Application.Mappers;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Email.GetSentPaged
 {
-    public class GetSentPagedQueryHandler
+    public class GetSentPagedQueryHandler: IRequestHandler<GetSentPagedQuery, CursorPagedResult<EmailSummaryDto>>
     {
         private readonly IEmailRepository _emailRepository;
 

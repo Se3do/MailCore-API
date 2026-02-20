@@ -3,10 +3,11 @@ using MailService.Application.DTOs.Drafts;
 using MailService.Application.Mappers;
 using MailService.Domain.Common;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Queries.Drafts.GetDraftsPaged
 {
-    public class GetDraftsPagedQueryHandler
+    public class GetDraftsPagedQueryHandler : IRequestHandler<GetDraftsPagedQuery, CursorPagedResult<DraftDto>>
     {
         private readonly IDraftRepository _draftRepository;
 

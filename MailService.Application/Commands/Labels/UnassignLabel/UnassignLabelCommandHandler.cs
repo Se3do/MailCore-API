@@ -1,15 +1,9 @@
-﻿using MailService.Domain.Entities;
-using MailService.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Labels.UnassignLabel
 {
-    public class UnassignLabelCommandHandler
+    public class UnassignLabelCommandHandler : IRequestHandler<UnassignLabelCommand, bool>
     {
         private readonly IMailRecipientRepository _mailRecipientRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -42,6 +36,5 @@ namespace MailService.Application.Commands.Labels.UnassignLabel
             await _unitOfWork.SaveChangesAsync(ct);
             return true;
         }
-
     }
 }

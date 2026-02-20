@@ -3,10 +3,11 @@ using MailService.Application.Interfaces.Services;
 using MailService.Domain.Entities;
 using MailService.Domain.Enums;
 using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Emails.SendEmail
 {
-    public class SendEmailCommandHandler
+    public class SendEmailCommandHandler: IRequestHandler<SendEmailCommand>
     {
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;

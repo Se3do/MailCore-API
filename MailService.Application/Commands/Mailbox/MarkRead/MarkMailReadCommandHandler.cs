@@ -1,8 +1,9 @@
 ﻿using MailService.Domain.Interfaces;
+using MediatR;
 
 namespace MailService.Application.Commands.Mailbox.MarkRead
 {
-    public class MarkMailReadCommandHandler
+    public class MarkMailReadCommandHandler: IRequestHandler<MarkMailReadCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
         private readonly IUnitOfWork _uow;
