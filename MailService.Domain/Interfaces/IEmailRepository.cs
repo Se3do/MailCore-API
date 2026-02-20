@@ -7,8 +7,6 @@ namespace MailService.Domain.Interfaces
     {
         Task AddAsync(Email email, CancellationToken cancellationToken = default);
         Task<Email?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<List<Email>> GetSentAsync(Guid userId, CancellationToken cancellationToken = default);
-
         Task<List<Email>> GetSentPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default);
     }
 }

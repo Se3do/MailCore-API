@@ -27,16 +27,6 @@ namespace MailService.Infrastructure.Repositories
                 .Include(e => e.Attachments)
                 .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         }
-        public Task<List<Email>> GetSentAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            return _context.Emails
-                .AsNoTracking()
-                .Include(e => e.Sender)
-                .Include(e => e.Recipients)
-                    .ThenInclude(r => r.User)
-                .Where(e => e.SenderId == userId)
-                .ToListAsync(cancellationToken);
-        }
         public async Task<List<Email>> GetSentPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _context.Emails

@@ -38,14 +38,6 @@ namespace MailService.Infrastructure.Repositories
                 _context.Drafts.Remove(draft);
             }
         }
-        public async Task<IReadOnlyList<Draft>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            return await _context.Drafts
-                .AsNoTracking()
-                .Where(d => d.UserId == userId)
-                .OrderByDescending(d => d.UpdatedAt)
-                .ToListAsync(cancellationToken);
-        }
         public async Task<Draft?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _context.Drafts
