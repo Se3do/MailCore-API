@@ -69,10 +69,10 @@
             }
 
             [HttpGet("{mailRecipientId}")]
-            public async Task<IActionResult> GetById(Guid mailId, CancellationToken ct)
+            public async Task<IActionResult> GetById(Guid mailRecipientId, CancellationToken ct)
             {
                 var userId = User.GetUserId();
-                var result = await _mailboxService.GetMailByIdAsync(userId, mailId, ct);
+                var result = await _mailboxService.GetMailByIdAsync(userId, mailRecipientId, ct);
                 return result is null ? NotFound() : Ok(result);
             }
 
