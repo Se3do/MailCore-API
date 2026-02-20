@@ -4,6 +4,11 @@ using MailService.Application.Commands.Drafts.UpdateDraft;
 using MailService.Application.Commands.Emails.ForwardEmail;
 using MailService.Application.Commands.Emails.ReplyEmail;
 using MailService.Application.Commands.Emails.SendEmail;
+using MailService.Application.Commands.Labels.AssignLabel;
+using MailService.Application.Commands.Labels.CreateLabel;
+using MailService.Application.Commands.Labels.DeleteLabel;
+using MailService.Application.Commands.Labels.UnassignLabel;
+using MailService.Application.Commands.Labels.UpdateLabel;
 using MailService.Application.Commands.Mailbox.MarkDeleted;
 using MailService.Application.Commands.Mailbox.MarkRead;
 using MailService.Application.Commands.Mailbox.MarkSpam;
@@ -18,6 +23,7 @@ using MailService.Application.Queries.Drafts.GetDraftById;
 using MailService.Application.Queries.Drafts.GetDraftsPaged;
 using MailService.Application.Queries.Email.GetSentById;
 using MailService.Application.Queries.Email.GetSentPaged;
+using MailService.Application.Queries.Labels.GetAllLabels;
 using MailService.Application.Queries.Mailbox.GetByThreadPaged;
 using MailService.Application.Queries.Mailbox.GetInboxPaged;
 using MailService.Application.Queries.Mailbox.GetMailById;
@@ -88,6 +94,18 @@ namespace MailService.Application
             services.AddScoped<GetSpamPagedQueryHandler>();
             services.AddScoped<GetTrashPagedQueryHandler>();
             services.AddScoped<GetByThreadPagedQueryHandler>();
+
+            // ===================== MAILBOX COMMANDS =====================
+
+            services.AddScoped<CreateLabelCommandHandler>();
+            services.AddScoped<UpdateLabelCommandHandler>();
+            services.AddScoped<DeleteLabelCommandHandler>();
+            services.AddScoped<AssignLabelCommandHandler>();
+            services.AddScoped<UnassignLabelCommandHandler>();
+
+            // ===================== MAILBOX QUERIES =====================
+
+            services.AddScoped<GetAllLabelsQueryHandler>();
 
             return services;
         }
