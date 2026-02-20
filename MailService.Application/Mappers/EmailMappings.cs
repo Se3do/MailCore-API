@@ -40,8 +40,7 @@ public static class EmailMappings
             bcc,
             new DateTimeOffset(email.CreatedAt),
             email.ThreadId,
-            attachments,
-            labels ?? Array.Empty<LabelDto>());
+            attachments);
     }
 
     private static IReadOnlyList<string>? MapRecipients(IEnumerable<MailRecipient> recipients, RecipientType type, bool allowNull)

@@ -13,6 +13,5 @@ public sealed record EmailDto(
     IReadOnlyList<string>? Bcc,
     DateTimeOffset SentAt,
     Guid? ThreadId,
-    IReadOnlyList<AttachmentDto> Attachments,
-    IReadOnlyList<LabelDto> Labels
+    IReadOnlyList<AttachmentDto> Attachments
 );
