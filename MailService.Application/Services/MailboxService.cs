@@ -8,6 +8,7 @@ using MailService.Application.Commands.Mailbox.Unspam;
 using MailService.Application.Commands.Mailbox.Unstar;
 using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Mailbox;
+using MailService.Application.Queries.Mailbox.GetByLabelPaged;
 using MailService.Application.Queries.Mailbox.GetByThreadPaged;
 using MailService.Application.Queries.Mailbox.GetInboxPaged;
 using MailService.Application.Queries.Mailbox.GetMailById;
@@ -39,6 +40,7 @@ namespace MailService.Application.Services
         private readonly GetSpamPagedQueryHandler _getSpamPaged;
         private readonly GetTrashPagedQueryHandler _getTrashPaged;
         private readonly GetByThreadPagedQueryHandler _getByThreadPaged;
+        private readonly GetByLabelPagedQueryHandler _getByLabelPaged;
 
         public MailboxService(
             // Commands
@@ -58,7 +60,8 @@ namespace MailService.Application.Services
             GetStarredPagedQueryHandler getStarredPaged,
             GetSpamPagedQueryHandler getSpamPaged,
             GetTrashPagedQueryHandler getTrashPaged,
-            GetByThreadPagedQueryHandler getByThreadPaged)
+            GetByThreadPagedQueryHandler getByThreadPaged,
+            GetByLabelPagedQueryHandler getByLabelPaged)
         {
             _markRead = markRead;
             _markUnread = markUnread;
@@ -76,6 +79,7 @@ namespace MailService.Application.Services
             _getSpamPaged = getSpamPaged;
             _getTrashPaged = getTrashPaged;
             _getByThreadPaged = getByThreadPaged;
+            _getByLabelPaged = getByLabelPaged;
         }
 
         // ===================== COMMANDS =====================
@@ -132,5 +136,9 @@ namespace MailService.Application.Services
         public Task<CursorPagedResult<MailboxItemDto>> GetByThreadPagedAsync(
             Guid userId, Guid threadId, CursorPaginationQuery query, CancellationToken ct)
             => _getByThreadPaged.Handle(new(userId, threadId, query), ct);
+
+        public Task<CursorPagedResult<MailboxItemDto>> GetByLabelPagedAsync(
+            Guid userId, Guid label, CursorPaginationQuery query, CancellationToken ct)
+            => _getByLabelPaged.Handle(new(userId, label, query), ct);
     }
 }

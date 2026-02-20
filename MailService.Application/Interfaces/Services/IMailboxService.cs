@@ -22,4 +22,5 @@ public interface IMailboxService
     Task<CursorPagedResult<MailboxItemDto>> GetSpamPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default);
     Task<CursorPagedResult<MailboxItemDto>> GetTrashPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default);
     Task<CursorPagedResult<MailboxItemDto>> GetByThreadPagedAsync(Guid userId, Guid threadId, CursorPaginationQuery query, CancellationToken cancellationToken = default);
+    Task<CursorPagedResult<MailboxItemDto>> GetByLabelPagedAsync(Guid userId, Guid label, CursorPaginationQuery query, CancellationToken ct);
 }

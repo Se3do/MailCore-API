@@ -24,6 +24,7 @@ using MailService.Application.Queries.Drafts.GetDraftsPaged;
 using MailService.Application.Queries.Email.GetSentById;
 using MailService.Application.Queries.Email.GetSentPaged;
 using MailService.Application.Queries.Labels.GetAllLabels;
+using MailService.Application.Queries.Mailbox.GetByLabelPaged;
 using MailService.Application.Queries.Mailbox.GetByThreadPaged;
 using MailService.Application.Queries.Mailbox.GetInboxPaged;
 using MailService.Application.Queries.Mailbox.GetMailById;
@@ -94,6 +95,7 @@ namespace MailService.Application
             services.AddScoped<GetSpamPagedQueryHandler>();
             services.AddScoped<GetTrashPagedQueryHandler>();
             services.AddScoped<GetByThreadPagedQueryHandler>();
+            services.AddScoped<GetByLabelPagedQueryHandler>();
 
             // ===================== MAILBOX COMMANDS =====================
 

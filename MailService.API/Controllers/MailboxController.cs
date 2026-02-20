@@ -68,7 +68,15 @@
                 return Ok(result);
             }
 
-            [HttpGet("{mailRecipientId}")]
+            [HttpGet("label/{labelId}")]
+            public async Task<IActionResult> GetByLabel(Guid labelId, [FromQuery] CursorPaginationQuery query, CancellationToken ct)
+            {
+                var userId = User.GetUserId();
+                var result = await _mailboxService.GetByLabelPagedAsync(userId, labelId, query, ct);
+                return Ok(result);
+        }
+
+        [HttpGet("{mailRecipientId}")]
             public async Task<IActionResult> GetById(Guid mailRecipientId, CancellationToken ct)
             {
                 var userId = User.GetUserId();
