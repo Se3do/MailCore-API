@@ -20,6 +20,7 @@ namespace MailService.Infrastructure.Repositories
         public async Task<MailRecipient?> GetByUserAndEmailAsync(Guid UserId, Guid MailId, CancellationToken cancellationToken = default)
         {
             return await _context.MailRecipients
+                .AsTracking()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
                 .Include(mr => mr.Email)
@@ -35,9 +36,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr => mr.UserId == userId && mr.Labels.Any(l => l.LabelId == labelId))
                 .ToListAsync(cancellationToken);
         }
@@ -48,9 +46,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsSplitQuery()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr =>
                     mr.UserId == userId &&
                     mr.Labels.Any(l => l.LabelId == labelId) &&
@@ -69,9 +64,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr => mr.UserId == userId && mr.DeletedAt != null)
                 .ToListAsync(cancellationToken);
         }
@@ -82,9 +74,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsSplitQuery()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr =>
                     mr.UserId == userId &&
                     mr.DeletedAt != null &&
@@ -117,9 +106,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsSplitQuery()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr =>
                     mr.UserId == userId &&
                     (
@@ -138,9 +124,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr => mr.UserId == userId && mr.IsStarred)
                 .ToListAsync(cancellationToken);
         }
@@ -151,9 +134,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsSplitQuery()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr =>
                     mr.UserId == userId &&
                     mr.IsStarred &&
@@ -173,9 +153,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr => mr.UserId == userId && !mr.IsRead)
                 .ToListAsync(cancellationToken);
         }
@@ -186,9 +163,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsSplitQuery()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr =>
                     mr.UserId == userId &&
                     !mr.IsRead &&
@@ -205,6 +179,7 @@ namespace MailService.Infrastructure.Repositories
         public async Task<MailRecipient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _context.MailRecipients
+                .AsTracking()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
                 .Include(mr => mr.Email)
@@ -220,9 +195,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr => mr.UserId == userId && mr.Email.ThreadId == threadId)
                 .ToListAsync(cancellationToken);
         }
@@ -233,9 +205,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsSplitQuery()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr =>
                     mr.UserId == userId &&
                     mr.Email.ThreadId == threadId &&
@@ -255,9 +224,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr => mr.UserId == userId && mr.IsSpam)
                 .ToListAsync(cancellationToken);
         }
@@ -268,9 +234,6 @@ namespace MailService.Infrastructure.Repositories
                 .AsSplitQuery()
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
                 .Where(mr =>
                     mr.UserId == userId &&
                     mr.IsSpam &&

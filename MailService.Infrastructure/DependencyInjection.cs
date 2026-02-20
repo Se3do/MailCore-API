@@ -1,5 +1,7 @@
 ﻿using MailService.Application.Interfaces.Persistence;
 using MailService.Application.Interfaces.Security;
+using MailService.Application.Interfaces.Services;
+using MailService.Application.Services;
 using MailService.Domain.Interfaces;
 using MailService.Infrastructure.Data.Context;
 using MailService.Infrastructure.Repositories;
@@ -30,6 +32,7 @@ namespace MailService.Infrastructure
             services.AddScoped<IThreadRepository, ThreadRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
             services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
+            services.AddScoped<IAttachmentService, AttachmentService>();
 
             // read file storage options from configuration without Binder dependency
             var useProjectDirStr = configuration["FileStorage:UseProjectDirectory"];
