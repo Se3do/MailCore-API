@@ -16,15 +16,12 @@ namespace MailService.Application.Queries.Mailbox.GetUnreadPaged
             _repo = repo;
         }
 
-        public async Task<CursorPagedResult<MailboxItemDto>> Handle(
-            GetUnreadPagedQuery query,
-            CancellationToken ct)
+        public async Task<CursorPagedResult<MailboxItemDto>> Handle(GetUnreadPagedQuery query, CancellationToken ct)
         {
             var cursor = query.Pagination.ToCursor();
             var pageSize = query.Pagination.PageSize;
 
-            var mails = await _repo.GetUnreadPagedAsync(
-                query.UserId, cursor, pageSize, ct);
+            var mails = await _repo.GetUnreadPagedAsync(query.UserId, cursor, pageSize, ct);
 
             return CursorPaginationHelper.Build(
                 mails,

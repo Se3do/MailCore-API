@@ -21,8 +21,7 @@ namespace MailService.Application.Queries.Mailbox.GetSpamPaged
             var cursor = query.Pagination.ToCursor();
             var pageSize = query.Pagination.PageSize;
 
-            var mails = await _repo.GetSpamPagedAsync(
-                query.UserId, cursor, pageSize, ct);
+            var mails = await _repo.GetSpamPagedAsync(query.UserId, cursor, pageSize, ct);
 
             return CursorPaginationHelper.Build(
                 mails,

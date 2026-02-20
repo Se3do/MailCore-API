@@ -21,8 +21,7 @@ namespace MailService.Application.Queries.Mailbox.GetTrashPaged
             var cursor = query.Pagination.ToCursor();
             var pageSize = query.Pagination.PageSize;
 
-            var mails = await _repo.GetDeletedPagedAsync(
-                query.UserId, cursor, pageSize, ct);
+            var mails = await _repo.GetDeletedPagedAsync(query.UserId, cursor, pageSize, ct);
 
             return CursorPaginationHelper.Build(
                 mails,

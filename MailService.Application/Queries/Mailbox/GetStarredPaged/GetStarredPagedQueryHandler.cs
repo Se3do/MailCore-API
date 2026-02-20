@@ -21,8 +21,7 @@ namespace MailService.Application.Queries.Mailbox.GetStarredPaged
             var cursor = query.Pagination.ToCursor();
             var pageSize = query.Pagination.PageSize;
 
-            var mails = await _repo.GetStarredPagedAsync(
-                query.UserId, cursor, pageSize, ct);
+            var mails = await _repo.GetStarredPagedAsync(query.UserId, cursor, pageSize, ct);
 
             return CursorPaginationHelper.Build(
                 mails,

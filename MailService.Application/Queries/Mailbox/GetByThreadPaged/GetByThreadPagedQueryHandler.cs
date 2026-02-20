@@ -16,20 +16,13 @@ namespace MailService.Application.Queries.Mailbox.GetByThreadPaged
             _mailRecipientRepository = mailRecipientRepository;
         }
 
-        public async Task<CursorPagedResult<MailboxItemDto>> Handle(
-            GetByThreadPagedQuery query,
-            CancellationToken ct)
+        public async Task<CursorPagedResult<MailboxItemDto>> Handle(GetByThreadPagedQuery query, CancellationToken ct)
         {
             var cursor = query.Pagination.ToCursor();
             var pageSize = query.Pagination.PageSize;
 
             var mails = await _mailRecipientRepository
-                .GetByThreadPagedAsync(
-                    query.UserId,
-                    query.ThreadId,
-                    cursor,
-                    pageSize,
-                    ct);
+                .GetByThreadPagedAsync(query.UserId, query.ThreadId, cursor, pageSize, ct);
 
             return CursorPaginationHelper.Build(
                 mails,
