@@ -2,6 +2,5 @@
 
 namespace MailService.Application.Commands.Drafts.CreateDraft
 {
-    public record CreateDraftCommand(Guid UserId, CreateDraftRequest Request
-    );
+    public record CreateDraftCommand(Guid UserId, CreateDraftRequest Request);
 }

@@ -8,9 +8,7 @@ namespace MailService.Application.Commands.Drafts.CreateDraft
         private readonly IDraftRepository _draftRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CreateDraftCommandHandler(
-            IDraftRepository draftRepository,
-            IUnitOfWork unitOfWork)
+        public CreateDraftCommandHandler(IDraftRepository draftRepository, IUnitOfWork unitOfWork)
         {
             _draftRepository = draftRepository;
             _unitOfWork = unitOfWork;
