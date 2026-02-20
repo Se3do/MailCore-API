@@ -4,7 +4,6 @@ public sealed record MailboxItemDto(
     Guid MailRecipientId,
     Guid EmailId,
     string From,
-    IReadOnlyList<string> To,
     string Subject,
     string Preview,
     DateTimeOffset SentAt,

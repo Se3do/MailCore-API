@@ -1,98 +1,49 @@
-﻿using MailService.Application.Common.Pagination;
+﻿using MailService.Application.Commands.Drafts.CreateDraft;
+using MailService.Application.Commands.Drafts.DeleteDraft;
+using MailService.Application.Commands.Drafts.UpdateDraft;
+using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Drafts;
-using MailService.Application.Mappers;
+using MailService.Application.Queries.Drafts.GetDraftById;
+using MailService.Application.Queries.Drafts.GetDraftsPaged;
 using MailService.Application.Services.Interfaces;
-using MailService.Domain.Common;
-using MailService.Domain.Interfaces;
 
 namespace MailService.Application.Services
 {
     public class DraftService : IDraftService
     {
-        private readonly IDraftRepository _draftRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly CreateDraftCommandHandler _create;
+        private readonly UpdateDraftCommandHandler _update;
+        private readonly DeleteDraftCommandHandler _delete;
+        private readonly GetDraftByIdQueryHandler _getById;
+        private readonly GetDraftsPagedQueryHandler _getPaged;
 
-        public DraftService(IUnitOfWork unitOfWork, IDraftRepository draftRepository)
+        public DraftService(
+            CreateDraftCommandHandler create,
+            UpdateDraftCommandHandler update,
+            DeleteDraftCommandHandler delete,
+            GetDraftByIdQueryHandler getById,
+            GetDraftsPagedQueryHandler getPaged)
         {
-            _unitOfWork = unitOfWork;
-            _draftRepository = draftRepository;
+            _create = create;
+            _update = update;
+            _delete = delete;
+            _getById = getById;
+            _getPaged = getPaged;
         }
 
-        public async Task<DraftDto> CreateAsync(Guid userId, CreateDraftRequest request, CancellationToken cancellationToken = default)
-        {
-            var draft = new Domain.Entities.Draft
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Subject = request.Subject,
-                Body = request.Body,
-                ThreadId = request.ThreadId,
-                UpdatedAt = DateTime.UtcNow
-            };
-            await _draftRepository.AddAsync(draft, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return draft.ToDto();
-        }
-        public async Task<DraftDto> UpdateAsync(Guid userId, Guid draftId, UpdateDraftRequest request, CancellationToken cancellationToken = default)
-        {
-            var draft = await _draftRepository.GetByIdAsync(draftId, cancellationToken);
-            if (draft == null || draft.UserId != userId)
-            {
-                throw new KeyNotFoundException("Draft not found.");
-            }
+        public Task<CursorPagedResult<DraftDto>> GetAllPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken ct)
+            => _getPaged.Handle(new(userId, query), ct);
 
-            draft.Subject = request.Subject;
-            draft.Body = request.Body;
-            draft.UpdatedAt = DateTime.UtcNow;
+        public Task<DraftDto?> GetByIdAsync(Guid userId, Guid id, CancellationToken ct)
+            => _getById.Handle(new(userId, id), ct);
 
-            await _draftRepository.UpdateAsync(draftId, draft, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return draft.ToDto();
-        }
-        public async Task<bool> DeleteAsync(Guid userId, Guid draftId, CancellationToken cancellationToken = default)
-        {
-            var draft = await _draftRepository.GetByIdAsync(draftId, cancellationToken);
-            if (draft == null || draft.UserId != userId)
-            {
-                return false;
-            }
+        public Task<Guid> CreateAsync(Guid userId, CreateDraftRequest request, CancellationToken ct)
+            => _create.Handle(new(userId, request), ct);
 
-            await _draftRepository.DeleteAsync(draftId, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return true;
-        }
+        public Task<bool> UpdateAsync(Guid userId, Guid id, UpdateDraftRequest request, CancellationToken ct)
+            => _update.Handle(new(userId, id, request), ct);
 
-        public async Task<IReadOnlyList<DraftDto>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            var drafts = await _draftRepository.GetAllAsync(userId, cancellationToken);
-            return drafts.Select(draft => draft.ToDto()).ToList();
-        }
-
-        public async Task<DraftDto?> GetByIdAsync(Guid userId, Guid draftId, CancellationToken cancellationToken = default)
-        {
-            var draft = await _draftRepository.GetByIdAsync(draftId, cancellationToken);
-            if (draft == null || draft.UserId != userId)
-            {
-                return null;
-            }
-
-            return draft.ToDto();
-        }
-
-        public async Task<CursorPagedResult<DraftDto>> GetAllPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken cancellationToken = default)
-        {
-            var cursor = query.ToCursor();
-            var pageSize = query.PageSize;
-
-            var drafts = await _draftRepository
-                .GetAllPagedAsync(userId, cursor, pageSize, cancellationToken);
-
-            return CursorPaginationHelper.Build(
-                drafts,
-                pageSize,
-                d => new Cursor(d.UpdatedAt, d.Id),
-                d => d.ToDto()
-            );
-        }
+        public Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct)
+            => _delete.Handle(new(userId, id), ct);
     }
 }

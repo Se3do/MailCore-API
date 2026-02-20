@@ -1,266 +1,50 @@
-﻿using MailService.Application.DTOs.Emails;
-using MailService.Application.Interfaces.Services;
-using MailService.Application.Mappers;
+﻿using MailService.Application.Commands.Emails.ForwardEmail;
+using MailService.Application.Commands.Emails.ReplyEmail;
+using MailService.Application.Commands.Emails.SendEmail;
+using MailService.Application.Common.Pagination;
+using MailService.Application.DTOs.Emails;
+using MailService.Application.Queries.Email.GetSentById;
+using MailService.Application.Queries.Email.GetSentPaged;
 using MailService.Application.Services.Interfaces;
-using MailService.Domain.Entities;
-using MailService.Domain.Enums;
-using MailService.Domain.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace MailService.Application.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly IEmailRepository _emailRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IMailRecipientRepository _mailRecipientRepository;
-        private readonly IThreadRepository _threadRepository;
-        private readonly IAttachmentService _attachmentService;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly SendEmailCommandHandler _send;
+        private readonly ReplyEmailCommandHandler _reply;
+        private readonly ForwardEmailCommandHandler _forward;
+        private readonly GetSentPagedQueryHandler _getSentPaged;
+        private readonly GetSentByIdQueryHandler _getSentById;
 
-        public EmailService(IEmailRepository emailRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, IMailRecipientRepository mailRecipientRepository, IThreadRepository threadRepository, IAttachmentService attachmentService)
+        public EmailService(
+            SendEmailCommandHandler send,
+            ReplyEmailCommandHandler reply,
+            ForwardEmailCommandHandler forward,
+            GetSentPagedQueryHandler getSentPaged,
+            GetSentByIdQueryHandler getSentById)
         {
-            _emailRepository = emailRepository;
-            _unitOfWork = unitOfWork;
-            _userRepository = userRepository;
-            _mailRecipientRepository = mailRecipientRepository;
-            _threadRepository = threadRepository;
-            _attachmentService = attachmentService;
+            _send = send;
+            _reply = reply;
+            _forward = forward;
+            _getSentPaged = getSentPaged;
+            _getSentById = getSentById;
         }
 
-        public async Task<EmailDto> SendAsync(Guid userId, SendEmailRequest request, CancellationToken cancellationToken = default)
-        {
-            if (request.To is null || request.To.Count == 0)
-            {
-                throw new ArgumentException("At least one recipient is required.", nameof(request.To));
-            }
+        public Task SendAsync(Guid userId, SendEmailRequest request, CancellationToken ct)
+            => _send.Handle(new SendEmailCommand(userId, request), ct);
 
-            var sender = await _userRepository.GetByIdAsync(userId, cancellationToken);
-            if (sender == null)
-            {
-                throw new KeyNotFoundException("Sender not found.");
-            }
+        public Task ReplyAsync(Guid userId, Guid emailId, ReplyEmailRequest request, CancellationToken ct)
+            => _reply.Handle(new ReplyEmailCommand(userId, emailId, request), ct);
 
-            var now = DateTime.UtcNow;
-            Domain.Entities.Thread? thread;
+        public Task ForwardAsync(Guid userId, Guid emailId, ForwardEmailRequest request, CancellationToken ct)
+            => _forward.Handle(new ForwardEmailCommand(userId, emailId, request), ct);
 
-            if (request.ThreadId.HasValue)
-            {
-                thread = await _threadRepository.GetByIdAsync(request.ThreadId.Value, cancellationToken);
-                if (thread is null)
-                {
-                    throw new KeyNotFoundException("Thread not found.");
-                }
-                thread.LastMessageAt = now;
-            }
-            else
-            {
-                thread = new Domain.Entities.Thread
-                {
-                    Id = Guid.NewGuid(),
-                    CreatedAt = now,
-                    LastMessageAt = now
-                };
-                // Persist the new thread before referencing it in the email
-                await _threadRepository.AddAsync(thread, cancellationToken);
-            }
+        public Task<CursorPagedResult<EmailSummaryDto>> GetSentPagedAsync(Guid userId, CursorPaginationQuery query, CancellationToken ct)
+            => _getSentPaged.Handle(new GetSentPagedQuery(userId, query), ct);
 
-            var email = new Email
-            {
-                Id = Guid.NewGuid(),
-                SenderId = userId,
-                //Sender = sender,
-                Subject = request.Subject,
-                Body = request.Body,
-                CreatedAt = now,
-                ThreadId = thread.Id,
-                //Thread = request.ThreadId.HasValue ? null : thread
-            };
-
-            await _emailRepository.AddAsync(email, cancellationToken);
-
-            await HandleAttachmentsAsync(email, request.Attachments, cancellationToken);
-
-            await AddRecipientsAsync(email, request.To, RecipientType.To, now, cancellationToken);
-            if (request.Cc is { Count: > 0 })
-            {
-                await AddRecipientsAsync(email, request.Cc, RecipientType.Cc, now, cancellationToken);
-            }
-            if (request.Bcc is { Count: > 0 })
-            {
-                await AddRecipientsAsync(email, request.Bcc, RecipientType.Bcc, now, cancellationToken);
-            }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            var savedEmail = await _emailRepository.GetByIdAsync(email.Id, cancellationToken);
-
-            return savedEmail.ToDto();
-        }
-        public async Task<EmailDto> ReplyAsync(Guid userId, Guid emailId, ReplyEmailRequest request, CancellationToken cancellationToken = default)
-        {
-            var original = await _emailRepository.GetByIdAsync(emailId, cancellationToken);
-            if (original == null)
-            {
-                throw new KeyNotFoundException("Email not found.");
-            }
-
-            var sender = await _userRepository.GetByIdAsync(userId, cancellationToken);
-            if (sender == null)
-            {
-                throw new KeyNotFoundException("Sender not found.");
-            }
-
-            var toList = request.To is { Count: > 0 }
-                ? request.To
-                : await GetDefaultReplyRecipientsAsync(original, cancellationToken);
-
-            if (toList.Count == 0)
-            {
-                throw new ArgumentException("At least one recipient is required.", nameof(request.To));
-            }
-
-            var now = DateTime.UtcNow;
-            Domain.Entities.Thread? thread = await _threadRepository.GetByIdAsync(original.ThreadId, cancellationToken);
-            if (thread is null)
-            {
-                throw new KeyNotFoundException("Thread not found.");
-            }
-
-            thread.LastMessageAt = now;
-
-            var email = new Email
-            {
-                Id = Guid.NewGuid(),
-                SenderId = userId,
-                Sender = sender,
-                Subject = original.Subject.StartsWith("Re:", StringComparison.OrdinalIgnoreCase)
-                    ? original.Subject
-                    : $"Re: {original.Subject}",
-                Body = request.Body,
-                CreatedAt = now,
-                ThreadId = thread.Id,
-            };
-
-            await _emailRepository.AddAsync(email, cancellationToken);
-
-            await HandleAttachmentsAsync(email, request.Attachments, cancellationToken);
-
-            await AddRecipientsAsync(email, toList, RecipientType.To, now, cancellationToken);
-            if (request.Cc is { Count: > 0 })
-            {
-                await AddRecipientsAsync(email, request.Cc, RecipientType.Cc, now, cancellationToken);
-            }
-            if (request.Bcc is { Count: > 0 })
-            {
-                await AddRecipientsAsync(email, request.Bcc, RecipientType.Bcc, now, cancellationToken);
-            }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return email.ToDto();
-        }
-        public async Task<EmailDto> ForwardAsync(Guid userId, Guid emailId, ForwardEmailRequest request, CancellationToken cancellationToken = default)
-        {
-            var original = await _emailRepository.GetByIdAsync(emailId, cancellationToken);
-            if (original == null)
-            {
-                throw new KeyNotFoundException("Email not found.");
-            }
-
-            if (request.To is null || request.To.Count == 0)
-            {
-                throw new ArgumentException("At least one recipient is required.", nameof(request.To));
-            }
-
-            var sender = await _userRepository.GetByIdAsync(userId, cancellationToken);
-            if (sender == null)
-            {
-                throw new KeyNotFoundException("Sender not found.");
-            }
-
-            var now = DateTime.UtcNow;
-            var thread = new Domain.Entities.Thread
-            {
-                Id = Guid.NewGuid(),
-                CreatedAt = now,
-                LastMessageAt = now
-            };
-
-            var email = new Email
-            {
-                Id = Guid.NewGuid(),
-                SenderId = userId,
-                Sender = sender,
-                Subject = original.Subject.StartsWith("Fwd:", StringComparison.OrdinalIgnoreCase)
-                    ? original.Subject
-                    : $"Fwd: {original.Subject}",
-                Body = request.Body,
-                CreatedAt = now,
-                ThreadId = thread.Id,
-                Thread = thread,
-            };
-
-            await _emailRepository.AddAsync(email, cancellationToken);
-
-            await HandleAttachmentsAsync(email, request.Attachments, cancellationToken);
-
-            await AddRecipientsAsync(email, request.To, RecipientType.To, now, cancellationToken);
-            if (request.Cc is { Count: > 0 })
-            {
-                await AddRecipientsAsync(email, request.Cc, RecipientType.Cc, now, cancellationToken);
-            }
-            if (request.Bcc is { Count: > 0 })
-            {
-                await AddRecipientsAsync(email, request.Bcc, RecipientType.Bcc, now, cancellationToken);
-            }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return email.ToDto();
-        }
-        
-        private async Task<IReadOnlyList<string>> GetDefaultReplyRecipientsAsync(Email original, CancellationToken cancellationToken)
-        {
-            var originalSender = await _userRepository.GetByIdAsync(original.SenderId, cancellationToken);
-            if (originalSender == null)
-            {
-                return Array.Empty<string>();
-            }
-
-            return new[] { originalSender.Email };
-        }
-        private async Task AddRecipientsAsync(Email email, IEnumerable<string> recipients, RecipientType type, DateTime receivedAt, CancellationToken cancellationToken)
-        {
-            foreach (var address in recipients.Where(r => !string.IsNullOrWhiteSpace(r)).Distinct(StringComparer.OrdinalIgnoreCase))
-            {
-                var user = await _userRepository.GetByEmailAsync(address, cancellationToken);
-                if (user == null)
-                {
-                    throw new KeyNotFoundException($"Recipient not found: {address}");
-                }
-                await _mailRecipientRepository.AddAsync(new MailRecipient
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = user.Id,
-                    //User = user,
-                    EmailId = email.Id,
-                    Type = type,
-                    IsRead = false,
-                    IsSpam = false,
-                    IsStarred = false,
-                    ReceivedAt = receivedAt
-                });
-            }
-        }
-        private async Task HandleAttachmentsAsync(Email email, IReadOnlyCollection<IFormFile>? attachments, CancellationToken cancellationToken)
-        {
-            if (attachments is not { Count: > 0 })
-                return;
-
-            await _attachmentService.AddAsync(email, attachments, cancellationToken);
-            email.HasAttachments = true;
-        }
-
+        public Task<EmailDto?> GetSentByIdAsync(Guid userId, Guid emailId, CancellationToken ct)
+            => _getSentById.Handle(new GetSentByIdQuery(userId, emailId), ct);
     }
+
 }

@@ -7,11 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Commands\Drafts\SendDraft\" />
     <Folder Include="Exceptions\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="MediatR" Version="14.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.23" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.23">

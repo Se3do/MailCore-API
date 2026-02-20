@@ -34,7 +34,7 @@ public static class EmailMappings
             email.Id,
             email.Subject,
             email.Body,
-            email.Sender.Email,
+            email.Sender?.Email,
             to,
             cc,
             bcc,

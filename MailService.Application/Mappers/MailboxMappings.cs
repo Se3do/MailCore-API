@@ -13,7 +13,6 @@ public static class MailboxMappings
             mailRecipient.Id,
             email.Id,
             email.Sender.Email,
-            EmailMappings.ToDto(email).To,
             email.Subject,
             EmailMappings.ToSummaryDto(email).Preview,
             new DateTimeOffset(email.CreatedAt),

@@ -8,9 +8,9 @@ namespace MailService.Application.Services
 {
     public class AuthService : IAuthService
     {
-        IUserRepository _userRepository;
-        IUnitOfWork _unitOfWork;
-        ITokenGenerator _tokenGenerator;
+        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ITokenGenerator _tokenGenerator;
 
         public AuthService(IUserRepository userRepository, IUnitOfWork unitOfWork, ITokenGenerator tokenGenerator)
         {
