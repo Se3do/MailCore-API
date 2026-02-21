@@ -21,7 +21,6 @@ namespace MailService.Application.Commands.Mailbox.Restore
                 return false;
 
             mr.DeletedAt = null;
-            await _uow.SaveChangesAsync(ct);
             return true;
         }
     }

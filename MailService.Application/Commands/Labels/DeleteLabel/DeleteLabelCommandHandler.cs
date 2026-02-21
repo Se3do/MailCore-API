@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Labels.DeleteLabel
     public class DeleteLabelCommandHandler : IRequestHandler<DeleteLabelCommand, bool>
     {
         private readonly ILabelRepository _labelRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteLabelCommandHandler(ILabelRepository labelRepository, IUnitOfWork unitOfWork)
+        public DeleteLabelCommandHandler(ILabelRepository labelRepository)
         {
             this._labelRepository = labelRepository;
-            this._unitOfWork = unitOfWork;
         }
 
         public async Task<bool> Handle(DeleteLabelCommand command, CancellationToken ct)
@@ -25,7 +23,6 @@ namespace MailService.Application.Commands.Labels.DeleteLabel
             }
 
             await _labelRepository.DeleteAsync(labelId, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
 
             return true;
         }

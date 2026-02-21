@@ -12,20 +12,17 @@ namespace MailService.Application.Commands.Emails.SendEmail
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;
         private readonly IThreadRepository _threadRepository;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly EmailComposer _emailComposer;
 
         public SendEmailCommandHandler(
             IEmailRepository emailRepository,
             IUserRepository userRepository,
             IThreadRepository threadRepository,
-            IUnitOfWork unitOfWork,
             EmailComposer emailComposer)
         {
             _emailRepository = emailRepository;
             _userRepository = userRepository;
             _threadRepository = threadRepository;
-            _unitOfWork = unitOfWork;
             _emailComposer = emailComposer;
         }
 
@@ -72,8 +69,6 @@ namespace MailService.Application.Commands.Emails.SendEmail
             {
                 await _emailComposer.AddRecipientsAsync(email, request.Bcc, RecipientType.Bcc, now, cancellationToken);
             }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
         private async Task<Domain.Entities.Thread> GetOrCreateThreadAsync(Guid? threadId, DateTime now, CancellationToken ct)

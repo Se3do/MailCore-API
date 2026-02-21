@@ -8,12 +8,10 @@ namespace MailService.Application.Commands.Labels.UpdateLabel
     public class UpdateLabelCommandHandler : IRequestHandler<UpdateLabelCommand, bool>
     {
         private readonly ILabelRepository _labelRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateLabelCommandHandler(ILabelRepository labelRepository, IUnitOfWork unitOfWork)
+        public UpdateLabelCommandHandler(ILabelRepository labelRepository)
         {
             _labelRepository = labelRepository;
-            _unitOfWork = unitOfWork;
         }
         public async Task<bool> Handle(UpdateLabelCommand command, CancellationToken ct)
         {
@@ -29,7 +27,6 @@ namespace MailService.Application.Commands.Labels.UpdateLabel
             label.Color = request.Color ?? string.Empty;
 
             await _labelRepository.UpdateAsync(labelId, label, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
 
             return true;
         }

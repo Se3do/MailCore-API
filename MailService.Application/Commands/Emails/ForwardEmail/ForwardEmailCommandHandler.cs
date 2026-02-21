@@ -11,20 +11,17 @@ namespace MailService.Application.Commands.Emails.ForwardEmail
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;
         private readonly IThreadRepository _threadRepository;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly EmailComposer _composer;
 
         public ForwardEmailCommandHandler(
             IEmailRepository emailRepository,
             IUserRepository userRepository,
             IThreadRepository threadRepository,
-            IUnitOfWork unitOfWork,
             EmailComposer composer)
         {
             _emailRepository = emailRepository;
             _userRepository = userRepository;
             _threadRepository = threadRepository;
-            _unitOfWork = unitOfWork;
             _composer = composer;
         }
 
@@ -72,8 +69,6 @@ namespace MailService.Application.Commands.Emails.ForwardEmail
 
             if (command.Request.Bcc?.Any() == true)
                 await _composer.AddRecipientsAsync(email, command.Request.Bcc, RecipientType.Bcc, now, ct);
-
-            await _unitOfWork.SaveChangesAsync(ct);
         }
     }
 }

@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Mailbox.MarkDeleted
     public class MarkMailDeletedCommandHandler: IRequestHandler<MarkMailDeletedCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
-        private readonly IUnitOfWork _uow;
 
-        public MarkMailDeletedCommandHandler(IMailRecipientRepository repo, IUnitOfWork uow)
+        public MarkMailDeletedCommandHandler(IMailRecipientRepository repo)
         {
             _repo = repo;
-            _uow = uow;
         }
 
         public async Task<bool> Handle(MarkMailDeletedCommand cmd, CancellationToken ct)
@@ -21,7 +19,6 @@ namespace MailService.Application.Commands.Mailbox.MarkDeleted
                 return false;
 
             mr.DeletedAt = DateTime.UtcNow;
-            await _uow.SaveChangesAsync(ct);
             return true;
         }
     }

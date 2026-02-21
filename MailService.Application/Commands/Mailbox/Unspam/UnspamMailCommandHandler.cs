@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Mailbox.Unspam
     public class UnspamMailCommandHandler: IRequestHandler<UnspamMailCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
-        private readonly IUnitOfWork _uow;
 
-        public UnspamMailCommandHandler(IMailRecipientRepository repo, IUnitOfWork uow)
+        public UnspamMailCommandHandler(IMailRecipientRepository repo)
         {
             _repo = repo;
-            _uow = uow;
         }
 
         public async Task<bool> Handle(UnspamMailCommand cmd, CancellationToken ct)
@@ -21,7 +19,6 @@ namespace MailService.Application.Commands.Mailbox.Unspam
                 return false;
 
             mr.IsSpam = false;
-            await _uow.SaveChangesAsync(ct);
             return true;
         }
     }

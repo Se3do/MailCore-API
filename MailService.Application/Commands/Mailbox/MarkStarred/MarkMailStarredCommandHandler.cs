@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Mailbox.MarkStarred
     public class MarkMailStarredCommandHandler: IRequestHandler<MarkMailStarredCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
-        private readonly IUnitOfWork _uow;
 
-        public MarkMailStarredCommandHandler(IMailRecipientRepository repo, IUnitOfWork uow)
+        public MarkMailStarredCommandHandler(IMailRecipientRepository repo)
         {
             _repo = repo;
-            _uow = uow;
         }
 
         public async Task<bool> Handle(MarkMailStarredCommand cmd, CancellationToken ct)
@@ -21,7 +19,6 @@ namespace MailService.Application.Commands.Mailbox.MarkStarred
                 return false;
 
             mr.IsStarred = true;
-            await _uow.SaveChangesAsync(ct);
             return true;
         }
     }

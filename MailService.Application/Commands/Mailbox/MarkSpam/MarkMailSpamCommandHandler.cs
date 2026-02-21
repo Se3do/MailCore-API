@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Mailbox.MarkSpam
     public class MarkMailSpamCommandHandler: IRequestHandler<MarkMailSpamCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
-        private readonly IUnitOfWork _uow;
 
-        public MarkMailSpamCommandHandler(IMailRecipientRepository repo, IUnitOfWork uow)
+        public MarkMailSpamCommandHandler(IMailRecipientRepository repo)
         {
             _repo = repo;
-            _uow = uow;
         }
 
         public async Task<bool> Handle(MarkMailSpamCommand cmd, CancellationToken ct)
@@ -21,7 +19,6 @@ namespace MailService.Application.Commands.Mailbox.MarkSpam
                 return false;
 
             mr.IsSpam = true;
-            await _uow.SaveChangesAsync(ct);
             return true;
         }
     }

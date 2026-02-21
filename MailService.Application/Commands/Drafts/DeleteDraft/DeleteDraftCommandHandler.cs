@@ -6,14 +6,11 @@ namespace MailService.Application.Commands.Drafts.DeleteDraft
     public class DeleteDraftCommandHandler : IRequestHandler<DeleteDraftCommand, bool>
     {
         private readonly IDraftRepository _draftRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
         public DeleteDraftCommandHandler(
-            IDraftRepository draftRepository,
-            IUnitOfWork unitOfWork)
+            IDraftRepository draftRepository)
         {
             _draftRepository = draftRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<bool> Handle(DeleteDraftCommand command, CancellationToken ct)
@@ -23,7 +20,6 @@ namespace MailService.Application.Commands.Drafts.DeleteDraft
                 return false;
 
             await _draftRepository.DeleteAsync(command.DraftId, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
             return true;
         }
     }

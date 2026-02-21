@@ -6,14 +6,11 @@ namespace MailService.Application.Commands.Drafts.UpdateDraft
     public class UpdateDraftCommandHandler : IRequestHandler<UpdateDraftCommand, bool>
     {
         private readonly IDraftRepository _draftRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
         public UpdateDraftCommandHandler(
-            IDraftRepository draftRepository,
-            IUnitOfWork unitOfWork)
+            IDraftRepository draftRepository)
         {
             _draftRepository = draftRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<bool> Handle(UpdateDraftCommand command, CancellationToken ct)
@@ -26,7 +23,8 @@ namespace MailService.Application.Commands.Drafts.UpdateDraft
             draft.Body = command.Request.Body;
             draft.UpdatedAt = DateTime.UtcNow;
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            await _draftRepository.UpdateAsync(command.DraftId, draft, ct);
+
             return true;
         }
     }

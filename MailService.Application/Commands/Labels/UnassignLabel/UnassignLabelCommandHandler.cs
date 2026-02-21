@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Labels.UnassignLabel
     public class UnassignLabelCommandHandler : IRequestHandler<UnassignLabelCommand, bool>
     {
         private readonly IMailRecipientRepository _mailRecipientRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public UnassignLabelCommandHandler(IMailRecipientRepository mailRecipientRepository, IUnitOfWork unitOfWork)
+        public UnassignLabelCommandHandler(IMailRecipientRepository mailRecipientRepository)
         {
             _mailRecipientRepository = mailRecipientRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<bool> Handle(UnassignLabelCommand command, CancellationToken ct)
@@ -33,7 +31,6 @@ namespace MailService.Application.Commands.Labels.UnassignLabel
             }
 
             mailRecipient.Labels.Remove(link);
-            await _unitOfWork.SaveChangesAsync(ct);
             return true;
         }
     }

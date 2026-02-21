@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Labels.CreateLabel
     public class CreateLabelCommandHandler : IRequestHandler<CreateLabelCommand, Guid>
     {
         private readonly ILabelRepository _labelRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateLabelCommandHandler(ILabelRepository labelRepository, IUnitOfWork unitOfWork)
+        public CreateLabelCommandHandler(ILabelRepository labelRepository)
         {
             this._labelRepository = labelRepository;
-            this._unitOfWork = unitOfWork;
         }
 
         public async Task<Guid> Handle(CreateLabelCommand command, CancellationToken ct)
@@ -26,7 +24,6 @@ namespace MailService.Application.Commands.Labels.CreateLabel
                 Color = request.Color ?? string.Empty
             };
             await _labelRepository.AddAsync(label, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
             return label.Id;
         }
     }

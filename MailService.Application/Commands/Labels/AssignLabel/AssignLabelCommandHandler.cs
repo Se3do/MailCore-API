@@ -1,6 +1,6 @@
-﻿using MailService.Application.Services.Interfaces;
-using MailService.Domain.Entities;
+﻿using MailService.Domain.Entities;
 using MailService.Domain.Interfaces;
+using MailService.Application.Interfaces.Services;
 using MediatR;
 using System.Threading;
 
@@ -10,13 +10,11 @@ namespace MailService.Application.Commands.Labels.AssignLabel
     {
         private readonly ILabelRepository _labelRepository;
         private readonly IMailRecipientRepository _mailRecipientRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public AssignLabelCommandHandler(ILabelRepository labelRepository, IMailRecipientRepository mailRecipientRepository, IUnitOfWork unitOfWork)
+        public AssignLabelCommandHandler(ILabelRepository labelRepository, IMailRecipientRepository mailRecipientRepository)
         {
             _labelRepository = labelRepository;
             _mailRecipientRepository = mailRecipientRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<bool> Handle(AssignLabelCommand command, CancellationToken cancellationToken)
@@ -48,7 +46,6 @@ namespace MailService.Application.Commands.Labels.AssignLabel
                 LabelId = labelId
             });
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }
     }

@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Mailbox.Unstar
     public class UnstarMailCommandHandler: IRequestHandler<UnstarMailCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
-        private readonly IUnitOfWork _uow;
 
-        public UnstarMailCommandHandler(IMailRecipientRepository repo, IUnitOfWork uow)
+        public UnstarMailCommandHandler(IMailRecipientRepository repo)
         {
             _repo = repo;
-            _uow = uow;
         }
 
         public async Task<bool> Handle(UnstarMailCommand cmd, CancellationToken ct)
@@ -21,7 +19,6 @@ namespace MailService.Application.Commands.Mailbox.Unstar
                 return false;
 
             mr.IsStarred = false;
-            await _uow.SaveChangesAsync(ct);
             return true;
         }
     }

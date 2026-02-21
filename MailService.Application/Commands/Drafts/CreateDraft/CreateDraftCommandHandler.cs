@@ -7,12 +7,10 @@ namespace MailService.Application.Commands.Drafts.CreateDraft
     public class CreateDraftCommandHandler : IRequestHandler<CreateDraftCommand, Guid>
     {
         private readonly IDraftRepository _draftRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateDraftCommandHandler(IDraftRepository draftRepository, IUnitOfWork unitOfWork)
+        public CreateDraftCommandHandler(IDraftRepository draftRepository)
         {
             _draftRepository = draftRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<Guid> Handle(CreateDraftCommand command, CancellationToken ct)
@@ -27,8 +25,6 @@ namespace MailService.Application.Commands.Drafts.CreateDraft
             };
 
             await _draftRepository.AddAsync(draft, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
-
             return draft.Id;
         }
     }

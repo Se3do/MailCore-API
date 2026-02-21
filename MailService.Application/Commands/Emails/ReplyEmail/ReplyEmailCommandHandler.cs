@@ -11,20 +11,17 @@ namespace MailService.Application.Commands.Emails.ReplyEmail
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;
         private readonly IThreadRepository _threadRepository;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly EmailComposer _composer;
 
         public ReplyEmailCommandHandler(
             IEmailRepository emailRepository,
             IUserRepository userRepository,
             IThreadRepository threadRepository,
-            IUnitOfWork unitOfWork,
             EmailComposer composer)
         {
             _emailRepository = emailRepository;
             _userRepository = userRepository;
             _threadRepository = threadRepository;
-            _unitOfWork = unitOfWork;
             _composer = composer;
         }
 
@@ -66,8 +63,6 @@ namespace MailService.Application.Commands.Emails.ReplyEmail
 
             if (command.Request.Bcc?.Any() == true)
                 await _composer.AddRecipientsAsync(email, command.Request.Bcc, RecipientType.Bcc, now, ct);
-
-            await _unitOfWork.SaveChangesAsync(ct);
         }
 
         private async Task<IReadOnlyList<string>> GetDefaultReplyRecipientsAsync(

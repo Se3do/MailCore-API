@@ -6,12 +6,10 @@ namespace MailService.Application.Commands.Mailbox.MarkRead
     public class MarkMailReadCommandHandler: IRequestHandler<MarkMailReadCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
-        private readonly IUnitOfWork _uow;
 
-        public MarkMailReadCommandHandler(IMailRecipientRepository repo, IUnitOfWork uow)
+        public MarkMailReadCommandHandler(IMailRecipientRepository repo)
         {
             _repo = repo;
-            _uow = uow;
         }
 
         public async Task<bool> Handle(MarkMailReadCommand cmd, CancellationToken ct)
@@ -21,7 +19,6 @@ namespace MailService.Application.Commands.Mailbox.MarkRead
                 return false;
 
             mr.IsRead = true;
-            await _uow.SaveChangesAsync(ct);
             return true;
         }
     }
