@@ -11,7 +11,6 @@ namespace MailService.API
     {
         public static IServiceCollection AddAppDI(this IServiceCollection services, IConfiguration configuration)
         {
-            // Application service registrations go here
             services.AddApplicationDI().
                 AddInfrastructureDI(configuration);
 

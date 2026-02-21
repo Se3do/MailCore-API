@@ -17,19 +17,6 @@ namespace MailService.Infrastructure.Repositories
         {
             await _context.MailRecipients.AddAsync(mailRecipient, cancellationToken);
         }
-        public async Task<MailRecipient?> GetByUserAndEmailAsync(Guid UserId, Guid MailId, CancellationToken cancellationToken = default)
-        {
-            return await _context.MailRecipients
-                .AsTracking()
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Sender)
-                .Include(mr => mr.Email)
-                    .ThenInclude(e => e.Recipients)
-                        .ThenInclude(r => r.User)
-                .Include(mr => mr.Labels)
-                    .ThenInclude(l => l.Label)
-                .FirstOrDefaultAsync(mr => mr.UserId == UserId && mr.EmailId == MailId, cancellationToken);
-        }
         public async Task<IReadOnlyList<MailRecipient>> GetByLabelPagedAsync(Guid userId, Guid labelId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _context.MailRecipients

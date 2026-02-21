@@ -7,8 +7,6 @@ namespace MailService.Domain.Interfaces
     {
         // TODO: Add Filter By Type (To, Cc, Bcc) where applicable
         Task<MailRecipient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<MailRecipient?> GetByUserAndEmailAsync(Guid userId, Guid mailId, CancellationToken cancellationToken = default);
-
         Task<IReadOnlyList<MailRecipient>> GetInboxPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetUnreadPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetStarredPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default);

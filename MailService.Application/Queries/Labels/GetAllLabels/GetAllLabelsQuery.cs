@@ -3,5 +3,5 @@ using MediatR;
 
 namespace MailService.Application.Queries.Labels.GetAllLabels
 {
-    public record GetAllLabelsQuery(Guid UserId): IRequest<List<LabelDto>>;
+    public record GetAllLabelsQuery(Guid UserId): IRequest<IReadOnlyList<LabelDto>>;
 }
