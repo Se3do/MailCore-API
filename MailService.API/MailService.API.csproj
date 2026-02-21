@@ -19,10 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Middleware\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\MailService.Application\MailService.Application.csproj" />
     <ProjectReference Include="..\MailService.Infrastructure\MailService.Infrastructure.csproj" />
   </ItemGroup>

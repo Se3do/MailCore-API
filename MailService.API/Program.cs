@@ -22,6 +22,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseCors("AllowSwagger");
