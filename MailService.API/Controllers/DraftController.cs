@@ -1,9 +1,15 @@
 ﻿using MailService.API.Extensions;
+using MailService.Application.Commands.Drafts.CreateDraft;
+using MailService.Application.Commands.Drafts.DeleteDraft;
+using MailService.Application.Commands.Drafts.UpdateDraft;
 using MailService.Application.Common.Pagination;
 using MailService.Application.DTOs.Drafts;
-using MailService.Application.Services.Interfaces;
+using MailService.Application.Queries.Drafts.GetDraftById;
+using MailService.Application.Queries.Drafts.GetDraftsPaged;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MailService.API.Controllers
 {
@@ -12,50 +18,47 @@ namespace MailService.API.Controllers
     [Authorize]
     public sealed class DraftController : ControllerBase
     {
-        private readonly IDraftService _draftService;
-
-        public DraftController(IDraftService draftService)
+        private readonly IMediator _mediator;
+        public DraftController(IMediator mediator)
         {
-            _draftService = draftService;
+            _mediator = mediator;
         }
+
+        private Guid UserId =>
+            Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         [HttpGet]
         public async Task<IActionResult> GetPaged([FromQuery] CursorPaginationQuery query, CancellationToken ct)
         {
-            var userId = User.GetUserId();
-            var result = await _draftService.GetAllPagedAsync(userId, query, ct);
+            var result = await _mediator.Send(new GetDraftsPagedQuery(UserId, query), ct);
             return Ok(result);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
         {
-            var userId = User.GetUserId();
-            var result = await _draftService.GetByIdAsync(userId, id, ct);
+            var result = await _mediator.Send(new GetDraftByIdQuery(UserId, id), ct);
             return result is null ? NotFound() : Ok(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateDraftRequest request, CancellationToken ct)
         {
-            var userId = User.GetUserId();
-            var id = await _draftService.CreateAsync(userId, request, ct);
+            var id = await _mediator.Send(new CreateDraftCommand (UserId, request), ct);
             return CreatedAtAction(nameof(GetById), new { id }, null);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDraftRequest request, CancellationToken ct)
         {
-            var userId = User.GetUserId();
-            var updated = await _draftService.UpdateAsync(userId, id, request, ct);
+            var updated = await _mediator.Send(new UpdateDraftCommand(UserId, id, request), ct);
             return updated is false ? NotFound() : NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
         {
-            var userId = User.GetUserId();
-            return await _draftService.DeleteAsync(userId, id, ct) ? NoContent() : NotFound();
+            return await _mediator.Send(new DeleteDraftCommand(UserId, id)) ? NoContent() : NotFound();
         }
 
         //TODO: Implement endpoint for sending draft as email
