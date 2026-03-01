@@ -1,0 +1,42 @@
+﻿using MailCore.API.Contracts.Requests;
+using MailCore.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace MailCore.API.Controllers
+{
+    [Route("api/auth")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly IAuthService _authService;
+
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
+        // POST /api/auth/register
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
+        {
+            var result = await _authService.RegisterAsync(request.Name, request.Email, request.Password, ct);
+
+            return Ok(result);
+        }
+
+        // POST /api/auth/login
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
+        {
+            var result = await _authService.LoginAsync(request.Email, request.Password, ct);
+            if (result == null)
+            {
+                return Unauthorized();
+            }
+            return Ok(result);
+        }
+    }
+}

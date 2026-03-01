@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36623.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailCore.API", "MailCore.API\MailCore.API.csproj", "{61B1DE75-28C1-5790-7AB8-E367B863C0CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailCore.Application", "MailCore.Application\MailCore.Application.csproj", "{3718F4B5-55A6-712C-6FA0-82533252D975}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailCore.Domain", "MailCore.Domain\MailCore.Domain.csproj", "{9DCEC262-202C-42E9-DF37-EA8B43E78FDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailCore.Infrastructure", "MailCore.Infrastructure\MailCore.Infrastructure.csproj", "{051080F4-FFFF-E58A-2D10-55539B203BC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailCore.Infrastructure.Tests", "MailCore.Infrastructure.Tests\MailCore.Infrastructure.Tests.csproj", "{DD1A4527-044F-2680-46E1-F62002D6E238}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailCore.Application.Tests", "MailCore.Application.Tests\MailCore.Application.Tests.csproj", "{954C45C9-FE1F-9C15-35F6-F918B8AB7901}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{61B1DE75-28C1-5790-7AB8-E367B863C0CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61B1DE75-28C1-5790-7AB8-E367B863C0CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61B1DE75-28C1-5790-7AB8-E367B863C0CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61B1DE75-28C1-5790-7AB8-E367B863C0CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3718F4B5-55A6-712C-6FA0-82533252D975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3718F4B5-55A6-712C-6FA0-82533252D975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3718F4B5-55A6-712C-6FA0-82533252D975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3718F4B5-55A6-712C-6FA0-82533252D975}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DCEC262-202C-42E9-DF37-EA8B43E78FDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DCEC262-202C-42E9-DF37-EA8B43E78FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DCEC262-202C-42E9-DF37-EA8B43E78FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DCEC262-202C-42E9-DF37-EA8B43E78FDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{051080F4-FFFF-E58A-2D10-55539B203BC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{051080F4-FFFF-E58A-2D10-55539B203BC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{051080F4-FFFF-E58A-2D10-55539B203BC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{051080F4-FFFF-E58A-2D10-55539B203BC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD1A4527-044F-2680-46E1-F62002D6E238}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD1A4527-044F-2680-46E1-F62002D6E238}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD1A4527-044F-2680-46E1-F62002D6E238}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD1A4527-044F-2680-46E1-F62002D6E238}.Release|Any CPU.Build.0 = Release|Any CPU
+		{954C45C9-FE1F-9C15-35F6-F918B8AB7901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{954C45C9-FE1F-9C15-35F6-F918B8AB7901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{954C45C9-FE1F-9C15-35F6-F918B8AB7901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{954C45C9-FE1F-9C15-35F6-F918B8AB7901}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14E8AD24-157F-44CC-8324-C446DA0AE1E7}
+	EndGlobalSection
+EndGlobal
