@@ -1,4 +1,5 @@
-﻿using MailCore.Application.Common.Pagination;
+﻿using Asp.Versioning;
+using MailCore.Application.Common.Pagination;
 using MailCore.Application.Queries.Mailbox.GetByLabelPaged;
 using MailCore.Application.Queries.Mailbox.GetByThreadPaged;
 using MailCore.Application.Queries.Mailbox.GetInboxPaged;
@@ -22,8 +23,9 @@ using System.Security.Claims;
 
 namespace MailCore.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/mailbox")]
     [ApiController]
+    [ApiVersion("1.0")]
     [Authorize]
     public class MailboxController : ControllerBase
     {

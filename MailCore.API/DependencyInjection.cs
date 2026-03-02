@@ -1,8 +1,10 @@
-﻿using FluentValidation;
+﻿using Asp.Versioning;
+using FluentValidation;
 using MailCore.Application;
 using MailCore.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -23,6 +25,12 @@ namespace MailCore.API
 
             services.AddHealthChecks();
 
+            // Request size limit: 15 MB max (10 MB attachment + overhead)
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = 15 * 1024 * 1024;
+            });
+
             services.AddRateLimiter(options =>
             {
                 options.AddFixedWindowLimiter("auth", o =>
@@ -33,6 +41,22 @@ namespace MailCore.API
                     o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
                 });
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            });
+
+            // API versioning
+            services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+                options.ApiVersionReader = ApiVersionReader.Combine(
+                    new UrlSegmentApiVersionReader(),
+                    new HeaderApiVersionReader("X-Api-Version")
+                );
+            }).AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
             });
 
             services

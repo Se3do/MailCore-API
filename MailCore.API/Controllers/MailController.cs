@@ -1,4 +1,5 @@
-﻿using MailCore.Application.Commands.Emails.SendEmail;
+﻿using Asp.Versioning;
+using MailCore.Application.Commands.Emails.SendEmail;
 using MailCore.Application.Commands.Emails.ForwardEmail;
 using MailCore.Application.Commands.Emails.ReplyEmail;
 using MailCore.Application.Queries.Email.GetSentPaged;
@@ -13,8 +14,9 @@ using System.Security.Claims;
 namespace MailCore.API.Controllers
 {
     [Authorize]
-    [Route("api/mail")]
+    [Route("api/v{version:apiVersion}/mail")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class MailController : ControllerBase
     {
         private readonly IMediator _mediator;

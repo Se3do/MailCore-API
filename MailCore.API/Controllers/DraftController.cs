@@ -1,4 +1,5 @@
-﻿using MailCore.API.Extensions;
+﻿using Asp.Versioning;
+using MailCore.API.Extensions;
 using MailCore.Application.Commands.Drafts.CreateDraft;
 using MailCore.Application.Commands.Drafts.DeleteDraft;
 using MailCore.Application.Commands.Drafts.UpdateDraft;
@@ -14,7 +15,8 @@ using System.Security.Claims;
 namespace MailCore.API.Controllers
 {
     [ApiController]
-    [Route("api/drafts")]
+    [Route("api/v{version:apiVersion}/drafts")]
+    [ApiVersion("1.0")]
     [Authorize]
     public sealed class DraftController : ControllerBase
     {

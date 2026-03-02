@@ -1,4 +1,5 @@
-﻿using MailCore.Application.Commands.Labels.AssignLabel;
+﻿using Asp.Versioning;
+using MailCore.Application.Commands.Labels.AssignLabel;
 using MailCore.Application.Commands.Labels.CreateLabel;
 using MailCore.Application.Commands.Labels.DeleteLabel;
 using MailCore.Application.Commands.Labels.UnassignLabel;
@@ -12,8 +13,9 @@ using System.Security.Claims;
 
 namespace MailCore.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/labels")]
     [ApiController]
+    [ApiVersion("1.0")]
     [Authorize]
     public class LabelController : ControllerBase
     {

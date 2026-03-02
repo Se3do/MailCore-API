@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Asp.Versioning;
+using FluentValidation;
 using MailCore.API.Contracts.Requests;
 using MailCore.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +8,9 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace MailCore.API.Controllers
 {
-    [Route("api/auth")]
+    [Route("api/v{version:apiVersion}/auth")]
     [ApiController]
+    [ApiVersion("1.0")]
     [EnableRateLimiting("auth")]
     public class AuthController : ControllerBase
     {
