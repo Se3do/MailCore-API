@@ -2,23 +2,21 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Enforce no server header
+builder.WebHost.UseKestrel(o => o.AddServerHeader = false);
+
 builder.Services.AddAppDI(builder.Configuration);
 
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MailCore API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MailCore API v1");
     });
 }
 
@@ -27,11 +25,15 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowSwagger");
+app.UseCors("AllowedOrigins");
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
 
 app.Run();

@@ -1,4 +1,5 @@
 ﻿using MailCore.Application.DTOs.Auth;
+using MailCore.Application.Exceptions;
 using MailCore.Application.Interfaces.Security;
 using MailCore.Application.Interfaces.Services;
 using MailCore.Domain.Entities;
@@ -36,6 +37,10 @@ namespace MailCore.Application.Services
 
         public async Task<AuthResultDto> RegisterAsync(string name, string email, string password, CancellationToken cancellationToken)
         {
+            var emailExists = await _userRepository.ExistsByEmailAsync(email, cancellationToken);
+            if (emailExists)
+                throw new ValidationException($"An account with email '{email}' already exists.");
+
             var user = User.Create(name, email, password);
 
             await _userRepository.AddAsync(user, cancellationToken);

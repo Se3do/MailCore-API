@@ -27,21 +27,21 @@ namespace MailCore.API.Controllers
             Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         [HttpPost("send")]
-        public async Task<IActionResult> SendEmail([FromQuery] SendEmailRequest request, CancellationToken ct)
+        public async Task<IActionResult> SendEmail([FromForm] SendEmailRequest request, CancellationToken ct)
         {
             await _mediator.Send(new SendEmailCommand(UserId, request), ct);
             return NoContent();
         }
 
-        [HttpPost("forward")]
-        public async Task<IActionResult> ForwardEmail(Guid emailId, [FromQuery] ForwardEmailRequest request, CancellationToken ct)
+        [HttpPost("{emailId}/forward")]
+        public async Task<IActionResult> ForwardEmail(Guid emailId, [FromForm] ForwardEmailRequest request, CancellationToken ct)
         {
             await _mediator.Send(new ForwardEmailCommand(UserId, emailId, request), ct);
             return NoContent();
         }
 
-        [HttpPost("reply")]
-        public async Task<IActionResult> ReplyEmail(Guid emailId, [FromQuery] ReplyEmailRequest request, CancellationToken ct)
+        [HttpPost("{emailId}/reply")]
+        public async Task<IActionResult> ReplyEmail(Guid emailId, [FromForm] ReplyEmailRequest request, CancellationToken ct)
         {
             await _mediator.Send(new ReplyEmailCommand(UserId, emailId, request), ct);
             return NoContent();
