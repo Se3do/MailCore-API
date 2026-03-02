@@ -1,4 +1,5 @@
-﻿using MailCore.Application.Commands.Drafts.CreateDraft;
+﻿using FluentValidation;
+using MailCore.Application.Commands.Drafts.CreateDraft;
 using MailCore.Application.Common.Behaviors;
 using MailCore.Application.Emails;
 using MailCore.Application.Interfaces.Services;
@@ -15,6 +16,9 @@ namespace MailCore.Application
             services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(typeof(CreateDraftCommand).Assembly));
 
+            services.AddValidatorsFromAssembly(typeof(CreateDraftCommand).Assembly);
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
