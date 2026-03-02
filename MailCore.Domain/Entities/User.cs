@@ -18,7 +18,8 @@ namespace MailCore.Domain.Entities
         public static User Create(string name, string email, string password)
         {
             return new User
-            {
+             {
+                Id = Guid.NewGuid(),
                 Name = name,
                 Email = email,
                 PasswordHash = PasswordHasher.Hash(password),

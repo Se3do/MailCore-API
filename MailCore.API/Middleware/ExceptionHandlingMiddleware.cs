@@ -24,14 +24,23 @@ public sealed class ExceptionHandlingMiddleware
             _logger.LogWarning(ex, ex.Message);
             await WriteKnownError(context, ex);
         }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, ex.Message);
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, ex.Message);
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception");
             context.Response.StatusCode = 500;
-            await context.Response.WriteAsJsonAsync(new
-            {
-                error = "Unexpected error"
-            });
+            await context.Response.WriteAsJsonAsync(new { error = "An unexpected error occurred." });
         }
     }
 
