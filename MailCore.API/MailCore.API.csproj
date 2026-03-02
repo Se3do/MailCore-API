@@ -7,6 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.Production.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.24" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.23" />
@@ -15,11 +28,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MailCore.Application\MailCore.Application.csproj" />
+  <ProjectReference Include="..\MailCore.Application\MailCore.Application.csproj" />
     <ProjectReference Include="..\MailCore.Infrastructure\MailCore.Infrastructure.csproj" />
   </ItemGroup>
 

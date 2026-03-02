@@ -1,9 +1,12 @@
-﻿using MailCore.Application;
+﻿using FluentValidation;
+using MailCore.Application;
 using MailCore.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace MailCore.API
 {
@@ -11,8 +14,26 @@ namespace MailCore.API
     {
         public static IServiceCollection AddAppDI(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddApplicationDI().
-                AddInfrastructureDI(configuration);
+            services.AddApplicationDI()
+                .AddInfrastructureDI(configuration);
+
+            services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
+            services.AddEndpointsApiExplorer();
+
+            services.AddHealthChecks();
+
+            services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter("auth", o =>
+                {
+                    o.Window = TimeSpan.FromMinutes(1);
+                    o.PermitLimit = 10;
+                    o.QueueLimit = 0;
+                    o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                });
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            });
 
             services
                 .AddAuthentication(options =>
@@ -50,7 +71,6 @@ namespace MailCore.API
                     Version = "v1"
                 });
             
-                // JWT support (safe)
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -79,12 +99,20 @@ namespace MailCore.API
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowSwagger", policy =>
+                options.AddPolicy("AllowedOrigins", policy =>
                 {
-                    policy
-                        .AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
+                    var origins = configuration
+                        .GetSection("Cors:AllowedOrigins")
+                        .Get<string[]>() ?? [];
+
+                    if (origins.Length > 0)
+                        policy.WithOrigins(origins)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    else
+                        policy.AllowAnyOrigin()
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
                 });
             });
 
