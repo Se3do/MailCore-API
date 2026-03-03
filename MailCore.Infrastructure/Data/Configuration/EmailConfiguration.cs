@@ -18,7 +18,7 @@ namespace MailCore.Infrastructure.Data.Configuration
 
             builder.Property(e => e.Body)
                 .IsRequired()
-                .HasColumnType("nvarchar(max)"); ;
+                .HasColumnType("nvarchar(max)");
 
             builder.HasOne(e => e.Sender)
                 .WithMany(u => u.SentEmails)

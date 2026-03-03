@@ -19,12 +19,11 @@ namespace MailCore.Infrastructure.Data.Configuration
                 .WithMany(u => u.MailRecipients)
                 .HasForeignKey(mr => mr.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasOne(mr => mr.Email)
                 .WithMany(e => e.Recipients)
                 .HasForeignKey(mr => mr.EmailId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
-
-    //TODO : Add other entity configurations here
 }
