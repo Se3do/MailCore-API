@@ -11,10 +11,19 @@ namespace MailCore.Infrastructure.Data.Configuration
             builder.HasKey(e => e.Id);
 
 
+            builder.Property(e => e.Subject)
+                .IsRequired()
+                .HasMaxLength(500);
+
+
+            builder.Property(e => e.Body)
+                .IsRequired()
+                .HasColumnType("nvarchar(max)"); ;
+
             builder.HasOne(e => e.Sender)
-            .WithMany(u => u.SentEmails)
-            .HasForeignKey(e => e.SenderId)
-            .OnDelete(DeleteBehavior.Restrict);
+                .WithMany(u => u.SentEmails)
+                .HasForeignKey(e => e.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             builder.HasIndex(e => e.ThreadId);

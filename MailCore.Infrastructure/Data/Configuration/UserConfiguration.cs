@@ -10,12 +10,16 @@ namespace MailCore.Infrastructure.Data.Configuration
         {
             builder.HasKey(u => u.Id);
 
+            builder.Property(u => u.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
             builder.HasIndex(u => u.Email)
-            .IsUnique();
+                .IsUnique();
 
             builder.Property(u => u.Email)
-            .IsRequired()
-            .HasMaxLength(256);
+                .IsRequired()
+                .HasMaxLength(256);
         }
     }
 }
