@@ -1,4 +1,5 @@
 ﻿using MailCore.Application.Emails;
+using MailCore.Application.Exceptions;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace MailCore.Application.Commands.Emails.ReplyEmail
 {
-    public class ReplyEmailCommandHandler: IRequestHandler<ReplyEmailCommand>
+    public class ReplyEmailCommandHandler : IRequestHandler<ReplyEmailCommand>
     {
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;
@@ -28,17 +29,17 @@ namespace MailCore.Application.Commands.Emails.ReplyEmail
         public async Task Handle(ReplyEmailCommand command, CancellationToken ct)
         {
             var original = await _emailRepository.GetByIdAsync(command.EmailId, ct)
-                ?? throw new Exception("Email not found.");
+                ?? throw new NotFoundException($"Email {command.EmailId} not found.");
 
             var toList = command.Request.To is { Count: > 0 }
                 ? command.Request.To
                 : await GetDefaultReplyRecipientsAsync(original, ct);
 
             if (toList.Count == 0)
-                throw new Exception("At least one recipient is required.");
+                throw new ValidationException("At least one recipient is required.");
 
             var thread = await _threadRepository.GetByIdAsync(original.ThreadId, ct)
-                ?? throw new Exception("Thread not found.");
+                ?? throw new NotFoundException($"Thread {original.ThreadId} not found.");
 
             var now = DateTime.UtcNow;
             thread.LastMessageAt = now;

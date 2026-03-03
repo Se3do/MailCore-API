@@ -1,4 +1,5 @@
-﻿using MailCore.Domain.Interfaces;
+﻿using MailCore.Application.Exceptions;
+using MailCore.Domain.Interfaces;
 using MediatR;
 
 namespace MailCore.Application.Commands.Drafts.UpdateDraft
@@ -7,26 +8,22 @@ namespace MailCore.Application.Commands.Drafts.UpdateDraft
     {
         private readonly IDraftRepository _draftRepository;
 
-        public UpdateDraftCommandHandler(
-            IDraftRepository draftRepository)
-        {
-            _draftRepository = draftRepository;
-        }
+        public UpdateDraftCommandHandler(IDraftRepository draftRepository) => _draftRepository = draftRepository;
 
         public async Task<bool> Handle(UpdateDraftCommand command, CancellationToken ct)
         {
-            var draft = await _draftRepository.GetByIdAsync(command.DraftId, ct);
-            if (draft is null || draft.UserId != command.UserId)
-                return false;
+            var draft = await _draftRepository.GetByIdAsync(command.DraftId, ct)
+                 ?? throw new NotFoundException($"Draft {command.DraftId} not found.");
 
-            draft.Subject = command.Request.Subject;
-            draft.Body = command.Request.Body;
-            draft.UpdatedAt = DateTime.UtcNow;
+            if (draft.UserId != command.UserId)
+                 throw new ForbiddenException("You do not have access to this draft.");
 
-            await _draftRepository.UpdateAsync(command.DraftId, draft, ct);
+              draft.Subject = command.Request.Subject;
+              draft.Body = command.Request.Body;
+              draft.UpdatedAt = DateTime.UtcNow;
 
-            return true;
+               await _draftRepository.UpdateAsync(command.DraftId, draft, ct);
+                return true;
         }
     }
-
 }

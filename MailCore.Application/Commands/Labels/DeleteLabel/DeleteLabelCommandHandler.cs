@@ -1,4 +1,5 @@
-﻿using MailCore.Domain.Interfaces;
+﻿using MailCore.Application.Exceptions;
+using MailCore.Domain.Interfaces;
 using MediatR;
 
 namespace MailCore.Application.Commands.Labels.DeleteLabel
@@ -7,23 +8,17 @@ namespace MailCore.Application.Commands.Labels.DeleteLabel
     {
         private readonly ILabelRepository _labelRepository;
 
-        public DeleteLabelCommandHandler(ILabelRepository labelRepository)
-        {
-            this._labelRepository = labelRepository;
-        }
+        public DeleteLabelCommandHandler(ILabelRepository labelRepository) => _labelRepository = labelRepository;
 
         public async Task<bool> Handle(DeleteLabelCommand command, CancellationToken ct)
         {
-            var userId = command.UserId;
-            var labelId = command.LabelId;
-            var label = await _labelRepository.GetByIdAsync(labelId, ct);
-            if (label == null || label.UserId != userId)
-            {
-                return false;
-            }
+            var label = await _labelRepository.GetByIdAsync(command.LabelId, ct)
+                ?? throw new NotFoundException($"Label {command.LabelId} not found.");
 
-            await _labelRepository.DeleteAsync(labelId, ct);
+            if (label.UserId != command.UserId)
+                throw new ForbiddenException("You do not have access to this label.");
 
+            await _labelRepository.DeleteAsync(command.LabelId, ct);
             return true;
         }
     }
