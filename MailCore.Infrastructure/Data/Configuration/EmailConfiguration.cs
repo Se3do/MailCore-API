@@ -30,6 +30,4 @@ namespace MailCore.Infrastructure.Data.Configuration
             builder.HasIndex(e => e.CreatedAt);
         }
     }
-
-    //TODO : Add other entity configurations here
 }
