@@ -1,4 +1,5 @@
 using MailCore.Application.DTOs.Mailbox;
+using MailCore.Application.Exceptions;
 using MailCore.Application.Mappers;
 using MailCore.Domain.Interfaces;
 using MediatR;
@@ -17,10 +18,11 @@ namespace MailCore.Application.Queries.Mailbox.GetMailById
         public async Task<MailboxDetailDto?> Handle(GetMailByIdQuery query, CancellationToken ct)
         {
             var mailRecipient = await _mailRecipientRepository
-                .GetByIdAsync(query.MailId, ct);
+                .GetByIdAsync(query.MailId, ct)
+                ?? throw new NotFoundException($"Mail {query.MailId} not found.");
 
-            if (mailRecipient is null || mailRecipient.UserId != query.UserId)
-                return null;
+            if (mailRecipient.UserId != query.UserId)
+                throw new ForbiddenException("You do not have access to this mail.");
 
             return mailRecipient.ToMailboxDetailDto();
         }

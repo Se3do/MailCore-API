@@ -1,4 +1,5 @@
 ﻿using MailCore.Application.Emails;
+using MailCore.Application.Exceptions;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
@@ -28,13 +29,13 @@ namespace MailCore.Application.Commands.Emails.ForwardEmail
         public async Task Handle(ForwardEmailCommand command, CancellationToken ct)
         {
             var original = await _emailRepository.GetByIdAsync(command.EmailId, ct)
-                           ?? throw new KeyNotFoundException("Email not found.");
+                ?? throw new NotFoundException("Email not found.");
 
             if (command.Request.To is null || command.Request.To.Count == 0)
-                throw new ArgumentException("At least one recipient is required.");
+                throw new ValidationException("At least one recipient is required.");
 
             var sender = await _userRepository.GetByIdAsync(command.UserId, ct)
-                         ?? throw new KeyNotFoundException("Sender not found.");
+                ?? throw new NotFoundException("Sender not found.");
 
             var now = DateTime.UtcNow;
 

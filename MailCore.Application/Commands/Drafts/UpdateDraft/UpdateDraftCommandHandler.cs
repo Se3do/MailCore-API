@@ -18,12 +18,12 @@ namespace MailCore.Application.Commands.Drafts.UpdateDraft
             if (draft.UserId != command.UserId)
                  throw new ForbiddenException("You do not have access to this draft.");
 
-              draft.Subject = command.Request.Subject;
-              draft.Body = command.Request.Body;
-              draft.UpdatedAt = DateTime.UtcNow;
+            draft.Subject = command.Request.Subject;
+            draft.Body = command.Request.Body;
+            draft.UpdatedAt = DateTime.UtcNow;
 
-               await _draftRepository.UpdateAsync(command.DraftId, draft, ct);
-                return true;
+            await _draftRepository.UpdateAsync(command.DraftId, draft, ct);
+            return true;
         }
     }
 }
