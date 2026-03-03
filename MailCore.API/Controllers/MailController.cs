@@ -60,8 +60,6 @@ namespace MailCore.API.Controllers
         public async Task<IActionResult> GetSentDetail(Guid emailId, CancellationToken ct)
         {
             var result = await _mediator.Send(new GetSentByIdQuery(UserId, emailId), ct);
-            if (result == null)
-                return NotFound();
             return Ok(result);
         }
     }

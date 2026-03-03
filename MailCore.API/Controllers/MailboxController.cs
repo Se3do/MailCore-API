@@ -94,7 +94,7 @@ namespace MailCore.API.Controllers
         public async Task<IActionResult> GetById(Guid mailRecipientId, CancellationToken ct)
         {
             var result = await _mediator.Send(new GetMailByIdQuery(UserId, mailRecipientId), ct);
-            return result is null ? NotFound() : Ok(result);
+            return Ok(result);
         }
 
         // ===================== WRITE =====================
@@ -102,57 +102,57 @@ namespace MailCore.API.Controllers
         [HttpPost("{mailRecipientId}/read")]
         public async Task<IActionResult> MarkRead(Guid mailRecipientId, CancellationToken ct)
         {
-            var result = await _mediator.Send(new MarkMailReadCommand(UserId, mailRecipientId), ct);
-            return result ? NoContent() : NotFound();
+            await _mediator.Send(new MarkMailReadCommand(UserId, mailRecipientId), ct);
+            return NoContent();
         }
 
         [HttpPost("{mailRecipientId}/unread")]
         public async Task<IActionResult> MarkUnread(Guid mailRecipientId, CancellationToken ct)
         {
-            var result = await _mediator.Send(new MarkMailUnreadCommand(UserId, mailRecipientId), ct);
-            return result ? NoContent() : NotFound();
+            await _mediator.Send(new MarkMailUnreadCommand(UserId, mailRecipientId), ct);
+            return NoContent();
         }
 
         [HttpPost("{mailRecipientId}/spam")]
         public async Task<IActionResult> MarkSpam(Guid mailRecipientId, CancellationToken ct)
         {
-            var result = await _mediator.Send(new MarkMailSpamCommand(UserId, mailRecipientId), ct);
-            return result ? NoContent() : NotFound();
+            await _mediator.Send(new MarkMailSpamCommand(UserId, mailRecipientId), ct);
+            return NoContent();
         }
 
         [HttpPost("{mailRecipientId}/unspam")]
         public async Task<IActionResult> Unspam(Guid mailRecipientId, CancellationToken ct)
         {
-            var result = await _mediator.Send(new UnspamMailCommand(UserId, mailRecipientId), ct);
-            return result ? NoContent() : NotFound();
+            await _mediator.Send(new UnspamMailCommand(UserId, mailRecipientId), ct);
+            return NoContent();
         }
 
         [HttpPost("{mailRecipientId}/star")]
         public async Task<IActionResult> Star(Guid mailRecipientId, CancellationToken ct)
         {
-            var result = await _mediator.Send(new MarkMailStarredCommand(UserId, mailRecipientId), ct);
-            return result ? NoContent() : NotFound();
+            await _mediator.Send(new MarkMailStarredCommand(UserId, mailRecipientId), ct);
+            return NoContent();
         }
 
         [HttpPost("{mailRecipientId}/unstar")]
         public async Task<IActionResult> Unstar(Guid mailRecipientId, CancellationToken ct)
         {
-            var result = await _mediator.Send(new UnstarMailCommand(UserId, mailRecipientId), ct);
-            return result ? NoContent() : NotFound();
+            await _mediator.Send(new UnstarMailCommand(UserId, mailRecipientId), ct);
+            return NoContent();
         }
 
         [HttpDelete("{mailRecipientId}")]
         public async Task<IActionResult> Delete(Guid mailRecipientId, CancellationToken ct)
         {
-            var result = await _mediator.Send(new MarkMailDeletedCommand(UserId, mailRecipientId), ct);
-            return result ? NoContent() : NotFound();
+            await _mediator.Send(new MarkMailDeletedCommand(UserId, mailRecipientId), ct);
+            return NoContent();
         }
 
         [HttpPost("{mailRecipientId}/restore")]
         public async Task<IActionResult> Restore(Guid mailRecipientId, CancellationToken ct)
         {
-            var result = await _mediator.Send(new RestoreMailCommand(UserId, mailRecipientId), ct);
-            return result ? NoContent() : NotFound();
+            await _mediator.Send(new RestoreMailCommand(UserId, mailRecipientId), ct);
+            return NoContent();
         }
     }
 }
