@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MailCore.Application.DTOs.Auth;
+using MailCore.Application.Exceptions;
 using MailCore.Application.Interfaces.Security;
 using MailCore.Application.Services;
 using MailCore.Domain.Entities;
@@ -21,17 +22,18 @@ public class AuthServiceTests
  public AuthServiceTests()
  {
  _sut = new AuthService(_userRepo.Object, _unitOfWork.Object, _tokenGen.Object);
- _user = User.Create("Test User", "test@example.com", "password");
- _user.Name = "Test User";
+_user = User.Create("Test User", "test@example.com", "password");
  }
 
+ // ?? Login ??????????????????????????????????????????????????????????????
+
  [Fact]
- public async Task LoginAsync_WithValidCredentials_ReturnsAuthResult()
+ public async Task LoginAsync_ValidCredentials_ReturnsAuthResult()
  {
- _userRepo.Setup(r => r.GetByEmailAsync(_user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(_user);
+ _userRepo.Setup(r => r.GetByEmailAsync(_user.Email, default)).ReturnsAsync(_user);
  _tokenGen.Setup(t => t.Generate(_user)).Returns(Token);
 
- var result = await _sut.LoginAsync(_user.Email, "password", CancellationToken.None);
+ var result = await _sut.LoginAsync(_user.Email, "password", default);
 
  Assert.NotNull(result);
  Assert.Equal(_user.Id, result!.UserId);
@@ -41,35 +43,47 @@ public class AuthServiceTests
  [Fact]
  public async Task LoginAsync_UserNotFound_ReturnsNull()
  {
- _userRepo.Setup(r => r.GetByEmailAsync(_user.Email, It.IsAny<CancellationToken>())).ReturnsAsync((User?)null);
+ _userRepo.Setup(r => r.GetByEmailAsync(_user.Email, default)).ReturnsAsync((User?)null);
 
- var result = await _sut.LoginAsync(_user.Email, "password", CancellationToken.None);
-
- Assert.Null(result);
- }
-
- [Fact]
- public async Task LoginAsync_InvalidPassword_ReturnsNull()
- {
- var user = User.Create(_user.Name, _user.Email, "otherpassword");
- _userRepo.Setup(r => r.GetByEmailAsync(_user.Email, It.IsAny<CancellationToken>())).ReturnsAsync(user);
-
- var result = await _sut.LoginAsync(_user.Email, "wrongpassword", CancellationToken.None);
+ var result = await _sut.LoginAsync(_user.Email, "password", default);
 
  Assert.Null(result);
  }
 
  [Fact]
- public async Task RegisterAsync_CreatesUserAndReturnsAuthResult()
+ public async Task LoginAsync_WrongPassword_ReturnsNull()
  {
- _userRepo.Setup(r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>())).ReturnsAsync(_user);
+ var user = User.Create(_user.Name, _user.Email, "correct-password");
+ _userRepo.Setup(r => r.GetByEmailAsync(_user.Email, default)).ReturnsAsync(user);
+
+ var result = await _sut.LoginAsync(_user.Email, "wrong-password", default);
+
+ Assert.Null(result);
+ }
+
+ // ?? Register ???????????????????????????????????????????????????????????
+
+ [Fact]
+ public async Task RegisterAsync_NewEmail_CreatesUserAndReturnsToken()
+ {
+ _userRepo.Setup(r => r.ExistsByEmailAsync("new@example.com", default)).ReturnsAsync(false);
+ _userRepo.Setup(r => r.AddAsync(It.IsAny<User>(), default)).ReturnsAsync(_user);
  _tokenGen.Setup(t => t.Generate(It.IsAny<User>())).Returns(Token);
 
- var result = await _sut.RegisterAsync("Test User", "new@example.com", "password", CancellationToken.None);
+ var result = await _sut.RegisterAsync("New User", "new@example.com", "password", default);
 
  Assert.NotNull(result);
  Assert.Equal(Token, result.Token);
- Assert.Equal(_user.Id, result.UserId);
- _userRepo.Verify(r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
+ _userRepo.Verify(r => r.AddAsync(It.IsAny<User>(), default), Times.Once);
+ _unitOfWork.Verify(u => u.SaveChangesAsync(default), Times.Once);
+ }
+
+ [Fact]
+ public async Task RegisterAsync_DuplicateEmail_ThrowsValidationException()
+ {
+ _userRepo.Setup(r => r.ExistsByEmailAsync("dupe@example.com", default)).ReturnsAsync(true);
+
+ await Assert.ThrowsAsync<ValidationException>(
+ () => _sut.RegisterAsync("User", "dupe@example.com", "password", default));
  }
 }
