@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using MailCore.API.Extensions;
 using MailCore.Application.Commands.Emails.SendEmail;
 using MailCore.Application.Commands.Emails.ForwardEmail;
 using MailCore.Application.Commands.Emails.ReplyEmail;
@@ -9,7 +10,6 @@ using MailCore.Application.DTOs.Emails;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MailCore.API.Controllers
 {
@@ -25,8 +25,8 @@ namespace MailCore.API.Controllers
         {
             _mediator = mediator;
         }
-        private Guid UserId=>
-            Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private Guid UserId =>
+            User.GetUserId();
 
         [HttpPost("send")]
         public async Task<IActionResult> SendEmail([FromForm] SendEmailRequest request, CancellationToken ct)

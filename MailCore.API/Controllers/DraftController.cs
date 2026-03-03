@@ -2,6 +2,7 @@
 using MailCore.API.Extensions;
 using MailCore.Application.Commands.Drafts.CreateDraft;
 using MailCore.Application.Commands.Drafts.DeleteDraft;
+using MailCore.Application.Commands.Drafts.SendDraft;
 using MailCore.Application.Commands.Drafts.UpdateDraft;
 using MailCore.Application.Common.Pagination;
 using MailCore.Application.DTOs.Drafts;
@@ -10,7 +11,6 @@ using MailCore.Application.Queries.Drafts.GetDraftsPaged;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MailCore.API.Controllers
 {
@@ -21,13 +21,9 @@ namespace MailCore.API.Controllers
     public sealed class DraftController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public DraftController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public DraftController(IMediator mediator) => _mediator = mediator;
 
-        private Guid UserId =>
-            Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private Guid UserId => User.GetUserId();
 
         [HttpGet]
         public async Task<IActionResult> GetPaged([FromQuery] CursorPaginationQuery query, CancellationToken ct)
@@ -46,7 +42,7 @@ namespace MailCore.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateDraftRequest request, CancellationToken ct)
         {
-            var id = await _mediator.Send(new CreateDraftCommand (UserId, request), ct);
+            var id = await _mediator.Send(new CreateDraftCommand(UserId, request), ct);
             return CreatedAtAction(nameof(GetById), new { id }, null);
         }
 
@@ -60,9 +56,14 @@ namespace MailCore.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
         {
-            return await _mediator.Send(new DeleteDraftCommand(UserId, id)) ? NoContent() : NotFound();
+            return await _mediator.Send(new DeleteDraftCommand(UserId, id), ct) ? NoContent() : NotFound();
         }
 
-        //TODO: Implement endpoint for sending draft as email
+        [HttpPost("{id}/send")]
+        public async Task<IActionResult> Send(Guid id, CancellationToken ct)
+        {
+            await _mediator.Send(new SendDraftCommand(UserId, id), ct);
+            return NoContent();
+        }
     }
 }

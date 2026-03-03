@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using MailCore.API.Extensions;
 using MailCore.Application.Commands.Labels.AssignLabel;
 using MailCore.Application.Commands.Labels.CreateLabel;
 using MailCore.Application.Commands.Labels.DeleteLabel;
@@ -9,7 +10,6 @@ using MailCore.Application.Queries.Labels.GetAllLabels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MailCore.API.Controllers
 {
@@ -20,13 +20,9 @@ namespace MailCore.API.Controllers
     public class LabelController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public LabelController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public LabelController(IMediator mediator) => _mediator = mediator;
 
-        private Guid UserId =>
-            Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private Guid UserId => User.GetUserId();
 
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<LabelDto>>> GetAll(CancellationToken ct)

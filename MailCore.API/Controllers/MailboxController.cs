@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using MailCore.API.Extensions;
 using MailCore.Application.Common.Pagination;
 using MailCore.Application.Queries.Mailbox.GetByLabelPaged;
 using MailCore.Application.Queries.Mailbox.GetByThreadPaged;
@@ -19,7 +20,6 @@ using MailCore.Application.Commands.Mailbox.Restore;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MailCore.API.Controllers
 {
@@ -37,7 +37,7 @@ namespace MailCore.API.Controllers
         }
 
         private Guid UserId =>
-            Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            User.GetUserId();
 
         // ===================== READ =====================
 
