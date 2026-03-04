@@ -63,7 +63,8 @@ namespace MailCore.Infrastructure.Repositories
                 .Include(mr => mr.Email)
                     .ThenInclude(e => e.Sender)
                 .Where(mr =>
-                    mr.UserId == userId &&
+                    mr.UserId == userId && !mr.IsSpam &&
+                    mr.DeletedAt == null &&
                     (
                         mr.ReceivedAt < cursor.Timestamp ||
                         (mr.ReceivedAt == cursor.Timestamp && mr.Id.CompareTo(cursor.Id) < 0)

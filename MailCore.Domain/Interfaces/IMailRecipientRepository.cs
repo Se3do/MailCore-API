@@ -5,7 +5,6 @@ namespace MailCore.Domain.Interfaces
 {
     public interface IMailRecipientRepository
     {
-        // TODO: Add Filter By Type (To, Cc, Bcc) where applicable
         Task<MailRecipient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetInboxPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MailRecipient>> GetUnreadPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default);

@@ -17,7 +17,6 @@ namespace MailCore.Infrastructure.Repositories
         public async Task AddAsync(ThreadEntity thread, CancellationToken cancellationToken = default)
         {
             await _context.Threads.AddAsync(thread, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
         }
 
         public Task<ThreadEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
