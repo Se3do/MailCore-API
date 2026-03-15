@@ -1,4 +1,3 @@
-using MailCore.Domain.Common;
 using MailCore.Domain.Interfaces;
 using MediatR;
 
