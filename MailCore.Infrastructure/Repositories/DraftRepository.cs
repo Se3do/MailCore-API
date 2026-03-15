@@ -24,9 +24,10 @@ namespace MailCore.Infrastructure.Repositories
             {
                 throw new KeyNotFoundException($"Draft with Id {Id} not found.");
             }
+
             existingDraft.Subject = draft.Subject;
             existingDraft.Body = draft.Body;
-            existingDraft.UpdatedAt = DateTime.UtcNow;
+            existingDraft.UpdatedAt = draft.UpdatedAt;
 
             return existingDraft;
         }
