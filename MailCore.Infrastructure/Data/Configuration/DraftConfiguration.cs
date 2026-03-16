@@ -18,6 +18,15 @@ namespace MailCore.Infrastructure.Data.Configuration
                 .IsRequired()
                 .HasColumnType("nvarchar(max)");
 
+            builder.Property(d => d.ToRecipients)
+                .HasColumnType("nvarchar(max)");
+
+            builder.Property(d => d.CcRecipients)
+                .HasColumnType("nvarchar(max)");
+
+            builder.Property(d => d.BccRecipients)
+                .HasColumnType("nvarchar(max)");
+
             builder.HasOne(d => d.User)
                 .WithMany(u => u.Drafts)
                 .HasForeignKey(d => d.UserId)
