@@ -1,6 +1,209 @@
 @API_HostAddress = http://localhost:5101
+@API_Version =1.0
 
-GET {{API_HostAddress}}/weatherforecast/
+### Health
+GET {{API_HostAddress}}/health
 Accept: application/json
+
+###
+
+# ----------------------------
+# Auth
+# ----------------------------
+
+### Register
+POST {{API_HostAddress}}/api/v{{API_Version}}/auth/register
+Content-Type: application/json
+
+{
+ "name": "Demo User",
+ "email": "demo.user@mailcore.local",
+ "password": "Password123!"
+}
+
+###
+
+### Login (sets the JWT below)
+# @name login
+POST {{API_HostAddress}}/api/v{{API_Version}}/auth/login
+Content-Type: application/json
+
+{
+ "email": "demo.user@mailcore.local",
+ "password": "Password123!"
+}
+
+###
+
+@JWT = {{login.response.body.token}}
+
+# ----------------------------
+# Drafts
+# ----------------------------
+
+### Create Draft (with recipients)
+# @name createDraft
+POST {{API_HostAddress}}/api/v{{API_Version}}/drafts
+Authorization: Bearer {{JWT}}
+Content-Type: application/json
+
+{
+ "subject": "Draft subject",
+ "body": "Draft body",
+ "threadId": null,
+ "to": ["demo.user@mailcore.local"],
+ "cc": [],
+ "bcc": []
+}
+
+###
+
+@DraftId = {{createDraft.response.headers.Location}}
+
+### Get Drafts (paged)
+GET {{API_HostAddress}}/api/v{{API_Version}}/drafts?pageSize=20
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+### Get Draft By Id
+# Replace {{DraftGuid}} with the GUID from create response (CreatedAtAction uses /drafts/{id})
+@DraftGuid =00000000-0000-0000-0000-000000000000
+GET {{API_HostAddress}}/api/v{{API_Version}}/drafts/{{DraftGuid}}
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+### Update Draft
+PUT {{API_HostAddress}}/api/v{{API_Version}}/drafts/{{DraftGuid}}
+Authorization: Bearer {{JWT}}
+Content-Type: application/json
+
+{
+ "subject": "Updated draft subject",
+ "body": "Updated draft body",
+ "to": ["demo.user@mailcore.local"],
+ "cc": [],
+ "bcc": []
+}
+
+###
+
+### Send Draft
+POST {{API_HostAddress}}/api/v{{API_Version}}/drafts/{{DraftGuid}}/send
+Authorization: Bearer {{JWT}}
+
+###
+
+# ----------------------------
+# Mail
+# ----------------------------
+
+### Send Email (multipart/form-data)
+# Note: Add attachments by adding more file lines.
+POST {{API_HostAddress}}/api/v{{API_Version}}/mail/send
+Authorization: Bearer {{JWT}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="Subject"
+
+Hello from MailCore
+--boundary
+Content-Disposition: form-data; name="Body"
+
+This is a test email.
+--boundary
+Content-Disposition: form-data; name="To"
+
+demo.user@mailcore.local
+--boundary--
+
+###
+
+### Get Sent (paged)
+GET {{API_HostAddress}}/api/v{{API_Version}}/mail/sent?pageSize=20
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+# ----------------------------
+# Mailbox
+# ----------------------------
+
+### Inbox (paged)
+GET {{API_HostAddress}}/api/v{{API_Version}}/mailbox/inbox?pageSize=20
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+### Unread (paged)
+GET {{API_HostAddress}}/api/v{{API_Version}}/mailbox/unread?pageSize=20
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+### Starred (paged)
+GET {{API_HostAddress}}/api/v{{API_Version}}/mailbox/starred?pageSize=20
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+### Spam (paged)
+GET {{API_HostAddress}}/api/v{{API_Version}}/mailbox/spam?pageSize=20
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+### Trash (paged)
+GET {{API_HostAddress}}/api/v{{API_Version}}/mailbox/trash?pageSize=20
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+# ----------------------------
+# Labels
+# ----------------------------
+
+### Get Labels
+GET {{API_HostAddress}}/api/v{{API_Version}}/labels
+Authorization: Bearer {{JWT}}
+Accept: application/json
+
+###
+
+### Create Label
+# @name createLabel
+POST {{API_HostAddress}}/api/v{{API_Version}}/labels
+Authorization: Bearer {{JWT}}
+Content-Type: application/json
+
+{
+ "name": "Work",
+ "color": "#FF5733"
+}
+
+###
+
+### Assign Label
+# Replace labelId and mailId with IDs from responses
+@LabelGuid =00000000-0000-0000-0000-000000000000
+@MailRecipientGuid =00000000-0000-0000-0000-000000000000
+POST {{API_HostAddress}}/api/v{{API_Version}}/labels/{{LabelGuid}}/assign/{{MailRecipientGuid}}
+Authorization: Bearer {{JWT}}
+
+###
+
+### Unassign Label
+DELETE {{API_HostAddress}}/api/v{{API_Version}}/labels/{{LabelGuid}}/unassign/{{MailRecipientGuid}}
+Authorization: Bearer {{JWT}}
 
 ###
