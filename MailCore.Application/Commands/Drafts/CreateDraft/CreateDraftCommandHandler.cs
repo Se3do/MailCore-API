@@ -1,4 +1,5 @@
-﻿using MailCore.Domain.Entities;
+﻿using MailCore.Application.Common.Drafts;
+using MailCore.Domain.Entities;
 using MailCore.Domain.Interfaces;
 using MediatR;
 
@@ -19,8 +20,12 @@ namespace MailCore.Application.Commands.Drafts.CreateDraft
             {
                 Id = Guid.NewGuid(),
                 UserId = command.UserId,
+                ThreadId = command.Request.ThreadId,
                 Subject = command.Request.Subject,
                 Body = command.Request.Body,
+                ToRecipients = DraftRecipientsCodec.Serialize(command.Request.To),
+                CcRecipients = DraftRecipientsCodec.Serialize(command.Request.Cc),
+                BccRecipients = DraftRecipientsCodec.Serialize(command.Request.Bcc),
                 UpdatedAt = DateTime.UtcNow
             };
 

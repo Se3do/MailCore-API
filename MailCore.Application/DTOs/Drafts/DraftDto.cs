@@ -5,5 +5,8 @@ public sealed record DraftDto(
     string Subject,
     string Body,
     Guid? ThreadId,
+    IReadOnlyList<string> To,
+    IReadOnlyList<string> Cc,
+    IReadOnlyList<string> Bcc,
     DateTimeOffset UpdatedAt
 );

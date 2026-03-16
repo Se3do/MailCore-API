@@ -12,6 +12,9 @@
 
         public string Subject { get; set; } = null!;
         public string Body { get; set; } = null!;
+        public string? ToRecipients { get; set; }
+        public string? CcRecipients { get; set; }
+        public string? BccRecipients { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
 }

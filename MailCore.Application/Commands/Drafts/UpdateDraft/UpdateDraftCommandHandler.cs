@@ -1,4 +1,5 @@
-﻿using MailCore.Application.Exceptions;
+﻿using MailCore.Application.Common.Drafts;
+using MailCore.Application.Exceptions;
 using MailCore.Domain.Interfaces;
 using MediatR;
 
@@ -20,6 +21,9 @@ namespace MailCore.Application.Commands.Drafts.UpdateDraft
 
             draft.Subject = command.Request.Subject;
             draft.Body = command.Request.Body;
+            draft.ToRecipients = DraftRecipientsCodec.Serialize(command.Request.To);
+            draft.CcRecipients = DraftRecipientsCodec.Serialize(command.Request.Cc);
+            draft.BccRecipients = DraftRecipientsCodec.Serialize(command.Request.Bcc);
             draft.UpdatedAt = DateTime.UtcNow;
 
             await _draftRepository.UpdateAsync(command.DraftId, draft, ct);

@@ -1,3 +1,4 @@
+using MailCore.Application.Common.Drafts;
 using MailCore.Application.DTOs.Drafts;
 using MailCore.Domain.Entities;
 
@@ -12,6 +13,9 @@ public static class DraftMappings
             draft.Subject,
             draft.Body,
             draft.ThreadId,
+            DraftRecipientsCodec.Deserialize(draft.ToRecipients),
+            DraftRecipientsCodec.Deserialize(draft.CcRecipients),
+            DraftRecipientsCodec.Deserialize(draft.BccRecipients),
             new DateTimeOffset(draft.UpdatedAt));
     }
 }
