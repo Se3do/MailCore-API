@@ -2,6 +2,7 @@ using MailCore.Application.Commands.Drafts.CreateDraft;
 using MailCore.Application.Commands.Drafts.DeleteDraft;
 using MailCore.Application.Commands.Drafts.UpdateDraft;
 using MailCore.Application.DTOs.Drafts;
+using MailCore.Application.Exceptions;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Interfaces;
 using Moq;
@@ -14,21 +15,27 @@ public class DraftCommandHandlerTests
     private readonly Guid _userId = Guid.NewGuid();
     private readonly Guid _draftId = Guid.NewGuid();
 
-    // ?? CreateDraft ?????????????????????????????????????????????????????????
-
     [Fact]
     public async Task CreateDraft_ReturnsNewDraftId()
     {
         var handler = new CreateDraftCommandHandler(_draftRepo.Object);
-        var cmd = new CreateDraftCommand(_userId, new CreateDraftRequest("Subject", "Body", null));
+        var cmd = new CreateDraftCommand(
+            _userId,
+            new CreateDraftRequest(
+                "Subject",
+                "Body",
+                null,
+                To: new[] { "demo.user@mailcore.local" },
+                Cc: null,
+                Bcc: null));
 
         var id = await handler.Handle(cmd, default);
 
         Assert.NotEqual(Guid.Empty, id);
         _draftRepo.Verify(r => r.AddAsync(It.Is<Draft>(d =>
-    d.UserId == _userId &&
-    d.Subject == "Subject" &&
-      d.Body == "Body"), default), Times.Once);
+            d.UserId == _userId &&
+            d.Subject == "Subject" &&
+            d.Body == "Body"), default), Times.Once);
     }
 
     [Fact]
@@ -38,13 +45,12 @@ public class DraftCommandHandlerTests
         var handler = new CreateDraftCommandHandler(_draftRepo.Object);
 
         await handler.Handle(
-            new CreateDraftCommand(_userId, new CreateDraftRequest("S", "B", null)), default);
+            new CreateDraftCommand(_userId, new CreateDraftRequest("S", "B", null)),
+            default);
 
         _draftRepo.Verify(r => r.AddAsync(
             It.Is<Draft>(d => d.UpdatedAt >= before), default), Times.Once);
     }
-
-    // ?? UpdateDraft ?????????????????????????????????????????????????????????
 
     [Fact]
     public async Task UpdateDraft_ExistingOwnedDraft_UpdatesAndReturnsTrue()
@@ -53,7 +59,15 @@ public class DraftCommandHandlerTests
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync(draft);
 
         var handler = new UpdateDraftCommandHandler(_draftRepo.Object);
-        var cmd = new UpdateDraftCommand(_userId, _draftId, new UpdateDraftRequest("New", "New body"));
+        var cmd = new UpdateDraftCommand(
+            _userId,
+            _draftId,
+            new UpdateDraftRequest(
+                "New",
+                "New body",
+                To: new[] { "demo.user@mailcore.local" },
+                Cc: null,
+                Bcc: null));
 
         var result = await handler.Handle(cmd, default);
 
@@ -64,60 +78,60 @@ public class DraftCommandHandlerTests
     }
 
     [Fact]
-    public async Task UpdateDraft_NotFound_ReturnsFalse()
+    public async Task UpdateDraft_NotFound_ThrowsNotFound()
     {
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync((Draft?)null);
 
-        var result = await new UpdateDraftCommandHandler(_draftRepo.Object)
-            .Handle(new UpdateDraftCommand(_userId, _draftId, new UpdateDraftRequest("X", "Y")), default);
-
-        Assert.False(result);
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            new UpdateDraftCommandHandler(_draftRepo.Object)
+                .Handle(new UpdateDraftCommand(_userId, _draftId, new UpdateDraftRequest("X", "Y")), default));
     }
 
     [Fact]
-    public async Task UpdateDraft_WrongOwner_ReturnsFalse()
+    public async Task UpdateDraft_WrongOwner_ThrowsForbidden()
     {
         var draft = new Draft { Id = _draftId, UserId = Guid.NewGuid() };
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync(draft);
 
-        Assert.False(await new UpdateDraftCommandHandler(_draftRepo.Object)
- .Handle(new UpdateDraftCommand(_userId, _draftId, new UpdateDraftRequest("X", "Y")), default));
+        await Assert.ThrowsAsync<ForbiddenException>(() =>
+            new UpdateDraftCommandHandler(_draftRepo.Object)
+                .Handle(new UpdateDraftCommand(_userId, _draftId, new UpdateDraftRequest("X", "Y")), default));
     }
-
-    // ?? DeleteDraft ?????????????????????????????????????????????????????????
 
     [Fact]
     public async Task DeleteDraft_ExistingOwnedDraft_DeletesAndReturnsTrue()
     {
-   var draft = new Draft { Id = _draftId, UserId = _userId };
+        var draft = new Draft { Id = _draftId, UserId = _userId };
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync(draft);
 
         var result = await new DeleteDraftCommandHandler(_draftRepo.Object)
             .Handle(new DeleteDraftCommand(_userId, _draftId), default);
 
         Assert.True(result);
-  _draftRepo.Verify(r => r.DeleteAsync(_draftId, default), Times.Once);
+        _draftRepo.Verify(r => r.DeleteAsync(_draftId, default), Times.Once);
     }
 
     [Fact]
-    public async Task DeleteDraft_NotFound_ReturnsFalse()
+    public async Task DeleteDraft_NotFound_ThrowsNotFound()
     {
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync((Draft?)null);
 
-        Assert.False(await new DeleteDraftCommandHandler(_draftRepo.Object)
-          .Handle(new DeleteDraftCommand(_userId, _draftId), default));
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            new DeleteDraftCommandHandler(_draftRepo.Object)
+                .Handle(new DeleteDraftCommand(_userId, _draftId), default));
 
         _draftRepo.Verify(r => r.DeleteAsync(It.IsAny<Guid>(), default), Times.Never);
     }
 
     [Fact]
-    public async Task DeleteDraft_WrongOwner_ReturnsFalse()
+    public async Task DeleteDraft_WrongOwner_ThrowsForbidden()
     {
         var draft = new Draft { Id = _draftId, UserId = Guid.NewGuid() };
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync(draft);
 
-        Assert.False(await new DeleteDraftCommandHandler(_draftRepo.Object)
-        .Handle(new DeleteDraftCommand(_userId, _draftId), default));
+        await Assert.ThrowsAsync<ForbiddenException>(() =>
+            new DeleteDraftCommandHandler(_draftRepo.Object)
+                .Handle(new DeleteDraftCommand(_userId, _draftId), default));
 
         _draftRepo.Verify(r => r.DeleteAsync(It.IsAny<Guid>(), default), Times.Never);
     }
