@@ -44,3 +44,6 @@ coverage/
 *.coverage
 *.coveragexml
 lcov.info
+
+# Local publish output
+.publish/
