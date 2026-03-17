@@ -14,7 +14,7 @@ public static class EmailMappings
             email.Id,
             email.Subject,
             CreatePreview(email.Body),
-            email.Sender.Email,
+            email.Sender?.Email ?? string.Empty,
             new DateTimeOffset(email.CreatedAt),
             email.ThreadId,
             email.HasAttachments);
@@ -34,7 +34,7 @@ public static class EmailMappings
             email.Id,
             email.Subject,
             email.Body,
-            email.Sender?.Email,
+            email.Sender?.Email ?? string.Empty,
             to,
             cc,
             bcc,
@@ -49,6 +49,7 @@ public static class EmailMappings
             .Where(r => r.Type == type)
             .Select(r => r.User?.Email)
             .Where(email => !string.IsNullOrWhiteSpace(email))
+            .Select(email => email!)
             .ToList();
 
         if (values.Count == 0)
