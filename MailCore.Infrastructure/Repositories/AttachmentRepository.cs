@@ -1,11 +1,11 @@
-﻿using MailCore.Domain.Entities;
+using MailCore.Domain.Entities;
 using MailCore.Domain.Interfaces;
 using MailCore.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace MailCore.Infrastructure.Repositories
 {
-    internal class AttachmentRepository : IAttachmentRepository
+    public class AttachmentRepository : IAttachmentRepository
     {
         private readonly MailCoreDbContext _dbContext;
 
