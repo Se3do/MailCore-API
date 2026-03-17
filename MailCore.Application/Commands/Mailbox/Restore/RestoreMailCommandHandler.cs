@@ -7,12 +7,10 @@ namespace MailCore.Application.Commands.Mailbox.Restore
     public class RestoreMailCommandHandler : IRequestHandler<RestoreMailCommand, bool>
     {
         private readonly IMailRecipientRepository _repo;
-        private readonly IUnitOfWork _uow;
 
-        public RestoreMailCommandHandler(IMailRecipientRepository repo, IUnitOfWork uow)
+        public RestoreMailCommandHandler(IMailRecipientRepository repo)
         {
             _repo = repo;
-            _uow = uow;
         }
 
         public async Task<bool> Handle(RestoreMailCommand cmd, CancellationToken ct)
