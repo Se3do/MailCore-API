@@ -2,7 +2,7 @@ name: CD
 
 on:
   push:
-    branches: [main]
+    branches: [master]
 
 jobs:
   build-test-deploy:
@@ -61,9 +61,11 @@ jobs:
           SMTP__FROMNAME: ${{ secrets.SMTP__FROMNAME }}
 
       - name: Deploy via Web Deploy
-        uses: ricardoserradas/msdeploy-action@v1
+        uses: rasmusbuchholdt/simply-web-deploy@2.2.0
         with:
-          server: ${{ secrets.MONSTERASP_MSDEPLOY_URL }}
-          username: ${{ secrets.MONSTERASP_USERNAME }}
-          password: ${{ secrets.MONSTERASP_PASSWORD }}
-          source: ./publish_output
+          website-name: site59440
+          server-computer-name: ${{ secrets.MONSTERASP_MSDEPLOY_URL }}
+          server-username: ${{ secrets.MONSTERASP_USERNAME }}
+          server-password: ${{ secrets.MONSTERASP_PASSWORD }}
+          source-path: \publish_output\
+          target-delete: true
