@@ -30,7 +30,7 @@ jobs:
           dotnet publish MailCore.API/MailCore.API.csproj `
             --configuration Release `
             --output publish_output `
-            --runtime win-x86 `
+            --runtime win-x64 `
             --self-contained false
 
       - name: Bake production config
