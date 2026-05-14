@@ -60,10 +60,18 @@ jobs:
           SMTP__FROMADDRESS: ${{ secrets.SMTP__FROMADDRESS }}
           SMTP__FROMNAME: ${{ secrets.SMTP__FROMNAME }}
 
-      - name: Deploy via Web Deploy
-        uses: ricardoserradas/msdeploy-action@v1
-        with:
-          server: ${{ secrets.MONSTERASP_MSDEPLOY_URL }}
-          username: ${{ secrets.MONSTERASP_USERNAME }}
-          password: ${{ secrets.MONSTERASP_PASSWORD }}
-          source: ./publish_output
+      - name: Install Web Deploy
+        run: choco install webdeploy -y
+
+      - name: Deploy to MonsterASP
+        shell: pwsh
+        run: |
+          msdeploy.exe -verb:sync `
+            -source:contentPath="$pwd\publish_output" `
+            -dest:contentPath="$env:MONSTERASP_SITENAME",computerName="$env:MONSTERASP_MSDEPLOY_URL",userName="$env:MONSTERASP_USERNAME",password="$env:MONSTERASP_PASSWORD",authType=Basic `
+            -allowUntrusted=true -enableRule:DoNotDeleteRule
+        env:
+          MONSTERASP_SITENAME: ${{ secrets.MONSTERASP_SITENAME }}
+          MONSTERASP_MSDEPLOY_URL: ${{ secrets.MONSTERASP_MSDEPLOY_URL }}
+          MONSTERASP_USERNAME: ${{ secrets.MONSTERASP_USERNAME }}
+          MONSTERASP_PASSWORD: ${{ secrets.MONSTERASP_PASSWORD }}
