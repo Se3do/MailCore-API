@@ -58,5 +58,29 @@ namespace MailCore.Infrastructure.Repositories
                 .Take(pageSize + 1)
                 .ToListAsync(cancellationToken);
         }
+        public async Task<List<Email>> SearchPagedAsync(Guid userId, string query, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var term = $"%{query}%";
+
+            return await _context.Emails
+                .AsNoTracking()
+                .Include(e => e.Sender)
+                .Include(e => e.Recipients)
+                    .ThenInclude(r => r.User)
+                .Where(e => (e.SenderId == userId || e.Recipients.Any(r => r.UserId == userId)) &&
+                    (
+                        e.CreatedAt < cursor.Timestamp ||
+                        (e.CreatedAt == cursor.Timestamp && e.Id.CompareTo(cursor.Id) < 0)
+                    ) &&
+                    (EF.Functions.Like(e.Subject, term) ||
+                     EF.Functions.Like(e.Body, term) ||
+                     EF.Functions.Like(e.Sender.Email, term) ||
+                     e.Recipients.Any(r => EF.Functions.Like(r.User.Email, term)))
+                )
+                .OrderByDescending(e => e.CreatedAt)
+                .ThenByDescending(e => e.Id)
+                .Take(pageSize + 1)
+                .ToListAsync(cancellationToken);
+        }
     }
 }
