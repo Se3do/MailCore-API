@@ -30,8 +30,12 @@ jobs:
           dotnet publish MailCore.API/MailCore.API.csproj `
             --configuration Release `
             --output publish_output `
-            --runtime win-x64 `
-            --self-contained false
+            --no-build
+
+      - name: Set out-of-process IIS hosting
+        shell: pwsh
+        run: |
+          (Get-Content publish_output/web.config) -replace 'hostingModel="inprocess"', 'hostingModel="outofprocess"' | Set-Content publish_output/web.config
 
       - name: Bake production config
         run: |
