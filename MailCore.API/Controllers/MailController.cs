@@ -5,6 +5,7 @@ using MailCore.Application.Commands.Emails.ForwardEmail;
 using MailCore.Application.Commands.Emails.ReplyEmail;
 using MailCore.Application.Queries.Email.GetSentPaged;
 using MailCore.Application.Queries.Email.GetSentById;
+using MailCore.Application.Queries.Email.GetDeliveryStatus;
 using MailCore.Application.Common.Pagination;
 using MailCore.Application.DTOs.Emails;
 using MediatR;
@@ -60,6 +61,13 @@ namespace MailCore.API.Controllers
         public async Task<IActionResult> GetSentDetail(Guid emailId, CancellationToken ct)
         {
             var result = await _mediator.Send(new GetSentByIdQuery(UserId, emailId), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("{emailId}/status")]
+        public async Task<IActionResult> GetDeliveryStatus(Guid emailId, CancellationToken ct)
+        {
+            var result = await _mediator.Send(new GetDeliveryStatusQuery(UserId, emailId), ct);
             return Ok(result);
         }
     }
