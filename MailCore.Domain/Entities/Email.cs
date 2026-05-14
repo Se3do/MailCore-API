@@ -1,4 +1,6 @@
-﻿namespace MailCore.Domain.Entities
+﻿using MailCore.Domain.Enums;
+
+namespace MailCore.Domain.Entities
 {
     public class Email
     {
@@ -14,6 +16,10 @@
         public string Body { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public bool HasAttachments { get; set; }
+        public EmailDeliveryStatus DeliveryStatus { get; set; }
+        public DateTime? SentAt { get; set; }
+        public int SendAttempts { get; set; }
+        public string? LastSendError { get; set; }
 
         public ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
         public ICollection<MailRecipient> Recipients { get; set; } = new List<MailRecipient>();

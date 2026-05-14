@@ -8,5 +8,6 @@ namespace MailCore.Domain.Interfaces
         Task AddAsync(Email email, CancellationToken cancellationToken = default);
         Task<Email?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<List<Email>> GetSentPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Email>> GetPendingAsync(int batchSize, CancellationToken cancellationToken = default);
     }
 }

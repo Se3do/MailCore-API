@@ -1,6 +1,4 @@
-﻿using MailCore.Domain.Security;
-
-namespace MailCore.Domain.Entities
+﻿namespace MailCore.Domain.Entities
 {
     public class User
     {
@@ -15,21 +13,16 @@ namespace MailCore.Domain.Entities
         public ICollection<Label> Labels { get; set; } = new List<Label>();
         public ICollection<Draft> Drafts { get; set; } = new List<Draft>();
 
-        public static User Create(string name, string email, string password)
+        public static User Create(string name, string email, string passwordHash)
         {
             return new User
-             {
+            {
                 Id = Guid.NewGuid(),
                 Name = name,
                 Email = email,
-                PasswordHash = PasswordHasher.Hash(password),
+                PasswordHash = passwordHash,
                 CreatedAt = DateTime.UtcNow
             };
-        }
-
-        public bool VerifyPassword(string password)
-        {
-            return PasswordHasher.Verify(password, PasswordHash);
         }
     }
 }
