@@ -15,7 +15,7 @@ MailCore is a production-ready backend service for an email application. Built w
 - **Authentication:** JWT-based with rate-limited auth endpoints (10 req/min).
 - **API Versioning:** URL segment + header-based versioning.
 - **Validation:** FluentValidation pipeline via MediatR behaviors.
-- **Swagger:** Full OpenAPI docs with XML comments, response schemas, and example values.
+- **Swagger:** Full OpenAPI docs with XML comments, response schemas, and example values (enabled in all environments).
 - **Dev Seeding:** Auto-seeds demo data (2 users, labels, threads, emails, drafts) in Development.
 
 ## Architecture
@@ -135,7 +135,7 @@ MailCore/
 ├── MailCore.Infrastructure/            # EF Core, repositories, SMTP sender, file storage
 ├── MailCore.Infrastructure.Tests/      # Unit tests for Infrastructure layer
 ├── MailCore.IntegrationTests/          # Integration tests with Testcontainers
-├── .github/workflows/                  # CI (develop) + CD (main) pipelines
+├── .github/workflows/                  # CI (develop) + CD (master) pipelines
 ├── Dockerfile                          # Container image for the API
 ├── docker-compose.yml                  # SQL Server + MailHog + API
 └── MailCore.sln                        # Solution file
@@ -145,12 +145,15 @@ MailCore/
 
 CI/CD configured via GitHub Actions:
 - **CI** runs on `develop` pushes — build + unit tests
-- **CD** runs on `main` pushes — build → test → publish → deploy to MonsterASP via Web Deploy
+- **CD** runs on `master` pushes — build → test → publish → deploy to MonsterASP via Web Deploy (`rasmusbuchholdt/simply-web-deploy`)
 
 Set these GitHub secrets for deployment:
 - `MONSTERASP_MSDEPLOY_URL`, `MONSTERASP_USERNAME`, `MONSTERASP_PASSWORD`
+- `WEBSITE_NAME`, `SERVER_COMPUTER_NAME`, `SERVER_USERNAME`, `SERVER_PASSWORD`
 - `CONNECTIONSTRINGS__DEFAULTCONNECTION`
-- `JWT__SECRET`, `SMTP__*`, `FILESTORAGE__ROOTPATH`
+- `JWT__SECRET`, `JWT__ISSUER`, `JWT__AUDIENCE`
+- `SMTP__HOST`, `SMTP__USERNAME`, `SMTP__PASSWORD`, `SMTP__FROMADDRESS`, `SMTP__FROMNAME`
+- `FILESTORAGE__ROOTPATH`
 
 ## License
 
