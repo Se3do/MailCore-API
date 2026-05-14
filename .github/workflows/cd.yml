@@ -71,7 +71,7 @@ jobs:
           if (-not $msdeploy) { throw "msdeploy.exe not found after choco install webdeploy" }
           & $msdeploy.FullName -verb:sync `
             -source:contentPath="$pwd\publish_output" `
-            -dest:contentPath="$env:MONSTERASP_SITENAME",computerName="$env:MONSTERASP_MSDEPLOY_URL",userName="$env:MONSTERASP_USERNAME",password="$env:MONSTERASP_PASSWORD",authType=Basic `
+            "-dest:contentPath=$env:MONSTERASP_SITENAME,computerName=$env:MONSTERASP_MSDEPLOY_URL,userName=$env:MONSTERASP_USERNAME,password=$env:MONSTERASP_PASSWORD,authType=Basic" `
             -allowUntrusted=true -enableRule:DoNotDeleteRule
         env:
           MONSTERASP_SITENAME: ${{ secrets.MONSTERASP_SITENAME }}
