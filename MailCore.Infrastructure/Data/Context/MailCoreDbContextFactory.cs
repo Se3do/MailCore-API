@@ -7,8 +7,11 @@ namespace MailCore.Infrastructure.Data.Context
     {
         public MailCoreDbContext CreateDbContext(string[] args)
         {
+            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+                ?? "Server=.;Database=MailService;TrustServerCertificate=True;MultipleActiveResultSets=true;Integrated Security=SSPI;";
+
             var options = new DbContextOptionsBuilder<MailCoreDbContext>()
-                .UseSqlServer("Server=.;Database=MailService;TrustServerCertificate=True;MultipleActiveResultSets=true;Integrated Security=SSPI;")
+                .UseSqlServer(connectionString)
                 .Options;
 
             return new MailCoreDbContext(options);
