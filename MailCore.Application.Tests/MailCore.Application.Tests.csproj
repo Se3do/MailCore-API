@@ -18,7 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MailCore.Application\MailCore.Application.csproj" />
+    <ProjectReference Include="..\MailCore.API\MailCore.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>

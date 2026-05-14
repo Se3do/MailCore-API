@@ -2,10 +2,10 @@ using MailCore.Application.Commands.Emails.SendEmail;
 using MailCore.Application.DTOs.Emails;
 using MailCore.Application.Emails;
 using MailCore.Application.Interfaces.Services;
-using MailCore.Application.Interfaces.Persistence;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
+using MediatR;
 using Moq;
 
 namespace MailCore.Application.Tests.Commands;
@@ -17,6 +17,7 @@ public class SendEmailCommandHandlerTests
   private readonly Mock<IThreadRepository> _threadRepo = new();
     private readonly Mock<IMailRecipientRepository> _mailRecipientRepo = new();
     private readonly Mock<IAttachmentService> _attachmentService = new();
+    private readonly Mock<IPublisher> _publisher = new();
     private readonly EmailComposer _composer;
     private readonly SendEmailCommandHandler _sut;
 
@@ -36,7 +37,8 @@ public class SendEmailCommandHandlerTests
          _emailRepo.Object,
             _userRepo.Object,
           _threadRepo.Object,
-            _composer);
+            _composer,
+            _publisher.Object);
     }
 
     private SendEmailCommand ValidCommand(Guid? threadId = null) => new(
