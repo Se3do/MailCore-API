@@ -29,8 +29,7 @@ jobs:
         run: |
           dotnet publish MailCore.API/MailCore.API.csproj `
             --configuration Release `
-            --output publish_output `
-            --no-build
+            --output publish_output
 
       - name: Bake production config
         run: |
