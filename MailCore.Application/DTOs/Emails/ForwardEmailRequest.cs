@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace MailCore.Application.DTOs.Emails;
 
+/// <summary>Request to forward an existing email to new recipients.</summary>
 public sealed record ForwardEmailRequest(
     string Body,
     IReadOnlyList<string> To,

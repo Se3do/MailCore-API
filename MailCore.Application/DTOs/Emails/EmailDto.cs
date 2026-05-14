@@ -3,6 +3,7 @@ using MailCore.Application.DTOs.Labels;
 
 namespace MailCore.Application.DTOs.Emails;
 
+/// <summary>Full email message with body, recipients, and attachments.</summary>
 public sealed record EmailDto(
     Guid Id,
     string Subject,

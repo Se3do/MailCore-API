@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -92,9 +93,37 @@ namespace MailCore.API
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "MailCore API",
-                    Version = "v1"
+                    Version = "v1",
+                    Description = "Email service backend with CQRS pattern, supporting send, receive, drafts, labels, search, and real-time push via SignalR.",
+                    Contact = new OpenApiContact { Name = "MailCore Team" }
                 });
-            
+
+                var apiXml = Path.Combine(AppContext.BaseDirectory, "MailCore.API.xml");
+                var appXml = Path.Combine(AppContext.BaseDirectory, "MailCore.Application.xml");
+
+                if (File.Exists(apiXml)) c.IncludeXmlComments(apiXml);
+                if (File.Exists(appXml)) c.IncludeXmlComments(appXml);
+
+                c.SchemaFilter<SwaggerSchemaFilter>();
+
+                c.MapType<IFormFile>(() => new OpenApiSchema
+                {
+                    Type = "string",
+                    Format = "binary",
+                    Description = "File attachment (max 10 MB each)"
+                });
+
+                c.MapType<IReadOnlyList<IFormFile>>(() => new OpenApiSchema
+                {
+                    Type = "array",
+                    Items = new OpenApiSchema
+                    {
+                        Type = "string",
+                        Format = "binary"
+                    },
+                    Description = "Multiple file attachments"
+                });
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -104,7 +133,7 @@ namespace MailCore.API
                     In = ParameterLocation.Header,
                     Description = "Enter: Bearer {your JWT token}"
                 });
-            
+
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {

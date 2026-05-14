@@ -1,5 +1,6 @@
 ﻿namespace MailCore.Application.DTOs.Drafts;
 
+/// <summary>A saved draft email message.</summary>
 public sealed record DraftDto(
     Guid Id,
     string Subject,

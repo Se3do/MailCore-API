@@ -1,5 +1,6 @@
 ﻿namespace MailCore.Application.Common.Pagination
 {
+    /// <summary>Result of a paginated query with cursor-based navigation.</summary>
     public sealed class CursorPagedResult<T>
     {
         public IReadOnlyList<T> Items { get; init; } = [];

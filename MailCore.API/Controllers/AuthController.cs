@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using FluentValidation;
 using MailCore.API.Contracts.Requests;
+using MailCore.Application.DTOs.Auth;
 using MailCore.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace MailCore.API.Controllers
 {
+    /// <summary>Handles user authentication operations including registration and login.</summary>
     [Route("api/v{version:apiVersion}/auth")]
     [ApiController]
     [ApiVersion("1.0")]
@@ -29,8 +31,14 @@ namespace MailCore.API.Controllers
         }
 
         // POST /api/auth/register
+        /// <summary>Registers a new user account and returns a JWT token.</summary>
+        /// <param name="request">The registration details containing name, email, and password.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>An <see cref="AuthResultDto"/> containing the new user ID and JWT token.</returns>
         [HttpPost("register")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(AuthResultDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
         {
             var validation = await _registerValidator.ValidateAsync(request, ct);
@@ -46,8 +54,15 @@ namespace MailCore.API.Controllers
         }
 
         // POST /api/auth/login
+        /// <summary>Authenticates a user and returns a JWT token.</summary>
+        /// <param name="request">The login credentials containing email and password.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>An <see cref="AuthResultDto"/> containing the user ID and JWT token.</returns>
         [HttpPost("login")]
         [AllowAnonymous]
+        [ProducesResponseType(typeof(AuthResultDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
         {
             var validation = await _loginValidator.ValidateAsync(request, ct);

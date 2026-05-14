@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 namespace MailCore.Application.DTOs.Emails;
 
+/// <summary>Request to send a new email message.</summary>
 public sealed record SendEmailRequest(
     string Subject,
     string Body,

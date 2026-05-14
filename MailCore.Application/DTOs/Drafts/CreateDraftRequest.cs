@@ -1,5 +1,6 @@
 ﻿namespace MailCore.Application.DTOs.Drafts;
 
+/// <summary>Request to create a new draft email.</summary>
 public sealed record CreateDraftRequest(
     string Subject,
     string Body,
