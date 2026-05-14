@@ -1,0 +1,40 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "MailCore_Dev123!"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MailCore_Dev123!" -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  api:
+    build: .
+    ports:
+      - "5237:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=MailService;User=sa;Password=MailCore_Dev123!;TrustServerCertificate=true;MultipleActiveResultSets=true"
+      FileStorage__RelativePath: "/app/App_Data/Attachments"
+      Smtp__Host: "mailhog"
+      Smtp__Port: "1025"
+      SeedOnStartup: "true"
+
+volumes:
+  sqlserver_data:
