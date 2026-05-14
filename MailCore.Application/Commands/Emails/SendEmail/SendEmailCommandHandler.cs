@@ -1,5 +1,7 @@
 ﻿using MailCore.Application.Emails;
 using MailCore.Application.Interfaces.Services;
+using MailCore.Application.Mappers;
+using MailCore.Application.Notifications;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
@@ -13,17 +15,20 @@ namespace MailCore.Application.Commands.Emails.SendEmail
         private readonly IUserRepository _userRepository;
         private readonly IThreadRepository _threadRepository;
         private readonly EmailComposer _emailComposer;
+        private readonly IPublisher _publisher;
 
         public SendEmailCommandHandler(
             IEmailRepository emailRepository,
             IUserRepository userRepository,
             IThreadRepository threadRepository,
-            EmailComposer emailComposer)
+            EmailComposer emailComposer,
+            IPublisher publisher)
         {
             _emailRepository = emailRepository;
             _userRepository = userRepository;
             _threadRepository = threadRepository;
             _emailComposer = emailComposer;
+            _publisher = publisher;
         }
 
         public async Task Handle(SendEmailCommand command, CancellationToken cancellationToken = default)
@@ -70,6 +75,12 @@ namespace MailCore.Application.Commands.Emails.SendEmail
             {
                 await _emailComposer.AddRecipientsAsync(email, request.Bcc, RecipientType.Bcc, now, cancellationToken);
             }
+
+            await _publisher.Publish(new EmailSentNotification(
+                sender.Email,
+                request.To,
+                email.ToSummaryDto()
+            ), cancellationToken);
         }
 
         private async Task<Domain.Entities.Thread> GetOrCreateThreadAsync(Guid? threadId, DateTime now, CancellationToken ct)

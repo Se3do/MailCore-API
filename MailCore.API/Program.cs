@@ -1,4 +1,5 @@
 ﻿using MailCore.API;
+using MailCore.API.Hubs;
 using MailCore.Domain.Interfaces;
 using MailCore.Infrastructure.Data.Context;
 using MailCore.Infrastructure.Data.Seeding;
@@ -11,6 +12,7 @@ builder.WebHost.UseKestrel(o => o.AddServerHeader = false);
 builder.Services.AddAppDI(builder.Configuration);
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -44,6 +46,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<MailHub>("/hubs/mail");
 
 app.MapHealthChecks("/health").AllowAnonymous();
 
