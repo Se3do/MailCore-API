@@ -15,21 +15,22 @@ public class AuthServiceTests
  private readonly Mock<IUserRepository> _userRepo = new();
  private readonly Mock<IUnitOfWork> _unitOfWork = new();
  private readonly Mock<ITokenGenerator> _tokenGen = new();
+ private readonly Mock<IPasswordHasher> _passwordHasher = new();
  private readonly AuthService _sut;
  private readonly User _user;
  private const string Token = "jwt-token";
+ private const string PasswordHash = "hashed-password";
 
  public AuthServiceTests()
  {
- _sut = new AuthService(_userRepo.Object, _unitOfWork.Object, _tokenGen.Object);
-_user = User.Create("Test User", "test@example.com", "password");
+ _sut = new AuthService(_userRepo.Object, _unitOfWork.Object, _tokenGen.Object, _passwordHasher.Object);
+ _user = User.Create("Test User", "test@example.com", PasswordHash);
  }
-
- // ?? Login ??????????????????????????????????????????????????????????????
 
  [Fact]
  public async Task LoginAsync_ValidCredentials_ReturnsAuthResult()
  {
+ _passwordHasher.Setup(h => h.Verify("password", _user.PasswordHash)).Returns(true);
  _userRepo.Setup(r => r.GetByEmailAsync(_user.Email, default)).ReturnsAsync(_user);
  _tokenGen.Setup(t => t.Generate(_user)).Returns(Token);
 
@@ -53,7 +54,8 @@ _user = User.Create("Test User", "test@example.com", "password");
  [Fact]
  public async Task LoginAsync_WrongPassword_ReturnsNull()
  {
- var user = User.Create(_user.Name, _user.Email, "correct-password");
+ _passwordHasher.Setup(h => h.Verify("wrong-password", It.IsAny<string>())).Returns(false);
+ var user = User.Create(_user.Name, _user.Email, PasswordHash);
  _userRepo.Setup(r => r.GetByEmailAsync(_user.Email, default)).ReturnsAsync(user);
 
  var result = await _sut.LoginAsync(_user.Email, "wrong-password", default);
@@ -66,6 +68,7 @@ _user = User.Create("Test User", "test@example.com", "password");
  [Fact]
  public async Task RegisterAsync_NewEmail_CreatesUserAndReturnsToken()
  {
+ _passwordHasher.Setup(h => h.Hash("password")).Returns(PasswordHash);
  _userRepo.Setup(r => r.ExistsByEmailAsync("new@example.com", default)).ReturnsAsync(false);
  _userRepo.Setup(r => r.AddAsync(It.IsAny<User>(), default)).ReturnsAsync(_user);
  _tokenGen.Setup(t => t.Generate(It.IsAny<User>())).Returns(Token);
@@ -74,7 +77,8 @@ _user = User.Create("Test User", "test@example.com", "password");
 
  Assert.NotNull(result);
  Assert.Equal(Token, result.Token);
- _userRepo.Verify(r => r.AddAsync(It.IsAny<User>(), default), Times.Once);
+ _passwordHasher.Verify(h => h.Hash("password"), Times.Once);
+ _userRepo.Verify(r => r.AddAsync(It.Is<User>(u => u.PasswordHash == PasswordHash), default), Times.Once);
  _unitOfWork.Verify(u => u.SaveChangesAsync(default), Times.Once);
  }
 

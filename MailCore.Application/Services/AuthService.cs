@@ -12,12 +12,18 @@ namespace MailCore.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenGenerator _tokenGenerator;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public AuthService(IUserRepository userRepository, IUnitOfWork unitOfWork, ITokenGenerator tokenGenerator)
+        public AuthService(
+            IUserRepository userRepository,
+            IUnitOfWork unitOfWork,
+            ITokenGenerator tokenGenerator,
+            IPasswordHasher passwordHasher)
         {
             _userRepository = userRepository;
             _unitOfWork = unitOfWork;
             _tokenGenerator = tokenGenerator;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<AuthResultDto?> LoginAsync(string email, string password, CancellationToken cancellationToken)
@@ -27,7 +33,7 @@ namespace MailCore.Application.Services
             if (user is null)
                 return null;
 
-            if (!user.VerifyPassword(password))
+            if (!_passwordHasher.Verify(password, user.PasswordHash))
                 return null;
 
             var token = _tokenGenerator.Generate(user);
@@ -41,7 +47,8 @@ namespace MailCore.Application.Services
             if (emailExists)
                 throw new ValidationException($"An account with email '{email}' already exists.");
 
-            var user = User.Create(name, email, password);
+            var passwordHash = _passwordHasher.Hash(password);
+            var user = User.Create(name, email, passwordHash);
 
             await _userRepository.AddAsync(user, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -52,7 +52,8 @@ namespace MailCore.Application.Commands.Emails.SendEmail
                 Subject = request.Subject,
                 Body = request.Body,
                 CreatedAt = now,
-                ThreadId = thread.Id
+                ThreadId = thread.Id,
+                DeliveryStatus = EmailDeliveryStatus.Pending
             };
 
             await _emailRepository.AddAsync(email, cancellationToken);
