@@ -1,0 +1,69 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-test-deploy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build Release
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test Application Layer
+        run: dotnet test MailCore.Application.Tests --configuration Release --no-build --verbosity normal
+
+      - name: Test Infrastructure Layer
+        run: dotnet test MailCore.Infrastructure.Tests --configuration Release --no-build --verbosity normal
+
+      - name: Publish
+        run: |
+          dotnet publish MailCore.API/MailCore.API.csproj `
+            --configuration Release `
+            --output publish_output `
+            --no-build
+
+      - name: Bake production config
+        run: |
+          $config = Get-Content "publish_output/appsettings.Production.json" -Raw | ConvertFrom-Json
+          Add-Member -InputObject $config -NotePropertyName ConnectionStrings `
+            -NotePropertyValue ([PSCustomObject]@{ DefaultConnection = "$env:CONNECTIONSTRINGS__DEFAULTCONNECTION" }) -Force
+          $config.Jwt.Secret = "$env:JWT__SECRET"
+          $config.Jwt.Issuer = "$env:JWT__ISSUER"
+          $config.Jwt.Audience = "$env:JWT__AUDIENCE"
+          $config.FileStorage.RootPath = "$env:FILESTORAGE__ROOTPATH"
+          $config.Smtp.Host = "$env:SMTP__HOST"
+          $config.Smtp.Username = "$env:SMTP__USERNAME"
+          $config.Smtp.Password = "$env:SMTP__PASSWORD"
+          $config.Smtp.FromAddress = "$env:SMTP__FROMADDRESS"
+          $config.Smtp.FromName = "$env:SMTP__FROMNAME"
+          $config | ConvertTo-Json -Depth 10 `
+            | Set-Content "publish_output/appsettings.Production.json" -Encoding UTF8
+        env:
+          CONNECTIONSTRINGS__DEFAULTCONNECTION: ${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}
+          JWT__SECRET: ${{ secrets.JWT__SECRET }}
+          JWT__ISSUER: ${{ secrets.JWT__ISSUER }}
+          JWT__AUDIENCE: ${{ secrets.JWT__AUDIENCE }}
+          FILESTORAGE__ROOTPATH: ${{ secrets.FILESTORAGE__ROOTPATH }}
+          SMTP__HOST: ${{ secrets.SMTP__HOST }}
+          SMTP__USERNAME: ${{ secrets.SMTP__USERNAME }}
+          SMTP__PASSWORD: ${{ secrets.SMTP__PASSWORD }}
+          SMTP__FROMADDRESS: ${{ secrets.SMTP__FROMADDRESS }}
+          SMTP__FROMNAME: ${{ secrets.SMTP__FROMNAME }}
+
+      - name: Deploy via Web Deploy
+        uses: ricardoserradas/msdeploy-action@v1
+        with:
+          server: ${{ secrets.MONSTERASP_MSDEPLOY_URL }}
+          username: ${{ secrets.MONSTERASP_USERNAME }}
+          password: ${{ secrets.MONSTERASP_PASSWORD }}
+          source: ./publish_output

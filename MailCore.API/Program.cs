@@ -3,6 +3,7 @@ using MailCore.API.Hubs;
 using MailCore.Domain.Interfaces;
 using MailCore.Infrastructure.Data.Context;
 using MailCore.Infrastructure.Data.Seeding;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,13 @@ if (app.Configuration.GetValue<bool>("SeedOnStartup"))
     var context = scope.ServiceProvider.GetRequiredService<MailCoreDbContext>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
     await DbSeeder.SeedAsync(context, passwordHasher);
+}
+
+if (app.Environment.IsProduction())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<MailCoreDbContext>();
+    await context.Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();
