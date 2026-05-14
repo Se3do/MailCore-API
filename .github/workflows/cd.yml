@@ -66,8 +66,10 @@ jobs:
       - name: Deploy to MonsterASP
         shell: pwsh
         run: |
-          $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
-          msdeploy.exe -verb:sync `
+          $msdeploy = Get-ChildItem "$env:ProgramFiles\IIS\Microsoft Web Deploy V3\msdeploy.exe","$env:ProgramFiles\IIS\Web Deploy\msdeploy.exe","$env:ChocolateyInstall\bin\msdeploy.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $msdeploy) { $msdeploy = Get-ChildItem -Path "$env:ProgramFiles" -Recurse -Filter msdeploy.exe -ErrorAction SilentlyContinue | Select-Object -First 1 }
+          if (-not $msdeploy) { throw "msdeploy.exe not found after choco install webdeploy" }
+          & $msdeploy.FullName -verb:sync `
             -source:contentPath="$pwd\publish_output" `
             -dest:contentPath="$env:MONSTERASP_SITENAME",computerName="$env:MONSTERASP_MSDEPLOY_URL",userName="$env:MONSTERASP_USERNAME",password="$env:MONSTERASP_PASSWORD",authType=Basic `
             -allowUntrusted=true -enableRule:DoNotDeleteRule
