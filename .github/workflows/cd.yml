@@ -66,6 +66,7 @@ jobs:
       - name: Deploy to MonsterASP
         shell: pwsh
         run: |
+          $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
           msdeploy.exe -verb:sync `
             -source:contentPath="$pwd\publish_output" `
             -dest:contentPath="$env:MONSTERASP_SITENAME",computerName="$env:MONSTERASP_MSDEPLOY_URL",userName="$env:MONSTERASP_USERNAME",password="$env:MONSTERASP_PASSWORD",authType=Basic `
