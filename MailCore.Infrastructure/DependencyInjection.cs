@@ -3,7 +3,9 @@ using MailCore.Application.Interfaces.Security;
 using MailCore.Application.Interfaces.Services;
 using MailCore.Application.Services;
 using MailCore.Domain.Interfaces;
+using MailCore.Infrastructure.BackgroundServices;
 using MailCore.Infrastructure.Data.Context;
+using MailCore.Infrastructure.MailSender;
 using MailCore.Infrastructure.Repositories;
 using MailCore.Infrastructure.Security;
 using MailCore.Infrastructure.Storage;
@@ -32,7 +34,11 @@ namespace MailCore.Infrastructure
             services.AddScoped<IThreadRepository, ThreadRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
             services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
+            services.AddScoped<IPasswordHasher, IdentityPasswordHasher>();
             services.AddScoped<IAttachmentService, AttachmentService>();
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
+            services.Configure<SmtpOptions>(configuration.GetSection("Smtp"));
+            services.AddHostedService<EmailDispatchService>();
 
             // read file storage options from configuration without Binder dependency
             var useProjectDirStr = configuration["FileStorage:UseProjectDirectory"];

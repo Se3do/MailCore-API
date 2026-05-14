@@ -1,4 +1,7 @@
 ﻿using MailCore.API;
+using MailCore.Domain.Interfaces;
+using MailCore.Infrastructure.Data.Context;
+using MailCore.Infrastructure.Data.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,14 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "MailCore API v1");
     });
+}
+
+if (app.Configuration.GetValue<bool>("SeedOnStartup"))
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<MailCoreDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+    await DbSeeder.SeedAsync(context, passwordHasher);
 }
 
 app.UseHttpsRedirection();

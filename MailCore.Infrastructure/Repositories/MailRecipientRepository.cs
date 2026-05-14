@@ -144,6 +144,15 @@ namespace MailCore.Infrastructure.Repositories
                 .Take(pageSize + 1)
                 .ToListAsync(cancellationToken);
         }
+        public async Task<IReadOnlyList<MailRecipient>> GetByEmailIdAsync(Guid emailId, CancellationToken cancellationToken = default)
+        {
+            return await _context.MailRecipients
+                .AsNoTracking()
+                .Include(mr => mr.User)
+                .Where(mr => mr.EmailId == emailId)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<IReadOnlyList<MailRecipient>> GetSpamPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _context.MailRecipients

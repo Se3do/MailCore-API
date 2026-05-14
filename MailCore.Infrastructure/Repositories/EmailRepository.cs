@@ -1,5 +1,6 @@
 ﻿using MailCore.Domain.Common;
 using MailCore.Domain.Entities;
+using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
 using MailCore.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,17 @@ namespace MailCore.Infrastructure.Repositories
                 .Include(e => e.Attachments)
                 .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         }
+        public async Task<IReadOnlyList<Email>> GetPendingAsync(int batchSize, CancellationToken cancellationToken = default)
+        {
+            return await _context.Emails
+                .AsTracking()
+                .Include(e => e.Attachments)
+                .Where(e => e.DeliveryStatus == EmailDeliveryStatus.Pending && e.SendAttempts < 3)
+                .OrderBy(e => e.CreatedAt)
+                .Take(batchSize)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<List<Email>> GetSentPagedAsync(Guid userId, Cursor cursor, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _context.Emails
