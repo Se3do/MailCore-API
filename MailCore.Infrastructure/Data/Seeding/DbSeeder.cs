@@ -14,101 +14,43 @@ namespace MailCore.Infrastructure.Data.Seeding
                 return;
 
             var alicePassword = passwordHasher.Hash("alice123");
-            var alice = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = "Alice Johnson",
-                Email = "alice@mailcore.local",
-                PasswordHash = alicePassword,
-                CreatedAt = DateTime.UtcNow
-            };
-
+            var alice = User.Create("Alice Johnson", "alice@mailcore.local", alicePassword);
             var bobPassword = passwordHasher.Hash("bob123");
-            var bob = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = "Bob Smith",
-                Email = "bob@mailcore.local",
-                PasswordHash = bobPassword,
-                CreatedAt = DateTime.UtcNow
-            };
+            var bob = User.Create("Bob Smith", "bob@mailcore.local", bobPassword);
 
             context.Users.AddRange(alice, bob);
 
-            var aliceWork = new Label { Id = Guid.NewGuid(), UserId = alice.Id, Name = "Work", Color = "#3b82f6" };
-            var alicePersonal = new Label { Id = Guid.NewGuid(), UserId = alice.Id, Name = "Personal", Color = "#10b981" };
-            var bobWork = new Label { Id = Guid.NewGuid(), UserId = bob.Id, Name = "Work", Color = "#f59e0b" };
+            var aliceWork = Label.Create(alice.Id, "Work", "#3b82f6");
+            var alicePersonal = Label.Create(alice.Id, "Personal", "#10b981");
+            var bobWork = Label.Create(bob.Id, "Work", "#f59e0b");
 
             context.Labels.AddRange(aliceWork, alicePersonal, bobWork);
 
-            var thread = new Domain.Entities.Thread
-            {
-                Id = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow.AddDays(-2),
-                LastMessageAt = DateTime.UtcNow.AddHours(-1)
-            };
+            var thread = Domain.Entities.Thread.Create(
+                createdAt: DateTime.UtcNow.AddDays(-2),
+                lastMessageAt: DateTime.UtcNow.AddHours(-1));
             context.Threads.Add(thread);
 
-            var email1 = new Email
-            {
-                Id = Guid.NewGuid(),
-                ThreadId = thread.Id,
-                SenderId = alice.Id,
-                Subject = "Welcome to MailCore",
-                Body = "Hi Bob,\n\nWelcome to MailCore! Let me know if you have any questions.\n\nBest,\nAlice",
-                CreatedAt = DateTime.UtcNow.AddDays(-2),
-                HasAttachments = false,
-                DeliveryStatus = EmailDeliveryStatus.Sent,
-                SentAt = DateTime.UtcNow.AddDays(-2)
-            };
+            var email1 = Email.Create(alice.Id, "Welcome to MailCore", "Hi Bob,\n\nWelcome to MailCore! Let me know if you have any questions.\n\nBest,\nAlice", thread.Id,
+                createdAt: DateTime.UtcNow.AddDays(-2));
+            email1.MarkAsSent(DateTime.UtcNow.AddDays(-2));
             context.Emails.Add(email1);
 
-            var email2 = new Email
-            {
-                Id = Guid.NewGuid(),
-                ThreadId = thread.Id,
-                SenderId = bob.Id,
-                Subject = "Re: Welcome to MailCore",
-                Body = "Thanks Alice! Looks great so far.\n\nBob",
-                CreatedAt = DateTime.UtcNow.AddHours(-1),
-                HasAttachments = false,
-                DeliveryStatus = EmailDeliveryStatus.Sent,
-                SentAt = DateTime.UtcNow.AddHours(-1)
-            };
+            var email2 = Email.Create(bob.Id, "Re: Welcome to MailCore", "Thanks Alice! Looks great so far.\n\nBob", thread.Id,
+                createdAt: DateTime.UtcNow.AddHours(-1));
+            email2.MarkAsSent(DateTime.UtcNow.AddHours(-1));
             context.Emails.Add(email2);
 
-            var mr1 = new MailRecipient
-            {
-                Id = Guid.NewGuid(),
-                UserId = bob.Id,
-                EmailId = email1.Id,
-                Type = RecipientType.To,
-                ReceivedAt = email1.CreatedAt,
-                IsRead = true
-            };
+            var mr1 = MailRecipient.Create(bob.Id, email1.Id, RecipientType.To, email1.CreatedAt);
+            mr1.MarkAsRead();
             context.MailRecipients.Add(mr1);
 
-            var mr2 = new MailRecipient
-            {
-                Id = Guid.NewGuid(),
-                UserId = alice.Id,
-                EmailId = email2.Id,
-                Type = RecipientType.To,
-                ReceivedAt = email2.CreatedAt,
-                IsRead = false
-            };
+            var mr2 = MailRecipient.Create(alice.Id, email2.Id, RecipientType.To, email2.CreatedAt);
             context.MailRecipients.Add(mr2);
 
-            context.MailRecipientLabels.Add(new MailRecipientLabel { MailRecipientId = mr1.Id, LabelId = bobWork.Id });
+            context.MailRecipientLabels.Add(MailRecipientLabel.Create(mr1.Id, bobWork.Id));
 
-            var draft = new Draft
-            {
-                Id = Guid.NewGuid(),
-                UserId = alice.Id,
-                Subject = "Meeting notes",
-                Body = "Discuss Q2 roadmap and resource allocation.",
-                UpdatedAt = DateTime.UtcNow
-            };
+            var draft = Draft.Create(alice.Id, "Meeting notes", "Discuss Q2 roadmap and resource allocation.");
             context.Drafts.Add(draft);
 
             await context.SaveChangesAsync();

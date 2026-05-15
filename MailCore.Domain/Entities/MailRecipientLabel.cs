@@ -2,10 +2,19 @@
 {
     public class MailRecipientLabel
     {
-        public Guid MailRecipientId { get; set; }
-        public MailRecipient MailRecipient { get; set; } = null!;
+        public Guid MailRecipientId { get; private set; }
+        public MailRecipient MailRecipient { get; private set; } = null!;
 
-        public Guid LabelId { get; set; }
-        public Label Label { get; set; } = null!;
+        public Guid LabelId { get; private set; }
+        public Label Label { get; private set; } = null!;
+
+        public static MailRecipientLabel Create(Guid mailRecipientId, Guid labelId)
+        {
+            return new MailRecipientLabel
+            {
+                MailRecipientId = mailRecipientId,
+                LabelId = labelId
+            };
+        }
     }
 }
