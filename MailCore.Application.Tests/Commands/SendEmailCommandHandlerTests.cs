@@ -79,7 +79,7 @@ _userRepo.Setup(r => r.GetByEmailAsync(email, default)).ReturnsAsync(user);
     public async Task Handle_ExistingThreadId_UsesExistingThread()
     {
         var threadId = Guid.NewGuid();
-        var thread = new Domain.Entities.Thread { Id = threadId, LastMessageAt = DateTime.UtcNow.AddHours(-1) };
+        var thread = Domain.Entities.Thread.Create(lastMessageAt: DateTime.UtcNow.AddHours(-1), id: threadId);
 
         _userRepo.Setup(r => r.GetByIdAsync(_userId, default)).ReturnsAsync(_sender);
         _threadRepo.Setup(r => r.GetByIdAsync(threadId, default)).ReturnsAsync(thread);

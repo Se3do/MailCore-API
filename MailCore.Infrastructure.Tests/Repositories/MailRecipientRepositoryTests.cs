@@ -1,6 +1,7 @@
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailCore.Infrastructure.Repositories;
+using ThreadEntity = MailCore.Domain.Entities.Thread;
 
 namespace MailCore.Infrastructure.Tests.Repositories;
 
@@ -26,17 +27,7 @@ public class MailRecipientRepositoryTests : RepositoryTestBase
     {
         var (sender, recipient, thread) = await SeedBaseDataAsync();
         var email = await SeedEmailAsync(sender, thread);
-        var mr = new MailRecipient
-        {
-            Id = Guid.NewGuid(),
-            UserId = recipient.Id,
-            EmailId = email.Id,
-            Type = RecipientType.To,
-            IsRead = false,
-            IsStarred = false,
-            IsSpam = false,
-            ReceivedAt = FixedNow
-        };
+        var mr = MailRecipient.Create(recipient.Id, email.Id, RecipientType.To, FixedNow, id: Guid.NewGuid());
 
         await _sut.AddAsync(mr);
         await SaveAndDetachAsync();
@@ -55,14 +46,7 @@ public class MailRecipientRepositoryTests : RepositoryTestBase
     {
         var (sender, recipient, thread) = await SeedBaseDataAsync();
         var email = await SeedEmailAsync(sender, thread);
-        var mr = new MailRecipient
-        {
-            Id = Guid.NewGuid(),
-            UserId = recipient.Id,
-            EmailId = email.Id,
-            Type = RecipientType.To,
-            ReceivedAt = FixedNow
-        };
+        var mr = MailRecipient.Create(recipient.Id, email.Id, RecipientType.To, FixedNow, id: Guid.NewGuid());
         Context.MailRecipients.Add(mr);
         await SaveAndDetachAsync();
 
@@ -80,19 +64,12 @@ public class MailRecipientRepositoryTests : RepositoryTestBase
     {
         var (sender, recipient, thread) = await SeedBaseDataAsync();
         var email = await SeedEmailAsync(sender, thread);
-        var label = new Label { Id = Guid.NewGuid(), UserId = recipient.Id, Name = "Work", Color = "blue" };
+        var label = Label.Create(recipient.Id, "Work", "blue", id: Guid.NewGuid());
         Context.Labels.Add(label);
 
-        var mr = new MailRecipient
-        {
-            Id = Guid.NewGuid(),
-            UserId = recipient.Id,
-            EmailId = email.Id,
-            Type = RecipientType.To,
-            ReceivedAt = FixedNow
-        };
+        var mr = MailRecipient.Create(recipient.Id, email.Id, RecipientType.To, FixedNow, id: Guid.NewGuid());
         Context.MailRecipients.Add(mr);
-        Context.MailRecipientLabels.Add(new MailRecipientLabel { MailRecipientId = mr.Id, LabelId = label.Id });
+        Context.MailRecipientLabels.Add(MailRecipientLabel.Create(mr.Id, label.Id));
         await SaveAndDetachAsync();
 
         var result = await _sut.GetByIdAsync(mr.Id);
@@ -115,8 +92,8 @@ public class MailRecipientRepositoryTests : RepositoryTestBase
         var recipient2 = await SeedUserAsync($"cc-{Guid.NewGuid():N}@test.com");
         var email = await SeedEmailAsync(sender, thread);
 
-        var mr1 = new MailRecipient { Id = Guid.NewGuid(), UserId = recipient1.Id, EmailId = email.Id, Type = RecipientType.To, ReceivedAt = FixedNow };
-        var mr2 = new MailRecipient { Id = Guid.NewGuid(), UserId = recipient2.Id, EmailId = email.Id, Type = RecipientType.Cc, ReceivedAt = FixedNow };
+        var mr1 = MailRecipient.Create(recipient1.Id, email.Id, RecipientType.To, FixedNow, id: Guid.NewGuid());
+        var mr2 = MailRecipient.Create(recipient2.Id, email.Id, RecipientType.Cc, FixedNow, id: Guid.NewGuid());
 
         await _sut.AddAsync(mr1);
         await _sut.AddAsync(mr2);
@@ -133,14 +110,9 @@ public class MailRecipientRepositoryTests : RepositoryTestBase
 
     private async Task<User> SeedUserAsync(string email)
     {
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Name = email.Split('@')[0],
-            Email = email,
-            PasswordHash = "hash",
-            CreatedAt = FixedNow
-        };
+        var user = User.Create(email.Split('@')[0], email, "hash");
+        user.Id = Guid.NewGuid();
+        user.CreatedAt = FixedNow;
         Context.Users.Add(user);
         await Context.SaveChangesAsync();
         return user;
@@ -148,12 +120,7 @@ public class MailRecipientRepositoryTests : RepositoryTestBase
 
     private async Task<Domain.Entities.Thread> SeedThreadAsync()
     {
-        var thread = new Domain.Entities.Thread
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = FixedNow,
-            LastMessageAt = FixedNow
-        };
+        var thread = ThreadEntity.Create(createdAt: FixedNow, lastMessageAt: FixedNow, id: Guid.NewGuid());
         Context.Threads.Add(thread);
         await Context.SaveChangesAsync();
         return thread;
@@ -161,15 +128,7 @@ public class MailRecipientRepositoryTests : RepositoryTestBase
 
     private async Task<Email> SeedEmailAsync(User sender, Domain.Entities.Thread thread)
     {
-        var email = new Email
-        {
-            Id = Guid.NewGuid(),
-            SenderId = sender.Id,
-            Subject = "Test Subject",
-            Body = "Test Body",
-            CreatedAt = FixedNow,
-            ThreadId = thread.Id
-        };
+        var email = Email.Create(sender.Id, "Test Subject", "Test Body", threadId: thread.Id, createdAt: FixedNow, id: Guid.NewGuid());
         Context.Emails.Add(email);
         await Context.SaveChangesAsync();
         return email;
@@ -181,5 +140,11 @@ public class MailRecipientRepositoryTests : RepositoryTestBase
         var recipient = await SeedUserAsync($"recipient-{Guid.NewGuid():N}@test.com");
         var thread = await SeedThreadAsync();
         return (sender, recipient, thread);
+    }
+
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field!.SetValue(target, value);
     }
 }

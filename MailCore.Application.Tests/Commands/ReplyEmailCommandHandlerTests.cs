@@ -31,22 +31,11 @@ public class ReplyEmailCommandHandlerTests
 
     public ReplyEmailCommandHandlerTests()
     {
-        _sender = new User { Id = _userId, Email = "sender@example.com", Name = "Sender" };
+        _sender = User.Create("Sender", "sender@example.com", "hash");
+        _sender.Id = _userId;
         var originalSenderId = Guid.NewGuid();
-        _originalEmail = new Email 
-        { 
-            Id = _originalEmailId, 
-            Subject = "Original Subject", 
-            Body = "Original Body",
-            ThreadId = _threadId,
-            SenderId = originalSenderId
-        };
-        _existingThread = new Domain.Entities.Thread
-        {
-            Id = _threadId,
-            CreatedAt = DateTime.UtcNow.AddDays(-1),
-            LastMessageAt = DateTime.UtcNow.AddDays(-1)
-        };
+        _originalEmail = Email.Create(originalSenderId, "Original Subject", "Original Body", threadId: _threadId, id: _originalEmailId);
+        _existingThread = Domain.Entities.Thread.Create(createdAt: DateTime.UtcNow.AddDays(-1), lastMessageAt: DateTime.UtcNow.AddDays(-1), id: _threadId);
 
         _composer = new EmailComposer(
             _userRepo.Object,
@@ -72,7 +61,7 @@ public class ReplyEmailCommandHandlerTests
 
     private void SetupRecipient(string email)
     {
-        var user = new User { Id = Guid.NewGuid(), Email = email };
+        var user = User.Create("", email, "");
         _userRepo.Setup(r => r.GetByEmailAsync(email, default)).ReturnsAsync(user);
     }
 
@@ -98,7 +87,7 @@ public class ReplyEmailCommandHandlerTests
     [Fact]
     public async Task Handle_SubjectAlreadyHasRe_DoesNotDuplicatePrefix()
     {
-        var originalWithRe = new Email { Id = _originalEmailId, Subject = "Re: Original Subject", ThreadId = _threadId };
+        var originalWithRe = Email.Create(Guid.NewGuid(), "Re: Original Subject", "", threadId: _threadId, id: _originalEmailId);
         _emailRepo.Setup(r => r.GetByIdAsync(_originalEmailId, default)).ReturnsAsync(originalWithRe);
         _threadRepo.Setup(r => r.GetByIdAsync(_threadId, default)).ReturnsAsync(_existingThread);
         _userRepo.Setup(r => r.GetByIdAsync(_userId, default)).ReturnsAsync(_sender);
@@ -116,7 +105,8 @@ public class ReplyEmailCommandHandlerTests
         _emailRepo.Setup(r => r.GetByIdAsync(_originalEmailId, default)).ReturnsAsync(_originalEmail);
         _threadRepo.Setup(r => r.GetByIdAsync(_threadId, default)).ReturnsAsync(_existingThread);
         
-        var originalSender = new User { Id = _originalEmail.SenderId, Email = "originalsender@example.com" };
+        var originalSender = User.Create("", "originalsender@example.com", "");
+        originalSender.Id = _originalEmail.SenderId;
         _userRepo.Setup(r => r.GetByIdAsync(_originalEmail.SenderId, default)).ReturnsAsync(originalSender);
         _userRepo.Setup(r => r.GetByEmailAsync("originalsender@example.com", default)).ReturnsAsync(originalSender);
 

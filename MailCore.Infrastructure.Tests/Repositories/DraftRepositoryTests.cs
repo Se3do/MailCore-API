@@ -16,17 +16,10 @@ public class DraftRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task AddAsync_And_GetByIdAsync_PersistsDraft()
     {
-        var draft = new Draft
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Subject = "Subject",
-            Body = "Body",
-            ThreadId = null,
-            UpdatedAt = DateTime.UtcNow
-        };
+        var draft = Draft.Create(Guid.NewGuid(), "Subject", "Body", id: Guid.NewGuid());
 
-        var user = new User { Id = draft.UserId, Email = "test@test.com", Name = "Test", PasswordHash = "hash" };
+        var user = User.Create("Test", "test@test.com", "hash");
+        user.Id = draft.UserId;
         Context.Users.Add(user);
         await Context.SaveChangesAsync();
 
@@ -38,5 +31,9 @@ public class DraftRepositoryTests : RepositoryTestBase
         Assert.Equal("Subject", result.Subject);
     }
 
-
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field!.SetValue(target, value);
+    }
 }

@@ -22,7 +22,7 @@ public class GetSentByIdQueryHandlerTests
     {
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var email = new Domain.Entities.Email { Id = emailId, SenderId = userId, Subject = "Hello", Body = "World", CreatedAt = DateTime.UtcNow };
+        var email = Domain.Entities.Email.Create(userId, "Hello", "World", createdAt: DateTime.UtcNow, id: emailId);
         
         _emailRepo.Setup(r => r.GetByIdAsync(emailId, default)).ReturnsAsync(email);
 
@@ -48,11 +48,17 @@ public class GetSentByIdQueryHandlerTests
     {
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var email = new Domain.Entities.Email { Id = emailId, SenderId = Guid.NewGuid(), CreatedAt = DateTime.UtcNow };
+        var email = Domain.Entities.Email.Create(Guid.NewGuid(), "", "", createdAt: DateTime.UtcNow, id: emailId);
         
         _emailRepo.Setup(r => r.GetByIdAsync(emailId, default)).ReturnsAsync(email);
 
         await Assert.ThrowsAsync<ForbiddenException>(
             () => _sut.Handle(new GetSentByIdQuery(userId, emailId), default));
+    }
+
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field!.SetValue(target, value);
     }
 }

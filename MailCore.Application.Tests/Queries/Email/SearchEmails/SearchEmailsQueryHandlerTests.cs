@@ -74,17 +74,17 @@ public class SearchEmailsQueryHandlerTests
         var emails = new List<Domain.Entities.Email>();
         for (var i = 0; i < count; i++)
         {
-            emails.Add(new Domain.Entities.Email
-            {
-                Id = Guid.NewGuid(),
-                SenderId = userId,
-                Sender = new User { Email = $"sender{i}@example.com" },
-                Subject = $"Hello {i + 1}",
-                Body = $"Body {i + 1}",
-                CreatedAt = DateTime.UtcNow.AddMinutes(-i),
-                HasAttachments = false
-            });
+            var email = Domain.Entities.Email.Create(userId, $"Hello {i + 1}", $"Body {i + 1}", createdAt: DateTime.UtcNow.AddMinutes(-i), id: Guid.NewGuid());
+            var sender = User.Create("", $"sender{i}@example.com", "");
+            SetField(email, nameof(Domain.Entities.Email.Sender), sender);
+            emails.Add(email);
         }
         return emails;
+    }
+
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field!.SetValue(target, value);
     }
 }

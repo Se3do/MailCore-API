@@ -16,23 +16,9 @@ public class AttachmentRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task AddAsync_PersistsAttachment()
     {
-        var attachment = new Attachment
-        {
-            Id = Guid.NewGuid(),
-            EmailId = Guid.NewGuid(),
-            FileName = "test.txt",
-            ContentType = "text/plain",
-            StorageKey = "some-key"
-        };
+        var attachment = Attachment.Create(Guid.NewGuid(), "test.txt", "text/plain", 1024, "some-key", id: Guid.NewGuid());
 
-        var contextEmail = new Email 
-        { 
-            Id = attachment.EmailId, 
-            Subject = "Subject", 
-            Body = "Body",
-            SenderId = Guid.NewGuid(), 
-            CreatedAt = DateTime.UtcNow 
-        };
+        var contextEmail = Email.Create(Guid.NewGuid(), "Subject", "Body", id: attachment.EmailId, createdAt: DateTime.UtcNow);
         Context.Emails.Add(contextEmail);
         await Context.SaveChangesAsync();
 
@@ -42,5 +28,11 @@ public class AttachmentRepositoryTests : RepositoryTestBase
         var result = await Context.Attachments.FindAsync(attachment.Id);
         Assert.NotNull(result);
         Assert.Equal("test.txt", result.FileName);
+    }
+
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field!.SetValue(target, value);
     }
 }

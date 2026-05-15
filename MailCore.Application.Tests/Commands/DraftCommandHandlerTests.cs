@@ -55,7 +55,7 @@ public class DraftCommandHandlerTests
     [Fact]
     public async Task UpdateDraft_ExistingOwnedDraft_UpdatesAndReturnsTrue()
     {
-        var draft = new Draft { Id = _draftId, UserId = _userId, Subject = "Old", Body = "Old body" };
+        var draft = Draft.Create(_userId, "Old", "Old body", id: _draftId);
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync(draft);
 
         var handler = new UpdateDraftCommandHandler(_draftRepo.Object);
@@ -90,7 +90,7 @@ public class DraftCommandHandlerTests
     [Fact]
     public async Task UpdateDraft_WrongOwner_ThrowsForbidden()
     {
-        var draft = new Draft { Id = _draftId, UserId = Guid.NewGuid() };
+        var draft = Draft.Create(Guid.NewGuid(), "X", "Y", id: _draftId);
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync(draft);
 
         await Assert.ThrowsAsync<ForbiddenException>(() =>
@@ -101,7 +101,7 @@ public class DraftCommandHandlerTests
     [Fact]
     public async Task DeleteDraft_ExistingOwnedDraft_DeletesAndReturnsTrue()
     {
-        var draft = new Draft { Id = _draftId, UserId = _userId };
+        var draft = Draft.Create(_userId, "Delete", "Body", id: _draftId);
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync(draft);
 
         var result = await new DeleteDraftCommandHandler(_draftRepo.Object)
@@ -126,7 +126,7 @@ public class DraftCommandHandlerTests
     [Fact]
     public async Task DeleteDraft_WrongOwner_ThrowsForbidden()
     {
-        var draft = new Draft { Id = _draftId, UserId = Guid.NewGuid() };
+        var draft = Draft.Create(Guid.NewGuid(), "S", "B", id: _draftId);
         _draftRepo.Setup(r => r.GetByIdAsync(_draftId, default)).ReturnsAsync(draft);
 
         await Assert.ThrowsAsync<ForbiddenException>(() =>

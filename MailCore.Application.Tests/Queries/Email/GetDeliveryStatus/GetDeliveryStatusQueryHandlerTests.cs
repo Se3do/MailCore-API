@@ -22,15 +22,9 @@ public class GetDeliveryStatusQueryHandlerTests
     {
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var email = new Domain.Entities.Email
-        {
-            Id = emailId,
-            SenderId = userId,
-            DeliveryStatus = EmailDeliveryStatus.Pending,
-            SentAt = null,
-            SendAttempts = 2,
-            LastSendError = "Connection timeout"
-        };
+        var email = Domain.Entities.Email.Create(userId, "", "", id: emailId);
+        email.MarkAsFailed("Connection timeout");
+        email.MarkAsFailed("Connection timeout");
 
         _emailRepo.Setup(r => r.GetByIdAsync(emailId, default)).ReturnsAsync(email);
 
@@ -60,7 +54,7 @@ public class GetDeliveryStatusQueryHandlerTests
     {
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var email = new Domain.Entities.Email { Id = emailId, SenderId = Guid.NewGuid(), DeliveryStatus = EmailDeliveryStatus.Pending };
+        var email = Domain.Entities.Email.Create(Guid.NewGuid(), "", "", id: emailId);
 
         _emailRepo.Setup(r => r.GetByIdAsync(emailId, default)).ReturnsAsync(email);
 
@@ -74,15 +68,9 @@ public class GetDeliveryStatusQueryHandlerTests
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var sentAt = DateTime.UtcNow;
-        var email = new Domain.Entities.Email
-        {
-            Id = emailId,
-            SenderId = userId,
-            DeliveryStatus = EmailDeliveryStatus.Sent,
-            SentAt = sentAt,
-            SendAttempts = 1,
-            LastSendError = null
-        };
+        var email = Domain.Entities.Email.Create(userId, "", "", id: emailId);
+        email.MarkAsSent(sentAt);
+        SetField(email, nameof(Domain.Entities.Email.SendAttempts), 1);
 
         _emailRepo.Setup(r => r.GetByIdAsync(emailId, default)).ReturnsAsync(email);
 
@@ -92,5 +80,11 @@ public class GetDeliveryStatusQueryHandlerTests
         Assert.Equal(sentAt, result.SentAt);
         Assert.Equal(1, result.SendAttempts);
         Assert.Null(result.LastSendError);
+    }
+
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field!.SetValue(target, value);
     }
 }

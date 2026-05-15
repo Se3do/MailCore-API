@@ -6,6 +6,7 @@ using MailCore.Application.Commands.Labels.UpdateLabel;
 using MailCore.Application.DTOs.Labels;
 using MailCore.Application.Exceptions;
 using MailCore.Domain.Entities;
+using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
 using Moq;
 
@@ -47,7 +48,7 @@ public class LabelCommandHandlerTests
     [Fact]
     public async Task UpdateLabel_OwnedLabel_UpdatesAndReturnsTrue()
     {
-        var label = new Label { Id = _labelId, UserId = _userId, Name = "Old", Color = "blue" };
+        var label = Label.Create(_userId, "Old", "blue", id: _labelId);
         _labelRepo.Setup(r => r.GetByIdAsync(_labelId, default)).ReturnsAsync(label);
 
         var result = await new UpdateLabelCommandHandler(_labelRepo.Object)
@@ -71,7 +72,7 @@ public class LabelCommandHandlerTests
     [Fact]
     public async Task UpdateLabel_WrongOwner_ThrowsForbidden()
     {
-        var label = new Label { Id = _labelId, UserId = Guid.NewGuid() };
+        var label = Label.Create(Guid.NewGuid(), "X", "red", id: _labelId);
         _labelRepo.Setup(r => r.GetByIdAsync(_labelId, default)).ReturnsAsync(label);
 
         await Assert.ThrowsAsync<ForbiddenException>(() => new UpdateLabelCommandHandler(_labelRepo.Object)
@@ -81,7 +82,7 @@ public class LabelCommandHandlerTests
     [Fact]
     public async Task DeleteLabel_OwnedLabel_DeletesAndReturnsTrue()
     {
-        var label = new Label { Id = _labelId, UserId = _userId };
+        var label = Label.Create(_userId, "X", "red", id: _labelId);
         _labelRepo.Setup(r => r.GetByIdAsync(_labelId, default)).ReturnsAsync(label);
 
         var result = await new DeleteLabelCommandHandler(_labelRepo.Object)
@@ -105,7 +106,7 @@ public class LabelCommandHandlerTests
     [Fact]
     public async Task DeleteLabel_WrongOwner_ThrowsForbidden()
     {
-        var label = new Label { Id = _labelId, UserId = Guid.NewGuid() };
+        var label = Label.Create(Guid.NewGuid(), "X", "red", id: _labelId);
         _labelRepo.Setup(r => r.GetByIdAsync(_labelId, default)).ReturnsAsync(label);
 
         await Assert.ThrowsAsync<ForbiddenException>(() => new DeleteLabelCommandHandler(_labelRepo.Object)
@@ -117,8 +118,8 @@ public class LabelCommandHandlerTests
     [Fact]
     public async Task AssignLabel_ValidOwnership_AddsLabelAndReturnsTrue()
     {
-        var label = new Label { Id = _labelId, UserId = _userId };
-        var mr = new MailRecipient { Id = _mailId, UserId = _userId, Labels = [] };
+        var label = Label.Create(_userId, "Work", "#FF5733", id: _labelId);
+        var mr = MailRecipient.Create(_userId, Guid.NewGuid(), RecipientType.To, DateTime.UtcNow, id: _mailId);
 
         _labelRepo.Setup(r => r.GetByIdAsync(_labelId, default)).ReturnsAsync(label);
         _mailRecipientRepo.Setup(r => r.GetByIdAsync(_mailId, default)).ReturnsAsync(mr);
@@ -133,13 +134,9 @@ public class LabelCommandHandlerTests
     [Fact]
     public async Task AssignLabel_AlreadyAssigned_ReturnsTrueWithoutDuplicate()
     {
-        var label = new Label { Id = _labelId, UserId = _userId };
-        var mr = new MailRecipient
-        {
-            Id = _mailId,
-            UserId = _userId,
-            Labels = [new MailRecipientLabel { LabelId = _labelId }]
-        };
+        var label = Label.Create(_userId, "Work", "#FF5733", id: _labelId);
+        var mr = MailRecipient.Create(_userId, Guid.NewGuid(), RecipientType.To, DateTime.UtcNow, id: _mailId);
+        mr.Labels.Add(MailRecipientLabel.Create(_mailId, _labelId));
 
         _labelRepo.Setup(r => r.GetByIdAsync(_labelId, default)).ReturnsAsync(label);
         _mailRecipientRepo.Setup(r => r.GetByIdAsync(_mailId, default)).ReturnsAsync(mr);
@@ -153,7 +150,7 @@ public class LabelCommandHandlerTests
     public async Task AssignLabel_LabelNotOwned_ReturnsFalse()
     {
         _labelRepo.Setup(r => r.GetByIdAsync(_labelId, default))
-            .ReturnsAsync(new Label { Id = _labelId, UserId = Guid.NewGuid() });
+            .ReturnsAsync(Label.Create(Guid.NewGuid(), "X", "red", id: _labelId));
 
         Assert.False(await new AssignLabelCommandHandler(_labelRepo.Object, _mailRecipientRepo.Object)
             .Handle(new AssignLabelCommand(_userId, _mailId, _labelId), default));
@@ -163,9 +160,9 @@ public class LabelCommandHandlerTests
     public async Task AssignLabel_MailNotOwned_ReturnsFalse()
     {
         _labelRepo.Setup(r => r.GetByIdAsync(_labelId, default))
-            .ReturnsAsync(new Label { Id = _labelId, UserId = _userId });
+            .ReturnsAsync(Label.Create(_userId, "X", "red", id: _labelId));
         _mailRecipientRepo.Setup(r => r.GetByIdAsync(_mailId, default))
-            .ReturnsAsync(new MailRecipient { Id = _mailId, UserId = Guid.NewGuid() });
+            .ReturnsAsync(MailRecipient.Create(Guid.NewGuid(), Guid.NewGuid(), RecipientType.To, DateTime.UtcNow, id: _mailId));
 
         Assert.False(await new AssignLabelCommandHandler(_labelRepo.Object, _mailRecipientRepo.Object)
             .Handle(new AssignLabelCommand(_userId, _mailId, _labelId), default));
@@ -174,12 +171,8 @@ public class LabelCommandHandlerTests
     [Fact]
     public async Task UnassignLabel_AssignedLabel_RemovesAndReturnsTrue()
     {
-        var mr = new MailRecipient
-        {
-            Id = _mailId,
-            UserId = _userId,
-            Labels = [new MailRecipientLabel { LabelId = _labelId, MailRecipientId = _mailId }]
-        };
+        var mr = MailRecipient.Create(_userId, Guid.NewGuid(), RecipientType.To, DateTime.UtcNow, id: _mailId);
+        mr.Labels.Add(MailRecipientLabel.Create(_mailId, _labelId));
         _mailRecipientRepo.Setup(r => r.GetByIdAsync(_mailId, default)).ReturnsAsync(mr);
 
         var result = await new UnassignLabelCommandHandler(_mailRecipientRepo.Object)
@@ -192,7 +185,7 @@ public class LabelCommandHandlerTests
     [Fact]
     public async Task UnassignLabel_LabelNotAssigned_ReturnsTrueWithoutChange()
     {
-        var mr = new MailRecipient { Id = _mailId, UserId = _userId, Labels = [] };
+        var mr = MailRecipient.Create(_userId, Guid.NewGuid(), RecipientType.To, DateTime.UtcNow, id: _mailId);
         _mailRecipientRepo.Setup(r => r.GetByIdAsync(_mailId, default)).ReturnsAsync(mr);
 
         Assert.True(await new UnassignLabelCommandHandler(_mailRecipientRepo.Object)
@@ -203,7 +196,7 @@ public class LabelCommandHandlerTests
     public async Task UnassignLabel_MailNotOwned_ReturnsFalse()
     {
         _mailRecipientRepo.Setup(r => r.GetByIdAsync(_mailId, default))
-            .ReturnsAsync(new MailRecipient { Id = _mailId, UserId = Guid.NewGuid() });
+            .ReturnsAsync(MailRecipient.Create(Guid.NewGuid(), Guid.NewGuid(), RecipientType.To, DateTime.UtcNow, id: _mailId));
 
         Assert.False(await new UnassignLabelCommandHandler(_mailRecipientRepo.Object)
             .Handle(new UnassignLabelCommand(_userId, _mailId, _labelId), default));

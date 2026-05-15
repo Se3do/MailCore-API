@@ -21,7 +21,7 @@ public class GetDraftByIdQueryHandlerTests
     {
         var draftId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var draft = new Draft { Id = draftId, UserId = userId, Subject = "Subject", Body = "Body", UpdatedAt = DateTime.UtcNow };
+        var draft = Draft.Create(userId, "Subject", "Body", id: draftId);
         
         _draftRepo.Setup(r => r.GetByIdAsync(draftId, default)).ReturnsAsync(draft);
 
@@ -49,7 +49,7 @@ public class GetDraftByIdQueryHandlerTests
         var draftId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var anotherUserId = Guid.NewGuid();
-        var draft = new Draft { Id = draftId, UserId = anotherUserId, Subject = "Subject", UpdatedAt = DateTime.UtcNow };
+        var draft = Draft.Create(anotherUserId, "Subject", "", id: draftId);
         
         _draftRepo.Setup(r => r.GetByIdAsync(draftId, default)).ReturnsAsync(draft);
 

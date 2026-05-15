@@ -1,5 +1,6 @@
 using MailCore.Domain.Entities;
 using MailCore.Infrastructure.Repositories;
+using ThreadEntity = MailCore.Domain.Entities.Thread;
 using Xunit;
 
 namespace MailCore.Infrastructure.Tests.Repositories;
@@ -16,22 +17,15 @@ public class EmailRepositoryTests : RepositoryTestBase
     [Fact]
     public async Task AddAsync_And_GetByIdAsync_PersistsEmail()
     {
-        var user = new User { Id = Guid.NewGuid(), Email = "s@s.com", Name = "S", PasswordHash = "hash" };
-        var thread = new Domain.Entities.Thread { Id = Guid.NewGuid(), CreatedAt = DateTime.UtcNow, LastMessageAt = DateTime.UtcNow };
+        var user = User.Create("S", "s@s.com", "hash");
+        user.Id = Guid.NewGuid();
+        var thread = ThreadEntity.Create(createdAt: DateTime.UtcNow, lastMessageAt: DateTime.UtcNow, id: Guid.NewGuid());
         
         Context.Users.Add(user);
         Context.Threads.Add(thread);
         await Context.SaveChangesAsync();
 
-        var email = new Domain.Entities.Email
-        {
-            Id = Guid.NewGuid(),
-            SenderId = user.Id,
-            ThreadId = thread.Id,
-            Subject = "Hello",
-            Body = "World",
-            CreatedAt = DateTime.UtcNow
-        };
+        var email = Email.Create(user.Id, "Hello", "World", threadId: thread.Id, createdAt: DateTime.UtcNow, id: Guid.NewGuid());
 
         await _sut.AddAsync(email);
         await SaveAndDetachAsync();
@@ -39,5 +33,11 @@ public class EmailRepositoryTests : RepositoryTestBase
         var result = await _sut.GetByIdAsync(email.Id);
         Assert.NotNull(result);
         Assert.Equal("Hello", result.Subject);
+    }
+
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field!.SetValue(target, value);
     }
 }

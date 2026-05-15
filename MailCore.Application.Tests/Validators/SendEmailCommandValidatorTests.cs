@@ -9,27 +9,27 @@ public class SendEmailCommandValidatorTests
     private readonly SendEmailCommandValidator _sut = new();
 
     private static SendEmailCommand Valid() => new(
-      Guid.NewGuid(),
-    new SendEmailRequest(
-    Subject: "Hello",
-    Body: "World",
-    To: ["alice@example.com"],
-     Cc: null,
-      Bcc: null,
-      ThreadId: null,
-          Attachments: null));
-
-  [Fact]
-    public void Valid_Command_Passes()
-    {
-     var result = _sut.Validate(Valid());
-        Assert.True(result.IsValid);
-  }
+        Guid.NewGuid(),
+        new SendEmailRequest(
+            Subject: "Hello",
+            Body: "World",
+            To: ["alice@example.com"],
+            Cc: null,
+            Bcc: null,
+            ThreadId: null,
+            Attachments: null));
 
     [Fact]
- public void EmptyUserId_Fails()
+    public void Valid_Command_Passes()
     {
- var cmd = Valid() with { UserId = Guid.Empty };
+        var result = _sut.Validate(Valid());
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public void EmptyUserId_Fails()
+    {
+        var cmd = Valid() with { UserId = Guid.Empty };
         var result = _sut.Validate(cmd);
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.ErrorMessage.Contains("UserId"));
@@ -38,10 +38,10 @@ public class SendEmailCommandValidatorTests
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-  public void EmptySubject_Fails(string? subject)
+    public void EmptySubject_Fails(string? subject)
     {
- var req = Valid().Request with { Subject = subject! };
-  var result = _sut.Validate(Valid() with { Request = req });
+        var req = Valid().Request with { Subject = subject! };
+        var result = _sut.Validate(Valid() with { Request = req });
         Assert.False(result.IsValid);
     }
 
@@ -62,39 +62,39 @@ public class SendEmailCommandValidatorTests
     [Fact]
     public void EmptyToList_Fails()
     {
-  var req = Valid().Request with { To = [] };
-  Assert.False(_sut.Validate(Valid() with { Request = req }).IsValid);
+        var req = Valid().Request with { To = [] };
+        Assert.False(_sut.Validate(Valid() with { Request = req }).IsValid);
     }
 
     [Fact]
     public void InvalidEmailInTo_Fails()
     {
-    var req = Valid().Request with { To = ["not-an-email"] };
-     Assert.False(_sut.Validate(Valid() with { Request = req }).IsValid);
-  }
+        var req = Valid().Request with { To = ["not-an-email"] };
+        Assert.False(_sut.Validate(Valid() with { Request = req }).IsValid);
+    }
 
     [Fact]
     public void InvalidEmailInCc_Fails()
     {
-  var req = Valid().Request with { Cc = ["not-an-email"] };
-      Assert.False(_sut.Validate(Valid() with { Request = req }).IsValid);
+        var req = Valid().Request with { Cc = ["not-an-email"] };
+        Assert.False(_sut.Validate(Valid() with { Request = req }).IsValid);
     }
 
     [Fact]
     public void InvalidEmailInBcc_Fails()
     {
         var req = Valid().Request with { Bcc = ["not-an-email"] };
- Assert.False(_sut.Validate(Valid() with { Request = req }).IsValid);
-  }
+        Assert.False(_sut.Validate(Valid() with { Request = req }).IsValid);
+    }
 
- [Fact]
+    [Fact]
     public void ValidCcAndBcc_Pass()
     {
-      var req = Valid().Request with
+        var req = Valid().Request with
         {
-       Cc = ["cc@example.com"],
-   Bcc = ["bcc@example.com"]
+            Cc = ["cc@example.com"],
+            Bcc = ["bcc@example.com"]
         };
- Assert.True(_sut.Validate(Valid() with { Request = req }).IsValid);
+        Assert.True(_sut.Validate(Valid() with { Request = req }).IsValid);
     }
 }

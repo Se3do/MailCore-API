@@ -1,6 +1,6 @@
 using System.Reflection;
 using MailCore.Application.Common.Pagination;
-using MailCore.Application.Queries.Mailbox.GetInboxPaged;
+using MailCore.Application.Queries.Mailbox.GetByLabelPaged;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
@@ -9,32 +9,33 @@ using Xunit;
 
 namespace MailCore.Application.Tests.Queries.Mailbox;
 
-public class GetInboxPagedQueryHandlerTests
+public class GetByLabelPagedQueryHandlerTests
 {
     private readonly Mock<IMailRecipientRepository> _mailRecipientRepo = new();
-    private readonly GetInboxPagedQueryHandler _sut;
+    private readonly GetByLabelPagedQueryHandler _sut;
 
-    public GetInboxPagedQueryHandlerTests()
+    public GetByLabelPagedQueryHandlerTests()
     {
-        _sut = new GetInboxPagedQueryHandler(_mailRecipientRepo.Object);
+        _sut = new GetByLabelPagedQueryHandler(_mailRecipientRepo.Object);
     }
 
     [Fact]
     public async Task Handle_ReturnsPagedResult()
     {
         var userId = Guid.NewGuid();
+        var labelId = Guid.NewGuid();
         var pagination = new CursorPaginationQuery(null, 10);
-        
+
         var email = MailCore.Domain.Entities.Email.Create(Guid.NewGuid(), "Test", "Hello", createdAt: DateTime.UtcNow);
         SetPrivateField(email, "Sender", User.Create("", "s@s.com", ""));
         var mr = MailRecipient.Create(userId, email.Id, RecipientType.To, DateTime.UtcNow);
         SetPrivateField(mr, "Email", email);
         var mails = new List<MailRecipient> { mr };
 
-        _mailRecipientRepo.Setup(r => r.GetInboxPagedAsync(userId, It.IsAny<Domain.Common.Cursor>(), 10, default))
+        _mailRecipientRepo.Setup(r => r.GetByLabelPagedAsync(userId, labelId, It.IsAny<Domain.Common.Cursor>(), 10, default))
             .ReturnsAsync(mails);
 
-        var result = await _sut.Handle(new GetInboxPagedQuery(userId, pagination), default);
+        var result = await _sut.Handle(new GetByLabelPagedQuery(userId, labelId, pagination), default);
 
         Assert.NotNull(result);
         Assert.NotEmpty(result.Items);

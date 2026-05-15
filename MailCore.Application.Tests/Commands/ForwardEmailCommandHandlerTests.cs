@@ -29,14 +29,9 @@ public class ForwardEmailCommandHandlerTests
 
     public ForwardEmailCommandHandlerTests()
     {
-        _sender = new User { Id = _userId, Email = "sender@example.com", Name = "Sender" };
-        _originalEmail = new Email 
-        { 
-            Id = _originalEmailId, 
-            Subject = "Original Subject", 
-            Body = "Original Body",
-            ThreadId = Guid.NewGuid()
-        };
+        _sender = User.Create("Sender", "sender@example.com", "hash");
+        _sender.Id = _userId;
+        _originalEmail = Email.Create(Guid.NewGuid(), "Original Subject", "Original Body", id: _originalEmailId);
 
         _composer = new EmailComposer(
             _userRepo.Object,
@@ -62,7 +57,7 @@ public class ForwardEmailCommandHandlerTests
 
     private void SetupRecipient(string email)
     {
-        var user = new User { Id = Guid.NewGuid(), Email = email };
+        var user = User.Create("", email, "");
         _userRepo.Setup(r => r.GetByEmailAsync(email, default)).ReturnsAsync(user);
     }
 
@@ -86,7 +81,7 @@ public class ForwardEmailCommandHandlerTests
     [Fact]
     public async Task Handle_SubjectAlreadyHasFwd_DoesNotDuplicatePrefix()
     {
-        var originalWithFwd = new Email { Id = _originalEmailId, Subject = "Fwd: Original Subject", ThreadId = Guid.NewGuid() };
+        var originalWithFwd = Email.Create(Guid.NewGuid(), "Fwd: Original Subject", "", id: _originalEmailId);
         _emailRepo.Setup(r => r.GetByIdAsync(_originalEmailId, default)).ReturnsAsync(originalWithFwd);
         _userRepo.Setup(r => r.GetByIdAsync(_userId, default)).ReturnsAsync(_sender);
         SetupRecipient("recipient@example.com");

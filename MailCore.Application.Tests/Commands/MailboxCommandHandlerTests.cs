@@ -8,6 +8,7 @@ using MailCore.Application.Commands.Mailbox.Unspam;
 using MailCore.Application.Commands.Mailbox.Unstar;
 using MailCore.Application.Exceptions;
 using MailCore.Domain.Entities;
+using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
 using Moq;
 
@@ -20,7 +21,7 @@ public class MailboxCommandHandlerTests
     private readonly Guid _mailId = Guid.NewGuid();
 
     private MailRecipient OwnedMail() =>
-        new() { Id = _mailId, UserId = _userId, IsRead = false, IsStarred = false, IsSpam = false };
+        MailRecipient.Create(_userId, Guid.NewGuid(), RecipientType.To, DateTime.UtcNow, id: _mailId);
 
     private void SetupRepo(MailRecipient? mail) =>
         _repo.Setup(r => r.GetByIdAsync(_mailId, default)).ReturnsAsync(mail);
@@ -51,7 +52,7 @@ public class MailboxCommandHandlerTests
     [Fact]
     public async Task MarkRead_WrongOwner_ThrowsForbidden()
     {
-        SetupRepo(new MailRecipient { Id = _mailId, UserId = Guid.NewGuid() });
+        SetupRepo(MailRecipient.Create(Guid.NewGuid(), Guid.NewGuid(), RecipientType.To, DateTime.UtcNow, id: _mailId));
 
         await Assert.ThrowsAsync<ForbiddenException>(() =>
             new MarkMailReadCommandHandler(_repo.Object)
@@ -62,7 +63,7 @@ public class MailboxCommandHandlerTests
     public async Task MarkUnread_OwnedMail_SetsIsReadFalse()
     {
         var mail = OwnedMail();
-        mail.IsRead = true;
+        mail.MarkAsRead();
         SetupRepo(mail);
 
         var result = await new MarkMailUnreadCommandHandler(_repo.Object)
@@ -89,7 +90,7 @@ public class MailboxCommandHandlerTests
     public async Task Unstar_OwnedMail_SetsIsStarredFalse()
     {
         var mail = OwnedMail();
-        mail.IsStarred = true;
+        mail.MarkAsStarred();
         SetupRepo(mail);
 
         Assert.True(await new UnstarMailCommandHandler(_repo.Object)
@@ -114,7 +115,7 @@ public class MailboxCommandHandlerTests
     public async Task Unspam_OwnedMail_SetsIsSpamFalse()
     {
         var mail = OwnedMail();
-        mail.IsSpam = true;
+        mail.MarkAsSpam();
         SetupRepo(mail);
 
         Assert.True(await new UnspamMailCommandHandler(_repo.Object)
@@ -150,7 +151,7 @@ public class MailboxCommandHandlerTests
     public async Task Restore_OwnedDeletedMail_ClearsDeletedAt()
     {
         var mail = OwnedMail();
-        mail.DeletedAt = DateTime.UtcNow;
+        mail.SoftDelete();
         SetupRepo(mail);
 
         Assert.True(await new RestoreMailCommandHandler(_repo.Object)

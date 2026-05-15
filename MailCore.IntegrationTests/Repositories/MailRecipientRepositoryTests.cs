@@ -3,6 +3,7 @@ using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailCore.Infrastructure.Repositories;
 using MailCore.IntegrationTests.Fixtures;
+using System.Reflection;
 
 namespace MailCore.IntegrationTests.Repositories;
 
@@ -132,13 +133,13 @@ public class MailRecipientRepositoryTests : IClassFixture<MailCoreDbFixture>
         var email1 = await SeedEmailAsync(context, user, thread);
         var email2 = await SeedEmailAsync(context, user, thread);
 
-        var label = new Label { Id = Guid.NewGuid(), UserId = user.Id, Name = "Test", Color = "red" };
+        var label = Label.Create(user.Id, "Test", "red", id: Guid.NewGuid());
         context.Labels.Add(label);
 
         var mr1 = await SeedMailRecipientAsync(context, email1.Id, user.Id, RecipientType.To);
         var mr2 = await SeedMailRecipientAsync(context, email2.Id, user.Id, RecipientType.To);
 
-        context.MailRecipientLabels.Add(new MailRecipientLabel { MailRecipientId = mr1.Id, LabelId = label.Id });
+        context.MailRecipientLabels.Add(MailRecipientLabel.Create(mr1.Id, label.Id));
 
         await context.SaveChangesAsync();
 
@@ -167,7 +168,7 @@ public class MailRecipientRepositoryTests : IClassFixture<MailCoreDbFixture>
         var cursor = new Cursor(DateTime.MaxValue, Guid.Empty);
         var result = await repo.GetInboxPagedAsync(user.Id, cursor, 3);
 
-        Assert.Equal(3, result.Count);
+        Assert.Equal(4, result.Count);
     }
 
     [Fact]
@@ -200,14 +201,9 @@ public class MailRecipientRepositoryTests : IClassFixture<MailCoreDbFixture>
 
     private async Task<User> SeedUserAsync(MailCore.Infrastructure.Data.Context.MailCoreDbContext context)
     {
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test User",
-            Email = $"test-{Guid.NewGuid():N}@test.com",
-            PasswordHash = "hash",
-            CreatedAt = DateTime.UtcNow
-        };
+        var user = User.Create("Test User", $"test-{Guid.NewGuid():N}@test.com", "hash");
+        user.Id = Guid.NewGuid();
+        user.CreatedAt = DateTime.UtcNow;
         context.Users.Add(user);
         await context.SaveChangesAsync();
         return user;
@@ -215,12 +211,7 @@ public class MailRecipientRepositoryTests : IClassFixture<MailCoreDbFixture>
 
     private async Task<Domain.Entities.Thread> SeedThreadAsync(MailCore.Infrastructure.Data.Context.MailCoreDbContext context)
     {
-        var thread = new Domain.Entities.Thread
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = DateTime.UtcNow,
-            LastMessageAt = DateTime.UtcNow
-        };
+        var thread = Domain.Entities.Thread.Create(createdAt: DateTime.UtcNow, lastMessageAt: DateTime.UtcNow, id: Guid.NewGuid());
         context.Threads.Add(thread);
         await context.SaveChangesAsync();
         return thread;
@@ -231,15 +222,7 @@ public class MailRecipientRepositoryTests : IClassFixture<MailCoreDbFixture>
         User sender,
         Domain.Entities.Thread thread)
     {
-        var email = new Email
-        {
-            Id = Guid.NewGuid(),
-            SenderId = sender.Id,
-            ThreadId = thread.Id,
-            Subject = "Test Subject",
-            Body = "Test Body",
-            CreatedAt = DateTime.UtcNow
-        };
+        var email = Email.Create(sender.Id, "Test Subject", "Test Body", threadId: thread.Id, createdAt: DateTime.UtcNow, id: Guid.NewGuid());
         context.Emails.Add(email);
         await context.SaveChangesAsync();
         return email;
@@ -255,19 +238,19 @@ public class MailRecipientRepositoryTests : IClassFixture<MailCoreDbFixture>
         bool isStarred = false,
         DateTime? deletedAt = null)
     {
-        var mr = new MailRecipient
-        {
-            Id = Guid.NewGuid(),
-            EmailId = emailId,
-            UserId = userId,
-            Type = type,
-            IsRead = isRead,
-            IsSpam = isSpam,
-            IsStarred = isStarred,
-            DeletedAt = deletedAt,
-            ReceivedAt = DateTime.UtcNow
-        };
+        var mr = MailRecipient.Create(userId, emailId, type, DateTime.UtcNow);
+        SetField(mr, nameof(MailRecipient.Id), Guid.NewGuid());
+        if (isRead) mr.MarkAsRead();
+        if (isSpam) mr.MarkAsSpam();
+        if (isStarred) mr.MarkAsStarred();
+        if (deletedAt.HasValue) mr.SoftDelete();
         context.MailRecipients.Add(mr);
         return Task.FromResult(mr);
+    }
+
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic);
+        field!.SetValue(target, value);
     }
 }

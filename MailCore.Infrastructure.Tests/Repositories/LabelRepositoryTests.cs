@@ -17,13 +17,7 @@ public class LabelRepositoryTests : RepositoryTestBase
     public async Task AddAsync_And_GetByIdAsync_Persists()
     {
         var user = await SeedUserAsync();
-        var label = new Label
-        {
-            Id = Guid.NewGuid(),
-            UserId = user.Id,
-            Name = "Important",
-            Color = "#ff0000"
-        };
+        var label = Label.Create(user.Id, "Important", "#ff0000", id: Guid.NewGuid());
 
         await _sut.AddAsync(label);
         await SaveAndDetachAsync();
@@ -45,11 +39,11 @@ public class LabelRepositoryTests : RepositoryTestBase
     public async Task UpdateAsync_ExistingLabel_UpdatesFields()
     {
         var user = await SeedUserAsync();
-        var label = new Label { Id = Guid.NewGuid(), UserId = user.Id, Name = "Old", Color = "blue" };
+        var label = Label.Create(user.Id, "Old", "blue", id: Guid.NewGuid());
         Context.Labels.Add(label);
         await SaveAndDetachAsync();
 
-        var updated = new Label { Name = "New", Color = "green", IsSystemLabel = true };
+        var updated = Label.Create(Guid.Empty, "New", "green", isSystem: true);
         var result = await _sut.UpdateAsync(label.Id, updated);
 
         Assert.Equal("New", result.Name);
@@ -61,14 +55,14 @@ public class LabelRepositoryTests : RepositoryTestBase
     public async Task UpdateAsync_NotFound_ThrowsKeyNotFoundException()
     {
         await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            _sut.UpdateAsync(Guid.NewGuid(), new Label { Name = "X", Color = "Y" }));
+            _sut.UpdateAsync(Guid.NewGuid(), Label.Create(Guid.Empty, "X", "Y")));
     }
 
     [Fact]
     public async Task DeleteAsync_ExistingLabel_RemovesFromDb()
     {
         var user = await SeedUserAsync();
-        var label = new Label { Id = Guid.NewGuid(), UserId = user.Id, Name = "ToDelete", Color = "red" };
+        var label = Label.Create(user.Id, "ToDelete", "red", id: Guid.NewGuid());
         Context.Labels.Add(label);
         await SaveAndDetachAsync();
 
@@ -92,9 +86,9 @@ public class LabelRepositoryTests : RepositoryTestBase
         var bob = await SeedUserAsync();
 
         Context.Labels.AddRange(
-             new Label { Id = Guid.NewGuid(), UserId = alice.Id, Name = "Work", Color = "blue" },
-            new Label { Id = Guid.NewGuid(), UserId = alice.Id, Name = "Personal", Color = "green" },
-          new Label { Id = Guid.NewGuid(), UserId = bob.Id, Name = "BobLabel", Color = "red" }
+             Label.Create(alice.Id, "Work", "blue", id: Guid.NewGuid()),
+            Label.Create(alice.Id, "Personal", "green", id: Guid.NewGuid()),
+          Label.Create(bob.Id, "BobLabel", "red", id: Guid.NewGuid())
         );
         await SaveAndDetachAsync();
 
@@ -106,16 +100,21 @@ public class LabelRepositoryTests : RepositoryTestBase
 
     private async Task<User> SeedUserAsync()
     {
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Name = $"user-{Guid.NewGuid():N}",
-            Email = $"{Guid.NewGuid():N}@test.com",
-            PasswordHash = "hash",
-            CreatedAt = FixedNow
-        };
+        var user = User.Create(
+            $"user-{Guid.NewGuid():N}",
+            $"{Guid.NewGuid():N}@test.com",
+            "hash"
+        );
+        user.Id = Guid.NewGuid();
+        user.CreatedAt = FixedNow;
         Context.Users.Add(user);
         await Context.SaveChangesAsync();
         return user;
+    }
+
+    private static void SetField<T>(T target, string propertyName, object value)
+    {
+        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        field!.SetValue(target, value);
     }
 }

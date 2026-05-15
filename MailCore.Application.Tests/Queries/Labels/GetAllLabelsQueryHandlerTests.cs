@@ -22,8 +22,8 @@ public class GetAllLabelsQueryHandlerTests
         var userId = Guid.NewGuid();
         var labels = new List<Label>
         {
-            new Label { Id = Guid.NewGuid(), UserId = userId, Name = "Work", Color = "Blue" },
-            new Label { Id = Guid.NewGuid(), UserId = userId, Name = "Personal", Color = "Green" }
+            Label.Create(userId, "Work", "Blue"),
+            Label.Create(userId, "Personal", "Green")
         };
 
         _labelRepo.Setup(r => r.GetAllAsync(userId, default)).ReturnsAsync(labels);
