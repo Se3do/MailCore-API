@@ -135,7 +135,7 @@ MailCore/
 ├── MailCore.Infrastructure/            # EF Core, repositories, SMTP sender, file storage
 ├── MailCore.Infrastructure.Tests/      # Unit tests for Infrastructure layer
 ├── MailCore.IntegrationTests/          # Integration tests with Testcontainers
-├── .github/workflows/                  # CI (develop) + CD (master) pipelines
+├── .github/workflows/                  # CI + CD (both master branch) pipelines
 ├── Dockerfile                          # Container image for the API
 ├── docker-compose.yml                  # SQL Server + MailHog + API
 └── MailCore.sln                        # Solution file
@@ -144,7 +144,7 @@ MailCore/
 ## Deployment
 
 CI/CD configured via GitHub Actions:
-- **CI** runs on `develop` pushes — build + unit tests
+- **CI** runs on `master` pushes — build + unit tests
 - **CD** runs on `master` pushes — build → test → publish → deploy to MonsterASP via Web Deploy (`rasmusbuchholdt/simply-web-deploy`)
 
 Set these GitHub secrets for deployment:
