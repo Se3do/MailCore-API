@@ -92,6 +92,7 @@ namespace MailCore.Infrastructure.MailSender
 
             await client.SendAsync(message, ct);
             await client.DisconnectAsync(true, ct);
+            message.Body?.Dispose();
         }
     }
 }

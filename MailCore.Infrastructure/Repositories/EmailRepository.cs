@@ -18,6 +18,7 @@ namespace MailCore.Infrastructure.Repositories
         {
             await _context.Emails.AddAsync(email, cancellationToken);
         }
+        // Read-only display — no tracking needed.
         public async Task<Email?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _context.Emails

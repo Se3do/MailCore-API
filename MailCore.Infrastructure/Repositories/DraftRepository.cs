@@ -17,23 +17,21 @@ namespace MailCore.Infrastructure.Repositories
         {
             await _context.Drafts.AddAsync(draft, cancellationToken);
         }
-        public async Task<Draft> UpdateAsync(Guid Id, Draft draft, CancellationToken cancellationToken = default)
+        public async Task<Draft> UpdateAsync(Guid id, Draft draft, CancellationToken cancellationToken = default)
         {
-            var existingDraft = await _context.Drafts.FirstOrDefaultAsync(d => d.Id == Id, cancellationToken);
+            var existingDraft = await _context.Drafts.FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
             if (existingDraft == null)
             {
-                throw new KeyNotFoundException($"Draft with Id {Id} not found.");
+                throw new KeyNotFoundException($"Draft with Id {id} not found.");
             }
 
-            existingDraft.Subject = draft.Subject;
-            existingDraft.Body = draft.Body;
-            existingDraft.UpdatedAt = draft.UpdatedAt;
+            existingDraft.UpdateContent(draft.Subject, draft.Body, draft.ToRecipients, draft.CcRecipients, draft.BccRecipients);
 
             return existingDraft;
         }
-        public async Task DeleteAsync(Guid Id, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var draft = await _context.Drafts.FirstOrDefaultAsync(d => d.Id == Id, cancellationToken);
+            var draft = await _context.Drafts.FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
             if (draft != null)
             {
                 _context.Drafts.Remove(draft);

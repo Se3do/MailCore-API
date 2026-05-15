@@ -8,7 +8,7 @@ namespace MailCore.Infrastructure.Repositories
 {
     public class MailRecipientRepository : IMailRecipientRepository
     {
-        MailCoreDbContext _context;
+        private readonly MailCoreDbContext _context;
         public MailRecipientRepository(MailCoreDbContext context)
         {
             _context = context;
@@ -112,6 +112,7 @@ namespace MailCore.Infrastructure.Repositories
                 .Take(pageSize + 1)
                 .ToListAsync(cancellationToken);
         }
+        // Used for mutations (mark read/spam/star/delete) — tracking required.
         public async Task<MailRecipient?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _context.MailRecipients

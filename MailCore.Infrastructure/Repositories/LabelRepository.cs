@@ -24,9 +24,9 @@ namespace MailCore.Infrastructure.Repositories
             if (existingLabel is null)
                 throw new KeyNotFoundException($"Label with id '{id}' was not found.");
 
-            existingLabel.Name = label.Name;
-            existingLabel.Color = label.Color;
-            existingLabel.IsSystemLabel = label.IsSystemLabel;
+            existingLabel.Update(label.Name, label.Color);
+            if (label.IsSystemLabel)
+                existingLabel.MarkAsSystem();
 
             return existingLabel;
         }

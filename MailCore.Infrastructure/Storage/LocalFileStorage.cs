@@ -53,7 +53,7 @@ namespace MailCore.Infrastructure.Storage
             if (!File.Exists(fullPath))
                 throw new FileNotFoundException("File not found", fullPath);
 
-            Stream stream = File.OpenRead(fullPath);
+            Stream stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
             return Task.FromResult(stream);
         }
     }
