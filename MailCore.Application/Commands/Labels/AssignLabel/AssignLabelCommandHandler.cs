@@ -40,11 +40,7 @@ namespace MailCore.Application.Commands.Labels.AssignLabel
                 return true;
             }
 
-            mailRecipient.Labels.Add(new MailRecipientLabel
-            {
-                MailRecipientId = mailRecipient.Id,
-                LabelId = labelId
-            });
+            mailRecipient.Labels.Add(MailRecipientLabel.Create(mailRecipient.Id, labelId));
 
             return true;
         }

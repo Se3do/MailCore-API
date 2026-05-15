@@ -21,7 +21,7 @@ namespace MailCore.Application.Commands.Mailbox.Restore
             if (mr.UserId != cmd.UserId)
                 throw new ForbiddenException("You do not have access to this mail.");
 
-            mr.DeletedAt = null;
+            mr.Restore();
             return true;
         }
     }

@@ -1,8 +1,8 @@
 ﻿using MailCore.Application.Interfaces.Services;
+using MailCore.Application.Models;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailCore.Domain.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace MailCore.Application.Emails
 {
@@ -36,30 +36,21 @@ namespace MailCore.Application.Emails
                 var user = await _userRepository.GetByEmailAsync(address, ct)
                            ?? throw new KeyNotFoundException($"Recipient not found: {address}");
 
-                await _mailRecipientRepository.AddAsync(new MailRecipient
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = user.Id,
-                    EmailId = email.Id,
-                    Type = type,
-                    IsRead = false,
-                    IsSpam = false,
-                    IsStarred = false,
-                    ReceivedAt = receivedAt
-                }, ct);
+                var mr = MailRecipient.Create(user.Id, email.Id, type, receivedAt);
+                await _mailRecipientRepository.AddAsync(mr, ct);
             }
         }
 
         public async Task HandleAttachmentsAsync(
             Email email,
-            IReadOnlyCollection<IFormFile>? attachments,
+            IReadOnlyCollection<FileData>? attachments,
             CancellationToken ct)
         {
             if (attachments is not { Count: > 0 })
                 return;
 
             await _attachmentService.AddAsync(email, attachments, ct);
-            email.HasAttachments = true;
+            email.AttachFiles();
         }
     }
 

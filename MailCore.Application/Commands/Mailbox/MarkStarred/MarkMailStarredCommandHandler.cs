@@ -18,7 +18,7 @@ namespace MailCore.Application.Commands.Mailbox.MarkStarred
             if (mr.UserId != cmd.UserId)
                 throw new ForbiddenException("You do not have access to this mail.");
 
-            mr.IsStarred = true;
+            mr.MarkAsStarred();
             return true;
         }
     }

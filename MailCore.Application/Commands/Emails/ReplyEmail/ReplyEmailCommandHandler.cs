@@ -42,17 +42,9 @@ namespace MailCore.Application.Commands.Emails.ReplyEmail
                 ?? throw new NotFoundException($"Thread {original.ThreadId} not found.");
 
             var now = DateTime.UtcNow;
-            thread.LastMessageAt = now;
+            thread.Touch();
 
-            var email = new Email
-            {
-                Id = Guid.NewGuid(),
-                SenderId = command.UserId,
-                Subject = BuildReplySubject(original.Subject),
-                Body = command.Request.Body,
-                CreatedAt = now,
-                ThreadId = thread.Id
-            };
+            var email = Email.Create(command.UserId, BuildReplySubject(original.Subject), command.Request.Body, thread.Id);
 
             await _emailRepository.AddAsync(email, ct);
 

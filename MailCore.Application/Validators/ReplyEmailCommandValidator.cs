@@ -1,11 +1,12 @@
 using FluentValidation;
 using MailCore.Application.Commands.Emails.ReplyEmail;
+using MailCore.Domain.Common;
 
 namespace MailCore.Application.Validators;
 
 public sealed class ReplyEmailCommandValidator : AbstractValidator<ReplyEmailCommand>
 {
-public ReplyEmailCommandValidator()
+    public ReplyEmailCommandValidator()
     {
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("UserId is required.");
@@ -28,9 +29,9 @@ public ReplyEmailCommandValidator()
             .EmailAddress().WithMessage("BCC '{PropertyValue}' is not a valid email address.")
             .When(x => x.Request.Bcc is not null && x.Request.Bcc.Count > 0);
 
-   RuleForEach(x => x.Request.Attachments!)
-            .Must(f => f.Length <= 10 * 1024 * 1024)
-            .WithMessage("Each attachment must not exceed 10 MB.")
+        RuleForEach(x => x.Request.Attachments!)
+            .Must(f => f.Length <= DomainConstants.MaxAttachmentSizeBytes)
+            .WithMessage($"Each attachment must not exceed {DomainConstants.MaxAttachmentSizeBytes / (1024 * 1024)} MB.")
             .When(x => x.Request.Attachments is not null && x.Request.Attachments.Count > 0);
     }
 }

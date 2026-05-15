@@ -19,12 +19,12 @@ namespace MailCore.Application.Commands.Drafts.UpdateDraft
             if (draft.UserId != command.UserId)
                  throw new ForbiddenException("You do not have access to this draft.");
 
-            draft.Subject = command.Request.Subject;
-            draft.Body = command.Request.Body;
-            draft.ToRecipients = DraftRecipientsCodec.Serialize(command.Request.To);
-            draft.CcRecipients = DraftRecipientsCodec.Serialize(command.Request.Cc);
-            draft.BccRecipients = DraftRecipientsCodec.Serialize(command.Request.Bcc);
-            draft.UpdatedAt = DateTime.UtcNow;
+            draft.UpdateContent(
+                command.Request.Subject,
+                command.Request.Body,
+                DraftRecipientsCodec.Serialize(command.Request.To),
+                DraftRecipientsCodec.Serialize(command.Request.Cc),
+                DraftRecipientsCodec.Serialize(command.Request.Bcc));
 
             await _draftRepository.UpdateAsync(command.DraftId, draft, ct);
             return true;

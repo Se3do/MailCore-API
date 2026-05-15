@@ -1,11 +1,11 @@
 using FluentValidation;
-using MailCore.API.Contracts.Requests;
+using MailCore.Application.Commands.Auth.LoginUser;
 
-namespace MailCore.API.Validators;
+namespace MailCore.Application.Validators;
 
-public sealed class LoginRequestValidator : AbstractValidator<LoginRequest>
+public sealed class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
 {
-    public LoginRequestValidator()
+    public LoginUserCommandValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")

@@ -1,8 +1,9 @@
 ﻿using MailCore.Application.Interfaces.Persistence;
 using MailCore.Application.Interfaces.Services;
+using MailCore.Application.Models;
+using MailCore.Domain.Common;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace MailCore.Application.Services
 {
@@ -10,8 +11,6 @@ namespace MailCore.Application.Services
     {
         private readonly IAttachmentRepository _attachmentRepository;
         private readonly IFileStorage _fileStorage;
-
-        private const long MaxFileSizeBytes = 10 * 1024 * 1024; // 10 MB
 
         public AttachmentService(
             IAttachmentRepository attachmentRepository,
@@ -23,7 +22,7 @@ namespace MailCore.Application.Services
 
         public async Task AddAsync(
             Email email,
-            IReadOnlyCollection<IFormFile> files,
+            IReadOnlyCollection<FileData> files,
             CancellationToken cancellationToken)
         {
             if (email is null)
@@ -39,33 +38,19 @@ namespace MailCore.Application.Services
                 if (file is null || file.Length == 0)
                     continue;
 
-                if (file.Length > MaxFileSizeBytes)
+                if (file.Length > DomainConstants.MaxAttachmentSizeBytes)
                     throw new ArgumentException(
                         $"Attachment '{file.FileName}' exceeds the maximum allowed size.");
-
-                var fileName = Path.GetFileName(file.FileName);
-                var contentType = string.IsNullOrWhiteSpace(file.ContentType)
-                    ? "application/octet-stream"
-                    : file.ContentType;
 
                 await using var stream = file.OpenReadStream();
 
                 var storageKey = await _fileStorage.SaveAsync(
                     stream,
-                    fileName,
-                    contentType,
+                    file.FileName,
+                    file.ContentType,
                     cancellationToken);
 
-                var attachment = new Attachment
-                {
-                    Id = Guid.NewGuid(),
-                    EmailId = email.Id,
-                    FileName = fileName,
-                    ContentType = contentType,
-                    FileSize = file.Length,
-                    StorageKey = storageKey,
-                    CreatedAt = DateTime.UtcNow
-                };
+                var attachment = Attachment.Create(email.Id, file.FileName, file.ContentType, file.Length, storageKey);
 
                 await _attachmentRepository.AddAsync(attachment, cancellationToken);
             }

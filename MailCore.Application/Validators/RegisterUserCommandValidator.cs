@@ -1,11 +1,11 @@
 using FluentValidation;
-using MailCore.API.Contracts.Requests;
+using MailCore.Application.Commands.Auth.RegisterUser;
 
-namespace MailCore.API.Validators;
+namespace MailCore.Application.Validators;
 
-public sealed class RegisterRequestValidator : AbstractValidator<RegisterRequest>
+public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
-    public RegisterRequestValidator()
+    public RegisterUserCommandValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")

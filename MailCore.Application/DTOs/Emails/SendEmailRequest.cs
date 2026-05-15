@@ -1,5 +1,4 @@
-﻿using MailCore.Application.DTOs.Attachments;
-using Microsoft.AspNetCore.Http;
+﻿using MailCore.Application.Models;
 namespace MailCore.Application.DTOs.Emails;
 
 /// <summary>Request to send a new email message.</summary>
@@ -10,5 +9,5 @@ public sealed record SendEmailRequest(
     IReadOnlyList<string>? Cc,
     IReadOnlyList<string>? Bcc,
     Guid? ThreadId,
-    IReadOnlyList<IFormFile>? Attachments
+    IReadOnlyList<FileData>? Attachments
 );

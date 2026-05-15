@@ -18,7 +18,7 @@ namespace MailCore.Application.Commands.Mailbox.MarkSpam
             if (mr.UserId != cmd.UserId)
                  throw new ForbiddenException("You do not have access to this mail.");
 
-            mr.IsSpam = true;
+            mr.MarkAsSpam();
             return true;
         }
     }

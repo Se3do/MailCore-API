@@ -1,5 +1,4 @@
-﻿using MailCore.Application.DTOs.Attachments;
-using Microsoft.AspNetCore.Http;
+﻿using MailCore.Application.Models;
 
 namespace MailCore.Application.DTOs.Emails;
 
@@ -9,5 +8,5 @@ public sealed record ForwardEmailRequest(
     IReadOnlyList<string> To,
     IReadOnlyList<string>? Cc,
     IReadOnlyList<string>? Bcc,
-    IReadOnlyList<IFormFile>? Attachments
+    IReadOnlyList<FileData>? Attachments
 );

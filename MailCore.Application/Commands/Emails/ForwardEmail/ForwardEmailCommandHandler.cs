@@ -39,26 +39,14 @@ namespace MailCore.Application.Commands.Emails.ForwardEmail
 
             var now = DateTime.UtcNow;
 
-            var thread = new Domain.Entities.Thread
-            {
-                Id = Guid.NewGuid(),
-                CreatedAt = now,
-                LastMessageAt = now
-            };
+            var thread = Domain.Entities.Thread.Create();
 
             await _threadRepository.AddAsync(thread, ct);
 
-            var email = new Email
-            {
-                Id = Guid.NewGuid(),
-                SenderId = command.UserId,
-                Subject = original.Subject.StartsWith("Fwd:", StringComparison.OrdinalIgnoreCase)
-                    ? original.Subject
-                    : $"Fwd: {original.Subject}",
-                Body = command.Request.Body,
-                CreatedAt = now,
-                ThreadId = thread.Id
-            };
+            var subject = original.Subject.StartsWith("Fwd:", StringComparison.OrdinalIgnoreCase)
+                ? original.Subject
+                : $"Fwd: {original.Subject}";
+            var email = Email.Create(command.UserId, subject, command.Request.Body, thread.Id);
 
             await _emailRepository.AddAsync(email, ct);
 

@@ -16,13 +16,7 @@ namespace MailCore.Application.Commands.Labels.CreateLabel
         {
             var userId = command.userId;
             var request = command.request;
-            var label = new Domain.Entities.Label
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Name = request.Name,
-                Color = request.Color ?? string.Empty
-            };
+            var label = MailCore.Domain.Entities.Label.Create(userId, request.Name, request.Color ?? string.Empty);
             await _labelRepository.AddAsync(label, ct);
             return label.Id;
         }

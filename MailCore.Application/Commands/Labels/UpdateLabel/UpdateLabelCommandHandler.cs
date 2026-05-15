@@ -20,8 +20,7 @@ namespace MailCore.Application.Commands.Labels.UpdateLabel
             if (label.UserId != command.userId)
                 throw new ForbiddenException("You do not have access to this label.");
 
-            label.Name = command.request.Name;
-            label.Color = command.request.Color ?? string.Empty;
+            label.Update(command.request.Name, command.request.Color ?? string.Empty);
 
             await _labelRepository.UpdateAsync(command.labelId, label, ct);
 

@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using MailCore.API.Contracts.Requests;
 using MailCore.API.Extensions;
 using MailCore.Application.Commands.Emails.SendEmail;
 using MailCore.Application.Commands.Emails.ForwardEmail;
@@ -39,9 +40,9 @@ namespace MailCore.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> SendEmail([FromForm] SendEmailRequest request, CancellationToken ct)
+        public async Task<IActionResult> SendEmail([FromForm] SendEmailFormRequest request, CancellationToken ct)
         {
-            await _mediator.Send(new SendEmailCommand(UserId, request), ct);
+            await _mediator.Send(new SendEmailCommand(UserId, request.ToApplicationRequest()), ct);
             return NoContent();
         }
 
@@ -55,9 +56,9 @@ namespace MailCore.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ForwardEmail(Guid emailId, [FromForm] ForwardEmailRequest request, CancellationToken ct)
+        public async Task<IActionResult> ForwardEmail(Guid emailId, [FromForm] ForwardEmailFormRequest request, CancellationToken ct)
         {
-            await _mediator.Send(new ForwardEmailCommand(UserId, emailId, request), ct);
+            await _mediator.Send(new ForwardEmailCommand(UserId, emailId, request.ToApplicationRequest()), ct);
             return NoContent();
         }
 
@@ -71,9 +72,9 @@ namespace MailCore.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ReplyEmail(Guid emailId, [FromForm] ReplyEmailRequest request, CancellationToken ct)
+        public async Task<IActionResult> ReplyEmail(Guid emailId, [FromForm] ReplyEmailFormRequest request, CancellationToken ct)
         {
-            await _mediator.Send(new ReplyEmailCommand(UserId, emailId, request), ct);
+            await _mediator.Send(new ReplyEmailCommand(UserId, emailId, request.ToApplicationRequest()), ct);
             return NoContent();
         }
 

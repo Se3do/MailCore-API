@@ -16,18 +16,14 @@ namespace MailCore.Application.Commands.Drafts.CreateDraft
 
         public async Task<Guid> Handle(CreateDraftCommand command, CancellationToken ct)
         {
-            var draft = new Draft
-            {
-                Id = Guid.NewGuid(),
-                UserId = command.UserId,
-                ThreadId = command.Request.ThreadId,
-                Subject = command.Request.Subject,
-                Body = command.Request.Body,
-                ToRecipients = DraftRecipientsCodec.Serialize(command.Request.To),
-                CcRecipients = DraftRecipientsCodec.Serialize(command.Request.Cc),
-                BccRecipients = DraftRecipientsCodec.Serialize(command.Request.Bcc),
-                UpdatedAt = DateTime.UtcNow
-            };
+            var draft = Draft.Create(
+                command.UserId,
+                command.Request.Subject,
+                command.Request.Body,
+                DraftRecipientsCodec.Serialize(command.Request.To),
+                DraftRecipientsCodec.Serialize(command.Request.Cc),
+                DraftRecipientsCodec.Serialize(command.Request.Bcc),
+                command.Request.ThreadId);
 
             await _draftRepository.AddAsync(draft, ct);
             return draft.Id;

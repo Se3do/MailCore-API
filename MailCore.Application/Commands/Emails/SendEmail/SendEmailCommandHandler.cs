@@ -50,16 +50,7 @@ namespace MailCore.Application.Commands.Emails.SendEmail
             var now = DateTime.UtcNow;
             var thread = await GetOrCreateThreadAsync(request.ThreadId, now, cancellationToken);
 
-            var email = new Email
-            {
-                Id = Guid.NewGuid(),
-                SenderId = userId,
-                Subject = request.Subject,
-                Body = request.Body,
-                CreatedAt = now,
-                ThreadId = thread.Id,
-                DeliveryStatus = EmailDeliveryStatus.Pending
-            };
+            var email = Email.Create(userId, request.Subject, request.Body, thread.Id, createdAt: now);
 
             await _emailRepository.AddAsync(email, cancellationToken);
 
@@ -90,16 +81,11 @@ namespace MailCore.Application.Commands.Emails.SendEmail
                 var thread = await _threadRepository.GetByIdAsync(threadId.Value, ct)
                              ?? throw new KeyNotFoundException("Thread not found.");
 
-                thread.LastMessageAt = now;
+                thread.Touch();
                 return thread;
             }
 
-            var newThread = new Domain.Entities.Thread
-            {
-                Id = Guid.NewGuid(),
-                CreatedAt = now,
-                LastMessageAt = now
-            };
+            var newThread = Domain.Entities.Thread.Create(createdAt: now, lastMessageAt: now);
 
             await _threadRepository.AddAsync(newThread, ct);
             return newThread;

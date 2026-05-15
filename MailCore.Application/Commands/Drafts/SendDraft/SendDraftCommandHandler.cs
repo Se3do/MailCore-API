@@ -52,15 +52,8 @@ public sealed class SendDraftCommandHandler : IRequestHandler<SendDraftCommand>
 
         var thread = await GetOrCreateThreadAsync(draft.ThreadId, now, ct);
 
-        var email = new Email
-        {
-            Id = Guid.NewGuid(),
-            SenderId = command.UserId,
-            Subject = string.IsNullOrWhiteSpace(draft.Subject) ? "(No subject)" : draft.Subject,
-            Body = draft.Body,
-            CreatedAt = now,
-            ThreadId = thread.Id
-        };
+        var subject = string.IsNullOrWhiteSpace(draft.Subject) ? "(No subject)" : draft.Subject;
+        var email = Email.Create(command.UserId, subject, draft.Body, thread.Id);
 
         await _emailRepository.AddAsync(email, ct);
 
@@ -84,16 +77,11 @@ public sealed class SendDraftCommandHandler : IRequestHandler<SendDraftCommand>
         {
             var existing = await _threadRepository.GetByIdAsync(threadId.Value, ct)
                 ?? throw new NotFoundException($"Thread {threadId.Value} not found.");
-            existing.LastMessageAt = now;
+            existing.Touch();
             return existing;
         }
 
-        var thread = new Domain.Entities.Thread
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = now,
-            LastMessageAt = now
-        };
+        var thread = Domain.Entities.Thread.Create();
 
         await _threadRepository.AddAsync(thread, ct);
         return thread;

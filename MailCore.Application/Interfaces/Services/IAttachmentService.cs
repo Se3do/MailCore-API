@@ -1,11 +1,11 @@
-﻿using MailCore.Domain.Entities;
-using Microsoft.AspNetCore.Http;
+﻿using MailCore.Application.Models;
+using MailCore.Domain.Entities;
 
 namespace MailCore.Application.Interfaces.Services
 {
     public interface IAttachmentService
     {
-        Task AddAsync(Email email, IReadOnlyCollection<IFormFile> files, CancellationToken cancellationToken);
+        Task AddAsync(Email email, IReadOnlyCollection<FileData> files, CancellationToken cancellationToken);
     }
 
 }
