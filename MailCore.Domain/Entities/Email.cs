@@ -1,4 +1,5 @@
-﻿using MailCore.Domain.Enums;
+﻿using MailCore.Domain.Common;
+using MailCore.Domain.Enums;
 
 namespace MailCore.Domain.Entities
 {
@@ -50,7 +51,7 @@ namespace MailCore.Domain.Entities
         {
             SendAttempts++;
             LastSendError = error;
-            if (SendAttempts >= 3)
+            if (SendAttempts >= DomainConstants.MaxSendAttempts)
                 DeliveryStatus = EmailDeliveryStatus.Failed;
         }
 

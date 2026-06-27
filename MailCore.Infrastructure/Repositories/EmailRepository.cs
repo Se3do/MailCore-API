@@ -34,7 +34,7 @@ namespace MailCore.Infrastructure.Repositories
             return await _context.Emails
                 .AsTracking()
                 .Include(e => e.Attachments)
-                .Where(e => e.DeliveryStatus == EmailDeliveryStatus.Pending && e.SendAttempts < 3)
+                .Where(e => e.DeliveryStatus == EmailDeliveryStatus.Pending && e.SendAttempts < DomainConstants.MaxSendAttempts)
                 .OrderBy(e => e.CreatedAt)
                 .Take(batchSize)
                 .ToListAsync(cancellationToken);
