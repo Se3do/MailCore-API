@@ -1,4 +1,5 @@
 ﻿using MailCore.Application.Emails;
+using MailCore.Application.Exceptions;
 using MailCore.Application.Interfaces.Services;
 using MailCore.Application.Mappers;
 using MailCore.Application.Notifications;
@@ -44,7 +45,7 @@ namespace MailCore.Application.Commands.Emails.SendEmail
             var sender = await _userRepository.GetByIdAsync(userId, cancellationToken);
             if (sender == null)
             {
-                throw new KeyNotFoundException("Sender not found.");
+                throw new NotFoundException("Sender not found.");
             }
 
             var now = DateTime.UtcNow;
@@ -79,7 +80,7 @@ namespace MailCore.Application.Commands.Emails.SendEmail
             if (threadId.HasValue)
             {
                 var thread = await _threadRepository.GetByIdAsync(threadId.Value, ct)
-                             ?? throw new KeyNotFoundException("Thread not found.");
+                             ?? throw new NotFoundException("Thread not found.");
 
                 thread.Touch();
                 return thread;

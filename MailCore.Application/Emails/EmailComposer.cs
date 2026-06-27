@@ -1,4 +1,5 @@
-﻿using MailCore.Application.Interfaces.Services;
+﻿using MailCore.Application.Exceptions;
+using MailCore.Application.Interfaces.Services;
 using MailCore.Application.Models;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
@@ -34,7 +35,7 @@ namespace MailCore.Application.Emails
                          .Distinct(StringComparer.OrdinalIgnoreCase))
             {
                 var user = await _userRepository.GetByEmailAsync(address, ct)
-                           ?? throw new KeyNotFoundException($"Recipient not found: {address}");
+                           ?? throw new NotFoundException($"Recipient not found: {address}");
 
                 var mr = MailRecipient.Create(user.Id, email.Id, type, receivedAt);
                 await _mailRecipientRepository.AddAsync(mr, ct);

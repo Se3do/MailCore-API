@@ -1,6 +1,7 @@
 using MailCore.Application.Commands.Emails.SendEmail;
 using MailCore.Application.DTOs.Emails;
 using MailCore.Application.Emails;
+using MailCore.Application.Exceptions;
 using MailCore.Application.Interfaces.Services;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
@@ -106,35 +107,35 @@ public async Task Handle_AddsMailRecipientForEachToAddress()
     // ?? Failure paths ????????????????????????????????????????????????????????
 
     [Fact]
-    public async Task Handle_SenderNotFound_ThrowsKeyNotFoundException()
+    public async Task Handle_SenderNotFound_ThrowsNotFoundException()
     {
   _userRepo.Setup(r => r.GetByIdAsync(_userId, default)).ReturnsAsync((User?)null);
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(
+        await Assert.ThrowsAsync<NotFoundException>(
         () => _sut.Handle(ValidCommand(), default));
 
     _emailRepo.Verify(r => r.AddAsync(It.IsAny<Email>(), default), Times.Never);
     }
 
     [Fact]
-    public async Task Handle_ThreadNotFound_ThrowsKeyNotFoundException()
+    public async Task Handle_ThreadNotFound_ThrowsNotFoundException()
 {
    var threadId = Guid.NewGuid();
         _userRepo.Setup(r => r.GetByIdAsync(_userId, default)).ReturnsAsync(_sender);
 _threadRepo.Setup(r => r.GetByIdAsync(threadId, default)).ReturnsAsync((Domain.Entities.Thread?)null);
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(
+        await Assert.ThrowsAsync<NotFoundException>(
 () => _sut.Handle(ValidCommand(threadId), default));
     }
 
     [Fact]
-    public async Task Handle_RecipientNotFound_ThrowsKeyNotFoundException()
+    public async Task Handle_RecipientNotFound_ThrowsNotFoundException()
 {
         _userRepo.Setup(r => r.GetByIdAsync(_userId, default)).ReturnsAsync(_sender);
    _userRepo.Setup(r => r.GetByEmailAsync("recipient@example.com", default))
    .ReturnsAsync((User?)null);
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(
+        await Assert.ThrowsAsync<NotFoundException>(
             () => _sut.Handle(ValidCommand(), default));
     }
 }
