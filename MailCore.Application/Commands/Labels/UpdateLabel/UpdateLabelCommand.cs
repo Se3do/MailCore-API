@@ -4,5 +4,5 @@ using MediatR;
 
 namespace MailCore.Application.Commands.Labels.UpdateLabel
 {
-    public record UpdateLabelCommand(Guid userId, Guid labelId, UpdateLabelRequest request) : IRequest<bool>, ICommand;
+    public record UpdateLabelCommand(Guid UserId, Guid LabelId, UpdateLabelRequest Request) : IRequest<bool>, ICommand;
 }

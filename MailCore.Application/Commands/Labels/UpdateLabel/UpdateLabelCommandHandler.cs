@@ -14,15 +14,15 @@ namespace MailCore.Application.Commands.Labels.UpdateLabel
 
         public async Task<bool> Handle(UpdateLabelCommand command, CancellationToken ct)
         {
-            var label = await _labelRepository.GetByIdAsync(command.labelId, ct)
-                ?? throw new NotFoundException($"Label {command.labelId} not found.");
+            var label = await _labelRepository.GetByIdAsync(command.LabelId, ct)
+                ?? throw new NotFoundException($"Label {command.LabelId} not found.");
 
-            if (label.UserId != command.userId)
+            if (label.UserId != command.UserId)
                 throw new ForbiddenException("You do not have access to this label.");
 
-            label.Update(command.request.Name, command.request.Color ?? string.Empty);
+            label.Update(command.Request.Name, command.Request.Color ?? string.Empty);
 
-            await _labelRepository.UpdateAsync(command.labelId, label, ct);
+            await _labelRepository.UpdateAsync(command.LabelId, label, ct);
 
             return true;
         }

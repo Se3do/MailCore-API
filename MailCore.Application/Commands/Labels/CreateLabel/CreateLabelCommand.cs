@@ -4,5 +4,5 @@ using MediatR;
 
 namespace MailCore.Application.Commands.Labels.CreateLabel
 {
-    public record CreateLabelCommand(Guid userId, CreateLabelRequest request): IRequest<Guid>, ICommand;
+    public record CreateLabelCommand(Guid UserId, CreateLabelRequest Request): IRequest<Guid>, ICommand;
 }

@@ -14,9 +14,9 @@ namespace MailCore.Application.Commands.Labels.UnassignLabel
 
         public async Task<bool> Handle(UnassignLabelCommand command, CancellationToken ct)
         {
-            var userId = command.userId;
-            var mailId = command.mailId;
-            var labelId = command.labelId;
+            var userId = command.UserId;
+            var mailId = command.MailId;
+            var labelId = command.LabelId;
 
             var mailRecipient = await _mailRecipientRepository.GetByIdAsync(mailId, ct);
             if (mailRecipient == null || mailRecipient.UserId != userId)

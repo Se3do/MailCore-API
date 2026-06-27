@@ -7,13 +7,13 @@ public sealed class UnassignLabelCommandValidator : AbstractValidator<UnassignLa
 {
     public UnassignLabelCommandValidator()
     {
-        RuleFor(x => x.userId)
+        RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("UserId is required.");
 
-        RuleFor(x => x.mailId)
+        RuleFor(x => x.MailId)
             .NotEmpty().WithMessage("MailId is required.");
 
-        RuleFor(x => x.labelId)
+        RuleFor(x => x.LabelId)
             .NotEmpty().WithMessage("LabelId is required.");
     }
 }
