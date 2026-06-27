@@ -23,6 +23,7 @@ namespace MailCore.Infrastructure.Repositories
         {
             return await _context.Emails
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(e => e.Sender)
                 .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
@@ -44,6 +45,7 @@ namespace MailCore.Infrastructure.Repositories
         {
             return await _context.Emails
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(e => e.Sender)
                 .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
@@ -65,6 +67,7 @@ namespace MailCore.Infrastructure.Repositories
 
             return await _context.Emails
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(e => e.Sender)
                 .Include(e => e.Recipients)
                     .ThenInclude(r => r.User)
