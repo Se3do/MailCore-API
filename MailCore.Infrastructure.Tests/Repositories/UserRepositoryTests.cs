@@ -59,23 +59,6 @@ public class UserRepositoryTests : RepositoryTestBase
     }
 
     [Fact]
-    public async Task GetByUserNameAsync_ExistingName_ReturnsUser()
-    {
-        await SeedUserAsync("charlie@test.com", "Charlie");
-
-        var result = await _sut.GetByUserNameAsync("Charlie");
-
-        Assert.NotNull(result);
-        Assert.Equal("charlie@test.com", result!.Email);
-    }
-
-    [Fact]
-    public async Task GetByUserNameAsync_NotFound_ReturnsNull()
-    {
-        Assert.Null(await _sut.GetByUserNameAsync("Ghost"));
-    }
-
-    [Fact]
     public async Task ExistsByEmailAsync_ExistingEmail_ReturnsTrue()
     {
         await SeedUserAsync("exists@test.com", "Exists");
@@ -87,20 +70,6 @@ public class UserRepositoryTests : RepositoryTestBase
     public async Task ExistsByEmailAsync_NonExistent_ReturnsFalse()
     {
         Assert.False(await _sut.ExistsByEmailAsync("nope@test.com"));
-    }
-
-    [Fact]
-    public async Task ExistsByUserNameAsync_ExistingName_ReturnsTrue()
-    {
-        await SeedUserAsync("user@test.com", "UniqueUser");
-
-        Assert.True(await _sut.ExistsByUserNameAsync("UniqueUser"));
-    }
-
-    [Fact]
-    public async Task ExistsByUserNameAsync_NonExistent_ReturnsFalse()
-    {
-        Assert.False(await _sut.ExistsByUserNameAsync("NoSuchUser"));
     }
 
     private async Task SeedUserAsync(string email, string name)

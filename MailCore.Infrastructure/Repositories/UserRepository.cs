@@ -26,25 +26,11 @@ namespace MailCore.Infrastructure.Repositories
                 .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
         }
 
-        public Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
-        {
-            return _context.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Name == userName, cancellationToken);
-        }
-
         public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             return _context.Users
                 .AsNoTracking()
                 .AnyAsync(u => u.Email == email, cancellationToken);
-        }
-
-        public Task<bool> ExistsByUserNameAsync(string userName, CancellationToken cancellationToken = default)
-        {
-            return _context.Users
-                .AsNoTracking()
-                .AnyAsync(u => u.Name == userName, cancellationToken);
         }
         public async Task<User> AddAsync(User user, CancellationToken cancellationToken = default)
         {

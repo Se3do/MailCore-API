@@ -17,10 +17,6 @@ namespace MailCore.Infrastructure.Repositories
         {
             await _dbContext.Attachments.AddAsync(attachment, cancellationToken);
         }
-        public async Task<Attachment?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        {
-            return await _dbContext.Attachments.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
-        }
         public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var attachment = await _dbContext.Attachments.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
