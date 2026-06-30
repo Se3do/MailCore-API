@@ -13,6 +13,8 @@ namespace MailCore.Infrastructure.Data.Seeding
             if (await context.Users.AnyAsync())
                 return;
 
+            await using var transaction = await context.Database.BeginTransactionAsync();
+
             var alicePassword = passwordHasher.Hash("alice123");
             var alice = User.Create("Alice Johnson", "alice@mailcore.local", alicePassword);
             var bobPassword = passwordHasher.Hash("bob123");
@@ -54,6 +56,7 @@ namespace MailCore.Infrastructure.Data.Seeding
             context.Drafts.Add(draft);
 
             await context.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
     }
 }
