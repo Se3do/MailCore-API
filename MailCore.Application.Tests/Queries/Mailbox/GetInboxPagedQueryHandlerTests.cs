@@ -25,7 +25,7 @@ public class GetInboxPagedQueryHandlerTests
         var userId = Guid.NewGuid();
         var pagination = new CursorPaginationQuery(null, 10);
         
-        var email = MailCore.Domain.Entities.Email.Create(Guid.NewGuid(), "Test", "Hello", createdAt: DateTime.UtcNow);
+        var email = MailCore.Domain.Entities.Email.Create(Guid.NewGuid(), "Test", "Hello", threadId: Guid.NewGuid(), createdAt: DateTime.UtcNow);
         SetPrivateField(email, "Sender", User.Create("", "s@s.com", ""));
         var mr = MailRecipient.Create(userId, email.Id, RecipientType.To, DateTime.UtcNow);
         SetPrivateField(mr, "Email", email);

@@ -18,7 +18,7 @@ public class AttachmentRepositoryTests : RepositoryTestBase
     {
         var attachment = Attachment.Create(Guid.NewGuid(), "test.txt", "text/plain", 1024, "some-key", id: Guid.NewGuid());
 
-        var contextEmail = Email.Create(Guid.NewGuid(), "Subject", "Body", id: attachment.EmailId, createdAt: DateTime.UtcNow);
+        var contextEmail = Email.Create(Guid.NewGuid(), "Subject", "Body", threadId: Guid.NewGuid(), id: attachment.EmailId, createdAt: DateTime.UtcNow);
         Context.Emails.Add(contextEmail);
         await Context.SaveChangesAsync();
 

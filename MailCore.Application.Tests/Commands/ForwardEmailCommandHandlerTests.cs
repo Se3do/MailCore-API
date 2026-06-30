@@ -31,7 +31,7 @@ public class ForwardEmailCommandHandlerTests
     {
         _sender = User.Create("Sender", "sender@example.com", "hash");
         _sender.Id = _userId;
-        _originalEmail = Email.Create(Guid.NewGuid(), "Original Subject", "Original Body", id: _originalEmailId);
+        _originalEmail = Email.Create(Guid.NewGuid(), "Original Subject", "Original Body", threadId: Guid.NewGuid(), id: _originalEmailId);
 
         _composer = new EmailComposer(
             _userRepo.Object,
@@ -81,7 +81,7 @@ public class ForwardEmailCommandHandlerTests
     [Fact]
     public async Task Handle_SubjectAlreadyHasFwd_DoesNotDuplicatePrefix()
     {
-        var originalWithFwd = Email.Create(Guid.NewGuid(), "Fwd: Original Subject", "", id: _originalEmailId);
+        var originalWithFwd = Email.Create(Guid.NewGuid(), "Fwd: Original Subject", "", threadId: Guid.NewGuid(), id: _originalEmailId);
         _emailRepo.Setup(r => r.GetByIdAsync(_originalEmailId, default)).ReturnsAsync(originalWithFwd);
         _userRepo.Setup(r => r.GetByIdAsync(_userId, default)).ReturnsAsync(_sender);
         SetupRecipient("recipient@example.com");

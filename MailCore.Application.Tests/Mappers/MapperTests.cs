@@ -21,7 +21,7 @@ public class MapperTests
     {
         var sender = User.Create("Alice", "alice@test.com", "hash");
         var email = Email.Create(sender.Id, "Subject", "Body text",
-            createdAt: new DateTime(2025, 1, 1));
+            threadId: Guid.NewGuid(), createdAt: new DateTime(2025, 1, 1));
         SetField(email, nameof(Email.Sender), sender);
 
         var dto = email.ToSummaryDto();
@@ -38,7 +38,7 @@ public class MapperTests
     [Fact]
     public void ToSummaryDto_SenderIsNull_UsesEmptyFrom()
     {
-        var email = Email.Create(Guid.NewGuid(), "Sub", "Body");
+        var email = Email.Create(Guid.NewGuid(), "Sub", "Body", threadId: Guid.NewGuid());
         SetField(email, nameof(Email.Sender), null);
 
         var dto = email.ToSummaryDto();
@@ -51,7 +51,7 @@ public class MapperTests
     {
         var sender = User.Create("Bob", "b@t.com", "h");
         var longBody = new string('x', 200);
-        var email = Email.Create(sender.Id, "Sub", longBody);
+        var email = Email.Create(sender.Id, "Sub", longBody, threadId: Guid.NewGuid());
         SetField(email, nameof(Email.Sender), sender);
 
         var dto = email.ToSummaryDto();
@@ -64,7 +64,7 @@ public class MapperTests
     public void ToSummaryDto_NullBody_CreatesEmptyPreview()
     {
         var sender = User.Create("C", "c@t.com", "h");
-        var email = Email.Create(sender.Id, "Sub", null!);
+        var email = Email.Create(sender.Id, "Sub", null!, threadId: Guid.NewGuid());
         SetField(email, nameof(Email.Sender), sender);
 
         var dto = email.ToSummaryDto();
@@ -76,7 +76,7 @@ public class MapperTests
     public void ToSummaryDto_EmptyBody_CreatesEmptyPreview()
     {
         var sender = User.Create("D", "d@t.com", "h");
-        var email = Email.Create(sender.Id, "Sub", "");
+        var email = Email.Create(sender.Id, "Sub", "", threadId: Guid.NewGuid());
         SetField(email, nameof(Email.Sender), sender);
 
         var dto = email.ToSummaryDto();
@@ -89,7 +89,7 @@ public class MapperTests
     {
         var sender = User.Create("Eve", "eve@t.com", "h");
         var email = Email.Create(sender.Id, "Full", "Full body",
-            createdAt: new DateTime(2025, 3, 1));
+            threadId: Guid.NewGuid(), createdAt: new DateTime(2025, 3, 1));
         SetField(email, nameof(Email.Sender), sender);
 
         var toR = MailRecipient.Create(Guid.NewGuid(), email.Id, RecipientType.To, DateTime.UtcNow);
@@ -130,7 +130,7 @@ public class MapperTests
     public void ToDto_NoRecipients_ReturnsEmptyTo()
     {
         var sender = User.Create("F", "f@t.com", "h");
-        var email = Email.Create(sender.Id, "Sub", "Body");
+        var email = Email.Create(sender.Id, "Sub", "Body", threadId: Guid.NewGuid());
         SetField(email, nameof(Email.Sender), sender);
 
         var dto = email.ToDto();
@@ -146,7 +146,7 @@ public class MapperTests
     {
         var sender = User.Create("Grace", "grace@t.com", "h");
         var email = Email.Create(sender.Id, "Hello", "Long body content",
-            createdAt: new DateTime(2025, 6, 15));
+            threadId: Guid.NewGuid(), createdAt: new DateTime(2025, 6, 15));
         SetField(email, nameof(Email.Sender), sender);
 
         var recipient = MailRecipient.Create(sender.Id, email.Id, RecipientType.To, DateTime.UtcNow);
@@ -173,7 +173,7 @@ public class MapperTests
     public void ToMailboxItemDto_DeletedRecipient_IsTrashTrue()
     {
         var sender = User.Create("H", "h@t.com", "h");
-        var email = Email.Create(sender.Id, "Sub", "Body");
+        var email = Email.Create(sender.Id, "Sub", "Body", threadId: Guid.NewGuid());
         SetField(email, nameof(Email.Sender), sender);
 
         var recipient = MailRecipient.Create(sender.Id, email.Id, RecipientType.To, DateTime.UtcNow);
@@ -190,7 +190,7 @@ public class MapperTests
     {
         var sender = User.Create("Ivy", "ivy@t.com", "h");
         var email = Email.Create(sender.Id, "Detail", "Detail body",
-            createdAt: new DateTime(2025, 7, 1));
+            threadId: Guid.NewGuid(), createdAt: new DateTime(2025, 7, 1));
         SetField(email, nameof(Email.Sender), sender);
 
         var toR = MailRecipient.Create(Guid.NewGuid(), email.Id, RecipientType.To, DateTime.UtcNow);
@@ -223,7 +223,7 @@ public class MapperTests
     public void ToMailboxDetailDto_MapsRecipientFlags()
     {
         var sender = User.Create("J", "j@t.com", "h");
-        var email = Email.Create(sender.Id, "Sub", "Body");
+        var email = Email.Create(sender.Id, "Sub", "Body", threadId: Guid.NewGuid());
         SetField(email, nameof(Email.Sender), sender);
 
         var recipient = MailRecipient.Create(sender.Id, email.Id, RecipientType.To, DateTime.UtcNow);

@@ -25,12 +25,12 @@ namespace MailCore.Domain.Entities
         public ICollection<Attachment> Attachments { get; private set; } = new List<Attachment>();
         public ICollection<MailRecipient> Recipients { get; private set; } = new List<MailRecipient>();
 
-        public static Email Create(Guid senderId, string subject, string body, Guid? threadId = null, DateTime? createdAt = null, Guid? id = null)
+        public static Email Create(Guid senderId, string subject, string body, Guid threadId, DateTime? createdAt = null, Guid? id = null)
         {
             return new Email
             {
                 Id = id ?? Guid.NewGuid(),
-                ThreadId = threadId ?? Guid.NewGuid(),
+                ThreadId = threadId,
                 SenderId = senderId,
                 Subject = subject,
                 Body = body,

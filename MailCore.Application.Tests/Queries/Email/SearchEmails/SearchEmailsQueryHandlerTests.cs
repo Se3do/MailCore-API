@@ -74,7 +74,7 @@ public class SearchEmailsQueryHandlerTests
         var emails = new List<Domain.Entities.Email>();
         for (var i = 0; i < count; i++)
         {
-            var email = Domain.Entities.Email.Create(userId, $"Hello {i + 1}", $"Body {i + 1}", createdAt: DateTime.UtcNow.AddMinutes(-i), id: Guid.NewGuid());
+            var email = Domain.Entities.Email.Create(userId, $"Hello {i + 1}", $"Body {i + 1}", threadId: Guid.NewGuid(), createdAt: DateTime.UtcNow.AddMinutes(-i), id: Guid.NewGuid());
             var sender = User.Create("", $"sender{i}@example.com", "");
             SetField(email, nameof(Domain.Entities.Email.Sender), sender);
             emails.Add(email);

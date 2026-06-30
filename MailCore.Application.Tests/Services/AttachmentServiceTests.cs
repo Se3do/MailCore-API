@@ -12,7 +12,7 @@ public class AttachmentServiceTests
     private readonly Mock<IAttachmentRepository> _attachmentRepo = new();
     private readonly Mock<IFileStorage> _fileStorage = new();
     private readonly AttachmentService _sut;
-    private readonly Email _email = Email.Create(default, "", "", id: Guid.NewGuid());
+    private readonly Email _email = Email.Create(default, "", "", threadId: Guid.NewGuid(), id: Guid.NewGuid());
 
     public AttachmentServiceTests()
     {

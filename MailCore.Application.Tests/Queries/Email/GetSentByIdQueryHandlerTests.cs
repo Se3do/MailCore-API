@@ -22,7 +22,7 @@ public class GetSentByIdQueryHandlerTests
     {
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var email = Domain.Entities.Email.Create(userId, "Hello", "World", createdAt: DateTime.UtcNow, id: emailId);
+        var email = Domain.Entities.Email.Create(userId, "Hello", "World", threadId: Guid.NewGuid(), createdAt: DateTime.UtcNow, id: emailId);
         
         _emailRepo.Setup(r => r.GetByIdAsync(emailId, default)).ReturnsAsync(email);
 
@@ -48,7 +48,7 @@ public class GetSentByIdQueryHandlerTests
     {
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var email = Domain.Entities.Email.Create(Guid.NewGuid(), "", "", createdAt: DateTime.UtcNow, id: emailId);
+        var email = Domain.Entities.Email.Create(Guid.NewGuid(), "", "", threadId: Guid.NewGuid(), createdAt: DateTime.UtcNow, id: emailId);
         
         _emailRepo.Setup(r => r.GetByIdAsync(emailId, default)).ReturnsAsync(email);
 

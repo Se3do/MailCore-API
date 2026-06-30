@@ -22,7 +22,7 @@ public class GetDeliveryStatusQueryHandlerTests
     {
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var email = Domain.Entities.Email.Create(userId, "", "", id: emailId);
+        var email = Domain.Entities.Email.Create(userId, "", "", threadId: Guid.NewGuid(), id: emailId);
         email.MarkAsFailed("Connection timeout");
         email.MarkAsFailed("Connection timeout");
 
@@ -54,7 +54,7 @@ public class GetDeliveryStatusQueryHandlerTests
     {
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var email = Domain.Entities.Email.Create(Guid.NewGuid(), "", "", id: emailId);
+        var email = Domain.Entities.Email.Create(Guid.NewGuid(), "", "", threadId: Guid.NewGuid(), id: emailId);
 
         _emailRepo.Setup(r => r.GetByIdAsync(emailId, default)).ReturnsAsync(email);
 
@@ -68,7 +68,7 @@ public class GetDeliveryStatusQueryHandlerTests
         var emailId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var sentAt = DateTime.UtcNow;
-        var email = Domain.Entities.Email.Create(userId, "", "", id: emailId);
+        var email = Domain.Entities.Email.Create(userId, "", "", threadId: Guid.NewGuid(), id: emailId);
         email.MarkAsSent(sentAt);
         SetField(email, nameof(Domain.Entities.Email.SendAttempts), 1);
 
