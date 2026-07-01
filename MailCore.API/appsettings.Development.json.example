@@ -20,6 +20,15 @@
     "Audience": "MailCore",
     "ExpiryMinutes": 60
   },
+  "Smtp": {
+    "Host": "localhost",
+    "Port": 1025,
+    "Username": "",
+    "Password": "",
+    "FromAddress": "noreply@mailcore.local",
+    "FromName": "MailCore",
+    "UseSsl": false
+  },
   "AllowedHosts": "*",
   "Cors": {
     "AllowedOrigins": [ "http://localhost:3000", "http://localhost:5173" ]
