@@ -29,10 +29,4 @@ public class AttachmentRepositoryTests : RepositoryTestBase
         Assert.NotNull(result);
         Assert.Equal("test.txt", result.FileName);
     }
-
-    private static void SetField<T>(T target, string propertyName, object value)
-    {
-        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-        field!.SetValue(target, value);
-    }
 }

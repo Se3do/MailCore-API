@@ -34,10 +34,4 @@ public class EmailRepositoryTests : RepositoryTestBase
         Assert.NotNull(result);
         Assert.Equal("Hello", result.Subject);
     }
-
-    private static void SetField<T>(T target, string propertyName, object value)
-    {
-        var field = typeof(T).GetField($"<{propertyName}>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-        field!.SetValue(target, value);
-    }
 }

@@ -1,5 +1,6 @@
 ﻿using MailCore.API;
 using MailCore.API.Hubs;
+using MailCore.API.Middleware;
 using MailCore.Domain.Interfaces;
 using MailCore.Infrastructure.Data.Context;
 using MailCore.Infrastructure.Data.Seeding;
@@ -7,10 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Enforce no server header
 builder.WebHost.UseKestrel(o => o.AddServerHeader = false);
 
 builder.Services.AddAppDI(builder.Configuration);
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
@@ -38,10 +41,9 @@ if (app.Environment.IsProduction())
     await context.Database.MigrateAsync();
 }
 
+app.UseHttpLogging();
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseCors("AllowedOrigins");
 
