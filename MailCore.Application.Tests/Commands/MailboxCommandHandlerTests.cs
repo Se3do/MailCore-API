@@ -63,7 +63,7 @@ public class MailboxCommandHandlerTests
     public async Task MarkUnread_OwnedMail_SetsIsReadFalse()
     {
         var mail = OwnedMail();
-        mail.MarkAsRead();
+        mail.SetRead(true);
         SetupRepo(mail);
 
         var result = await new MarkMailUnreadCommandHandler(_repo.Object)
@@ -90,7 +90,7 @@ public class MailboxCommandHandlerTests
     public async Task Unstar_OwnedMail_SetsIsStarredFalse()
     {
         var mail = OwnedMail();
-        mail.MarkAsStarred();
+        mail.SetStarred(true);
         SetupRepo(mail);
 
         Assert.True(await new UnstarMailCommandHandler(_repo.Object)
@@ -115,7 +115,7 @@ public class MailboxCommandHandlerTests
     public async Task Unspam_OwnedMail_SetsIsSpamFalse()
     {
         var mail = OwnedMail();
-        mail.MarkAsSpam();
+        mail.SetSpam(true);
         SetupRepo(mail);
 
         Assert.True(await new UnspamMailCommandHandler(_repo.Object)
@@ -151,7 +151,7 @@ public class MailboxCommandHandlerTests
     public async Task Restore_OwnedDeletedMail_ClearsDeletedAt()
     {
         var mail = OwnedMail();
-        mail.SoftDelete();
+        mail.SetDeleted(true);
         SetupRepo(mail);
 
         Assert.True(await new RestoreMailCommandHandler(_repo.Object)

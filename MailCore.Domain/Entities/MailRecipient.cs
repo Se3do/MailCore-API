@@ -33,20 +33,12 @@ namespace MailCore.Domain.Entities
             };
         }
 
-        public void MarkAsRead() => IsRead = true;
+        public void SetRead(bool value) => IsRead = value;
 
-        public void MarkAsUnread() => IsRead = false;
+        public void SetStarred(bool value) => IsStarred = value;
 
-        public void MarkAsStarred() => IsStarred = true;
+        public void SetSpam(bool value) => IsSpam = value;
 
-        public void UnmarkAsStarred() => IsStarred = false;
-
-        public void MarkAsSpam() => IsSpam = true;
-
-        public void UnmarkAsSpam() => IsSpam = false;
-
-        public void SoftDelete() => DeletedAt = DateTime.UtcNow;
-
-        public void Restore() => DeletedAt = null;
+        public void SetDeleted(bool value) => DeletedAt = value ? DateTime.UtcNow : null;
     }
 }

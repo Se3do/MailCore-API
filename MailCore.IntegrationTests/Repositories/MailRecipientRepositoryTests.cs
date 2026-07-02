@@ -240,10 +240,10 @@ public class MailRecipientRepositoryTests : IClassFixture<MailCoreDbFixture>
     {
         var mr = MailRecipient.Create(userId, emailId, type, DateTime.UtcNow);
         SetField(mr, nameof(MailRecipient.Id), Guid.NewGuid());
-        if (isRead) mr.MarkAsRead();
-        if (isSpam) mr.MarkAsSpam();
-        if (isStarred) mr.MarkAsStarred();
-        if (deletedAt.HasValue) mr.SoftDelete();
+        if (isRead) mr.SetRead(true);
+        if (isSpam) mr.SetSpam(true);
+        if (isStarred) mr.SetStarred(true);
+        if (deletedAt.HasValue) mr.SetDeleted(true);
         context.MailRecipients.Add(mr);
         return Task.FromResult(mr);
     }

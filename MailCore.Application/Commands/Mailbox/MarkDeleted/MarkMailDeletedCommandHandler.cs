@@ -18,7 +18,7 @@ namespace MailCore.Application.Commands.Mailbox.MarkDeleted
             if (mr.UserId != cmd.UserId)
                 throw new ForbiddenException("You do not have access to this mail.");
 
-            mr.SoftDelete();
+            mr.SetDeleted(true);
             return true;
         }
     }

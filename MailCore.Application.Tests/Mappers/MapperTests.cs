@@ -151,8 +151,8 @@ public class MapperTests
 
         var recipient = MailRecipient.Create(sender.Id, email.Id, RecipientType.To, DateTime.UtcNow);
         SetField(recipient, nameof(MailRecipient.Email), email);
-        recipient.MarkAsRead();
-        recipient.MarkAsStarred();
+        recipient.SetRead(true);
+        recipient.SetStarred(true);
 
         var dto = recipient.ToMailboxItemDto();
 
@@ -178,7 +178,7 @@ public class MapperTests
 
         var recipient = MailRecipient.Create(sender.Id, email.Id, RecipientType.To, DateTime.UtcNow);
         SetField(recipient, nameof(MailRecipient.Email), email);
-        recipient.SoftDelete();
+        recipient.SetDeleted(true);
 
         var dto = recipient.ToMailboxItemDto();
 
@@ -228,9 +228,9 @@ public class MapperTests
 
         var recipient = MailRecipient.Create(sender.Id, email.Id, RecipientType.To, DateTime.UtcNow);
         SetField(recipient, nameof(MailRecipient.Email), email);
-        recipient.MarkAsRead();
-        recipient.MarkAsSpam();
-        recipient.SoftDelete();
+        recipient.SetRead(true);
+        recipient.SetSpam(true);
+        recipient.SetDeleted(true);
 
         var dto = recipient.ToMailboxDetailDto();
 

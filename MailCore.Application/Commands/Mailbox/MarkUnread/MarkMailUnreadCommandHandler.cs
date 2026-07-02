@@ -17,7 +17,7 @@ namespace MailCore.Application.Commands.Mailbox.MarkUnread
             if (mr.UserId != cmd.UserId)
                 throw new ForbiddenException("You do not have access to this mail.");
 
-            mr.MarkAsUnread();
+            mr.SetRead(false);
             return true;
         }
     }

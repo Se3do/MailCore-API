@@ -44,7 +44,7 @@ namespace MailCore.Infrastructure.Data.Seeding
             context.Emails.Add(email2);
 
             var mr1 = MailRecipient.Create(bob.Id, email1.Id, RecipientType.To, email1.CreatedAt);
-            mr1.MarkAsRead();
+            mr1.SetRead(true);
             context.MailRecipients.Add(mr1);
 
             var mr2 = MailRecipient.Create(alice.Id, email2.Id, RecipientType.To, email2.CreatedAt);
