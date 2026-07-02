@@ -22,7 +22,7 @@ packages/
 App_Data/
 Attachments/
 
-# Secrets & environment — never commit these
+# Secrets & environment ï¿½ never commit these
 appsettings.Development.json
 appsettings.Production.json
 appsettings.*.json
@@ -47,3 +47,8 @@ lcov.info
 
 # Local publish output
 .publish/
+
+# Working/scratch files
+-w
+best-practices-audit.md
+ddd-upgrade-plan.md
