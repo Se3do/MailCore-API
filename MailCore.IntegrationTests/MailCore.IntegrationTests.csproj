@@ -22,7 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MailCore.Infrastructure\MailCore.Infrastructure.csproj" />
     <ProjectReference Include="..\MailCore.Domain\MailCore.Domain.csproj" />
-    <ProjectReference Include="..\MailCore.Application\MailCore.Application.csproj" />
+
   </ItemGroup>
 
 </Project>

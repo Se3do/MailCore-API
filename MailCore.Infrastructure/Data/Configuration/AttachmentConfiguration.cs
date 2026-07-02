@@ -17,5 +17,5 @@ namespace MailCore.Infrastructure.Data.Configuration
         }
 
     }
-    //TODO : Add other entity configurations here
+
 }

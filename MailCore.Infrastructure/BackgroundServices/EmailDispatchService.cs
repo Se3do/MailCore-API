@@ -1,4 +1,4 @@
-using MailCore.Application.Interfaces.Services;
+using MailCore.Infrastructure.MailSender;
 using MailCore.Domain.Interfaces;
 using MailCore.Infrastructure.Configuration;
 using Microsoft.Extensions.DependencyInjection;

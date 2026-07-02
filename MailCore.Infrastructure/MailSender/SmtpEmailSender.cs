@@ -1,5 +1,5 @@
 using MailCore.Application.Interfaces.Persistence;
-using MailCore.Application.Interfaces.Services;
+using MailCore.Infrastructure.MailSender;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Enums;
 using MailKit.Net.Smtp;

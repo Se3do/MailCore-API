@@ -1,6 +1,6 @@
 using MailCore.Domain.Entities;
 
-namespace MailCore.Application.Interfaces.Services
+namespace MailCore.Infrastructure.MailSender
 {
     public interface IEmailSender
     {

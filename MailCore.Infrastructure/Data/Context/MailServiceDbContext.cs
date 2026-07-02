@@ -22,9 +22,5 @@ namespace MailCore.Infrastructure.Data.Context
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(MailCoreDbContext).Assembly);
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
     }
 }

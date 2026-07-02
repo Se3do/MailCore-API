@@ -1,6 +1,6 @@
 ﻿using MailCore.Application.Interfaces.Persistence;
-using MailCore.Application.Interfaces.Security;
 using MailCore.Application.Interfaces.Services;
+using MailCore.Application.Interfaces.Security;
 using MailCore.Application.Services;
 using MailCore.Domain.Interfaces;
 using MailCore.Infrastructure.BackgroundServices;

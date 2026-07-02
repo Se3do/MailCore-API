@@ -21,5 +21,5 @@ namespace MailCore.Infrastructure.Data.Configuration
             .OnDelete(DeleteBehavior.NoAction);
         }
     }
-    //TODO : Add other entity configurations here
+
 }

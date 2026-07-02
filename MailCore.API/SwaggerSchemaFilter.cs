@@ -13,19 +13,7 @@ public class SwaggerSchemaFilter : ISchemaFilter
         ["name"] = () => new OpenApiString("John Doe"),
         ["subject"] = () => new OpenApiString("Meeting Tomorrow"),
         ["body"] = () => new OpenApiString("Let's discuss the Q2 roadmap."),
-        ["preview"] = () => new OpenApiString("Let's discuss the Q2..."),
         ["color"] = () => new OpenApiString("#3B82F6"),
-        ["token"] = () => new OpenApiString("eyJhbGciOiJIUzI1NiIs..."),
-        ["status"] = () => new OpenApiString("Pending"),
-        ["firstname"] = () => new OpenApiString("John"),
-        ["lastname"] = () => new OpenApiString("Doe"),
-        ["username"] = () => new OpenApiString("johndoe"),
-        ["city"] = () => new OpenApiString("New York"),
-        ["country"] = () => new OpenApiString("US"),
-        ["phone"] = () => new OpenApiString("+1-555-1234"),
-        ["filename"] = () => new OpenApiString("report.pdf"),
-        ["contenttype"] = () => new OpenApiString("application/pdf"),
-        ["content_type"] = () => new OpenApiString("application/pdf"),
     };
 
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
