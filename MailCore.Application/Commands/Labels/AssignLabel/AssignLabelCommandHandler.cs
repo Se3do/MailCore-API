@@ -1,12 +1,11 @@
-﻿using MailCore.Domain.Entities;
+﻿using MailCore.Application.Exceptions;
+using MailCore.Domain.Entities;
 using MailCore.Domain.Interfaces;
-using MailCore.Application.Interfaces.Services;
 using MediatR;
-using System.Threading;
 
 namespace MailCore.Application.Commands.Labels.AssignLabel
 {
-    public class AssignLabelCommandHandler : IRequestHandler<AssignLabelCommand, bool>
+    public class AssignLabelCommandHandler : IRequestHandler<AssignLabelCommand>
     {
         private readonly ILabelRepository _labelRepository;
         private readonly IMailRecipientRepository _mailRecipientRepository;
@@ -17,32 +16,24 @@ namespace MailCore.Application.Commands.Labels.AssignLabel
             _mailRecipientRepository = mailRecipientRepository;
         }
 
-        public async Task<bool> Handle(AssignLabelCommand command, CancellationToken cancellationToken)
+        public async Task Handle(AssignLabelCommand command, CancellationToken cancellationToken)
         {
-            var userId = command.UserId;
-            var mailId = command.MailId;
-            var labelId = command.LabelId;
+            var label = await _labelRepository.GetByIdAsync(command.LabelId, cancellationToken);
+            if (label == null)
+                throw new NotFoundException($"Label {command.LabelId} not found.");
+            if (label.UserId != command.UserId)
+                throw new ForbiddenException("You do not have access to this label.");
 
-            var label = await _labelRepository.GetByIdAsync(labelId, cancellationToken);
-            if (label == null || label.UserId != userId)
+            var mailRecipient = await _mailRecipientRepository.GetByIdAsync(command.MailId, cancellationToken);
+            if (mailRecipient == null)
+                throw new NotFoundException($"Mail {command.MailId} not found.");
+            if (mailRecipient.UserId != command.UserId)
+                throw new ForbiddenException("You do not have access to this mail.");
+
+            if (mailRecipient.Labels.All(l => l.LabelId != command.LabelId))
             {
-                return false;
+                mailRecipient.Labels.Add(MailRecipientLabel.Create(mailRecipient.Id, command.LabelId));
             }
-
-            var mailRecipient = await _mailRecipientRepository.GetByIdAsync(mailId, cancellationToken);
-            if (mailRecipient == null || mailRecipient.UserId != userId)
-            {
-                return false;
-            }
-
-            if (mailRecipient.Labels.Any(l => l.LabelId == labelId))
-            {
-                return true;
-            }
-
-            mailRecipient.Labels.Add(MailRecipientLabel.Create(mailRecipient.Id, labelId));
-
-            return true;
         }
     }
 }

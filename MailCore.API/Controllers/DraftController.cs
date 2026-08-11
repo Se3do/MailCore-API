@@ -50,7 +50,7 @@ namespace MailCore.API.Controllers
         public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
         {
             var result = await _mediator.Send(new GetDraftByIdQuery(UserId, id), ct);
-            return result is null ? NotFound() : Ok(result);
+            return Ok(result);
         }
 
         /// <summary>Creates a new draft.</summary>

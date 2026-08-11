@@ -85,30 +85,32 @@ namespace MailCore.API.Controllers
         /// <param name="labelId">The label ID.</param>
         /// <param name="mailId">The mail (recipient) ID.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>No content if successful; 400 if the assignment fails.</returns>
+        /// <returns>No content if successful; 404/403 if the label or mail is missing or not owned.</returns>
         [HttpPost("{labelId}/assign/{mailId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> AssignLabel(Guid labelId, Guid mailId, CancellationToken ct)
         {
-            var assigned = await _mediator.Send(new AssignLabelCommand(UserId, mailId, labelId), ct);
-            return assigned ? NoContent() : BadRequest();
+            await _mediator.Send(new AssignLabelCommand(UserId, mailId, labelId), ct);
+            return NoContent();
         }
 
         /// <summary>Removes a label from an email.</summary>
         /// <param name="labelId">The label ID.</param>
         /// <param name="mailId">The mail (recipient) ID.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>No content if successful; 400 if the unassignment fails.</returns>
+        /// <returns>No content if successful; 404/403 if the mail is missing or not owned.</returns>
         [HttpDelete("{labelId}/unassign/{mailId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UnassignLabel(Guid labelId, Guid mailId, CancellationToken ct)
         {
-            var unassigned = await _mediator.Send(new UnassignLabelCommand(UserId, mailId, labelId), ct);
-            return unassigned ? NoContent() : BadRequest();
+            await _mediator.Send(new UnassignLabelCommand(UserId, mailId, labelId), ct);
+            return NoContent();
         }
     }
 }

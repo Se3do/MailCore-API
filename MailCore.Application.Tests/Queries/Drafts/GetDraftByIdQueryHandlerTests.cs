@@ -1,3 +1,4 @@
+using MailCore.Application.Exceptions;
 using MailCore.Application.Queries.Drafts.GetDraftById;
 using MailCore.Domain.Entities;
 using MailCore.Domain.Interfaces;
@@ -22,39 +23,36 @@ public class GetDraftByIdQueryHandlerTests
         var draftId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var draft = Draft.Create(userId, "Subject", "Body", id: draftId);
-        
+
         _draftRepo.Setup(r => r.GetByIdAsync(draftId, default)).ReturnsAsync(draft);
 
         var result = await _sut.Handle(new GetDraftByIdQuery(userId, draftId), default);
 
-        Assert.NotNull(result);
         Assert.Equal("Subject", result.Subject);
     }
 
     [Fact]
-    public async Task Handle_DraftNotFound_ReturnsNull()
+    public async Task Handle_DraftNotFound_ThrowsNotFound()
     {
         var draftId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         _draftRepo.Setup(r => r.GetByIdAsync(draftId, default)).ReturnsAsync((Draft?)null);
 
-        var result = await _sut.Handle(new GetDraftByIdQuery(userId, draftId), default);
-
-        Assert.Null(result);
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            _sut.Handle(new GetDraftByIdQuery(userId, draftId), default));
     }
-    
+
     [Fact]
-    public async Task Handle_DraftBelongsToAnotherUser_ReturnsNull()
+    public async Task Handle_DraftBelongsToAnotherUser_ThrowsForbidden()
     {
         var draftId = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var anotherUserId = Guid.NewGuid();
         var draft = Draft.Create(anotherUserId, "Subject", "", id: draftId);
-        
+
         _draftRepo.Setup(r => r.GetByIdAsync(draftId, default)).ReturnsAsync(draft);
 
-        var result = await _sut.Handle(new GetDraftByIdQuery(userId, draftId), default);
-
-        Assert.Null(result);
+        await Assert.ThrowsAsync<ForbiddenException>(() =>
+            _sut.Handle(new GetDraftByIdQuery(userId, draftId), default));
     }
 }

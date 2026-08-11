@@ -1,9 +1,10 @@
-﻿using MailCore.Domain.Interfaces;
+﻿using MailCore.Application.Exceptions;
+using MailCore.Domain.Interfaces;
 using MediatR;
 
 namespace MailCore.Application.Commands.Labels.UnassignLabel
 {
-    public class UnassignLabelCommandHandler : IRequestHandler<UnassignLabelCommand, bool>
+    public class UnassignLabelCommandHandler : IRequestHandler<UnassignLabelCommand>
     {
         private readonly IMailRecipientRepository _mailRecipientRepository;
 
@@ -12,26 +13,19 @@ namespace MailCore.Application.Commands.Labels.UnassignLabel
             _mailRecipientRepository = mailRecipientRepository;
         }
 
-        public async Task<bool> Handle(UnassignLabelCommand command, CancellationToken ct)
+        public async Task Handle(UnassignLabelCommand command, CancellationToken ct)
         {
-            var userId = command.UserId;
-            var mailId = command.MailId;
-            var labelId = command.LabelId;
+            var mailRecipient = await _mailRecipientRepository.GetByIdAsync(command.MailId, ct);
+            if (mailRecipient == null)
+                throw new NotFoundException($"Mail {command.MailId} not found.");
+            if (mailRecipient.UserId != command.UserId)
+                throw new ForbiddenException("You do not have access to this mail.");
 
-            var mailRecipient = await _mailRecipientRepository.GetByIdAsync(mailId, ct);
-            if (mailRecipient == null || mailRecipient.UserId != userId)
+            var link = mailRecipient.Labels.FirstOrDefault(l => l.LabelId == command.LabelId);
+            if (link != null)
             {
-                return false;
+                mailRecipient.Labels.Remove(link);
             }
-
-            var link = mailRecipient.Labels.FirstOrDefault(l => l.LabelId == labelId);
-            if (link == null)
-            {
-                return true;
-            }
-
-            mailRecipient.Labels.Remove(link);
-            return true;
         }
     }
 }
