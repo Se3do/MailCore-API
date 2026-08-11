@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using FluentValidation;
+using MailCore.API.Notifications;
 using MailCore.Application;
 using MailCore.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,6 +20,9 @@ namespace MailCore.API
         {
             services.AddApplicationDI()
                 .AddInfrastructureDI(configuration);
+
+            services.AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssembly(typeof(EmailSentNotificationHandler).Assembly));
 
             services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
