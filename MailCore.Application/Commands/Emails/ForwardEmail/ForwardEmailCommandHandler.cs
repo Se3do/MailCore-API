@@ -11,18 +11,15 @@ namespace MailCore.Application.Commands.Emails.ForwardEmail
     {
         private readonly IEmailRepository _emailRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IThreadRepository _threadRepository;
         private readonly EmailComposer _composer;
 
         public ForwardEmailCommandHandler(
             IEmailRepository emailRepository,
             IUserRepository userRepository,
-            IThreadRepository threadRepository,
             EmailComposer composer)
         {
             _emailRepository = emailRepository;
             _userRepository = userRepository;
-            _threadRepository = threadRepository;
             _composer = composer;
         }
 
@@ -39,9 +36,7 @@ namespace MailCore.Application.Commands.Emails.ForwardEmail
 
             var now = DateTime.UtcNow;
 
-            var thread = Domain.Entities.Thread.Create();
-
-            await _threadRepository.AddAsync(thread, ct);
+            var thread = await _composer.GetOrCreateThreadAsync(null, now, ct);
 
             var subject = original.Subject.StartsWith("Fwd:", StringComparison.OrdinalIgnoreCase)
                 ? original.Subject
@@ -51,13 +46,7 @@ namespace MailCore.Application.Commands.Emails.ForwardEmail
             await _emailRepository.AddAsync(email, ct);
 
             await _composer.HandleAttachmentsAsync(email, command.Request.Attachments, ct);
-            await _composer.AddRecipientsAsync(email, command.Request.To, RecipientType.To, now, ct);
-
-            if (command.Request.Cc?.Any() == true)
-                await _composer.AddRecipientsAsync(email, command.Request.Cc, RecipientType.Cc, now, ct);
-
-            if (command.Request.Bcc?.Any() == true)
-                await _composer.AddRecipientsAsync(email, command.Request.Bcc, RecipientType.Bcc, now, ct);
+            await _composer.AddRecipientsAsync(email, command.Request.To, command.Request.Cc, command.Request.Bcc, now, ct);
         }
     }
 }

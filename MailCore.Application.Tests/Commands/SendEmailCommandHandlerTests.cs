@@ -32,12 +32,12 @@ public class SendEmailCommandHandlerTests
       _composer = new EmailComposer(
        _userRepo.Object,
    _mailRecipientRepo.Object,
- _attachmentService.Object);
+  _attachmentService.Object,
+   _threadRepo.Object);
 
         _sut = new SendEmailCommandHandler(
          _emailRepo.Object,
             _userRepo.Object,
-          _threadRepo.Object,
             _composer,
             _publisher.Object);
     }

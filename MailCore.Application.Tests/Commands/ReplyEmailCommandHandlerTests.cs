@@ -40,7 +40,8 @@ public class ReplyEmailCommandHandlerTests
         _composer = new EmailComposer(
             _userRepo.Object,
             _mailRecipientRepo.Object,
-            _attachmentService.Object);
+            _attachmentService.Object,
+            _threadRepo.Object);
 
         _sut = new ReplyEmailCommandHandler(
             _emailRepo.Object,

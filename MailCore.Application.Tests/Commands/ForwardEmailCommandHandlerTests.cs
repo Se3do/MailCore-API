@@ -36,12 +36,12 @@ public class ForwardEmailCommandHandlerTests
         _composer = new EmailComposer(
             _userRepo.Object,
             _mailRecipientRepo.Object,
-            _attachmentService.Object);
+            _attachmentService.Object,
+            _threadRepo.Object);
 
         _sut = new ForwardEmailCommandHandler(
             _emailRepo.Object,
             _userRepo.Object,
-            _threadRepo.Object,
             _composer);
     }
 

@@ -49,13 +49,7 @@ namespace MailCore.Application.Commands.Emails.ReplyEmail
             await _emailRepository.AddAsync(email, ct);
 
             await _composer.HandleAttachmentsAsync(email, command.Request.Attachments, ct);
-            await _composer.AddRecipientsAsync(email, toList, RecipientType.To, now, ct);
-
-            if (command.Request.Cc?.Any() == true)
-                await _composer.AddRecipientsAsync(email, command.Request.Cc, RecipientType.Cc, now, ct);
-
-            if (command.Request.Bcc?.Any() == true)
-                await _composer.AddRecipientsAsync(email, command.Request.Bcc, RecipientType.Bcc, now, ct);
+            await _composer.AddRecipientsAsync(email, toList, command.Request.Cc, command.Request.Bcc, now, ct);
         }
 
         private async Task<IReadOnlyList<string>> GetDefaultReplyRecipientsAsync(

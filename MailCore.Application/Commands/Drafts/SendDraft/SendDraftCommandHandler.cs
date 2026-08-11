@@ -12,20 +12,17 @@ public sealed class SendDraftCommandHandler : IRequestHandler<SendDraftCommand>
 {
     private readonly IDraftRepository _draftRepository;
     private readonly IEmailRepository _emailRepository;
-    private readonly IThreadRepository _threadRepository;
     private readonly IUserRepository _userRepository;
     private readonly EmailComposer _emailComposer;
 
     public SendDraftCommandHandler(
         IDraftRepository draftRepository,
         IEmailRepository emailRepository,
-        IThreadRepository threadRepository,
         IUserRepository userRepository,
         EmailComposer emailComposer)
     {
         _draftRepository = draftRepository;
         _emailRepository = emailRepository;
-        _threadRepository = threadRepository;
         _userRepository = userRepository;
         _emailComposer = emailComposer;
     }
@@ -50,40 +47,19 @@ public sealed class SendDraftCommandHandler : IRequestHandler<SendDraftCommand>
 
         var now = DateTime.UtcNow;
 
-        var thread = await GetOrCreateThreadAsync(draft.ThreadId, now, ct);
+        var thread = await _emailComposer.GetOrCreateThreadAsync(draft.ThreadId, now, ct);
 
         var subject = string.IsNullOrWhiteSpace(draft.Subject) ? "(No subject)" : draft.Subject;
         var email = Email.Create(command.UserId, subject, draft.Body, thread.Id);
 
         await _emailRepository.AddAsync(email, ct);
 
-        await _emailComposer.AddRecipientsAsync(email, toRecipients, RecipientType.To, now, ct);
-
         var ccRecipients = DraftRecipientsCodec.Deserialize(draft.CcRecipients);
-        if (ccRecipients.Count > 0)
-            await _emailComposer.AddRecipientsAsync(email, ccRecipients, RecipientType.Cc, now, ct);
-
         var bccRecipients = DraftRecipientsCodec.Deserialize(draft.BccRecipients);
-        if (bccRecipients.Count > 0)
-            await _emailComposer.AddRecipientsAsync(email, bccRecipients, RecipientType.Bcc, now, ct);
+
+        await _emailComposer.AddRecipientsAsync(email, toRecipients, ccRecipients, bccRecipients, now, ct);
 
         // Delete draft after sending; it has been promoted to an email.
         await _draftRepository.DeleteAsync(draft.Id, ct);
-    }
-
-    private async Task<Domain.Entities.Thread> GetOrCreateThreadAsync(Guid? threadId, DateTime now, CancellationToken ct)
-    {
-        if (threadId.HasValue)
-        {
-            var existing = await _threadRepository.GetByIdAsync(threadId.Value, ct)
-                ?? throw new NotFoundException($"Thread {threadId.Value} not found.");
-            existing.Touch();
-            return existing;
-        }
-
-        var thread = Domain.Entities.Thread.Create();
-
-        await _threadRepository.AddAsync(thread, ct);
-        return thread;
     }
 }
