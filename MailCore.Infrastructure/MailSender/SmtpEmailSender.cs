@@ -76,23 +76,29 @@ namespace MailCore.Infrastructure.MailSender
 
             using var client = new SmtpClient();
 
-            if (!_options.UseSsl)
+            try
             {
-                await client.ConnectAsync(_options.Host, _options.Port, MailKit.Security.SecureSocketOptions.StartTlsWhenAvailable, ct);
-            }
-            else
-            {
-                await client.ConnectAsync(_options.Host, _options.Port, _options.UseSsl, ct);
-            }
+                if (!_options.UseSsl)
+                {
+                    await client.ConnectAsync(_options.Host, _options.Port, MailKit.Security.SecureSocketOptions.StartTlsWhenAvailable, ct);
+                }
+                else
+                {
+                    await client.ConnectAsync(_options.Host, _options.Port, _options.UseSsl, ct);
+                }
 
-            if (!string.IsNullOrEmpty(_options.Username) && !string.IsNullOrEmpty(_options.Password))
-            {
-                await client.AuthenticateAsync(_options.Username, _options.Password, ct);
-            }
+                if (!string.IsNullOrEmpty(_options.Username) && !string.IsNullOrEmpty(_options.Password))
+                {
+                    await client.AuthenticateAsync(_options.Username, _options.Password, ct);
+                }
 
-            await client.SendAsync(message, ct);
-            await client.DisconnectAsync(true, ct);
-            message.Body?.Dispose();
+                await client.SendAsync(message, ct);
+                await client.DisconnectAsync(true, ct);
+            }
+            finally
+            {
+                message.Body?.Dispose();
+            }
         }
     }
 }
