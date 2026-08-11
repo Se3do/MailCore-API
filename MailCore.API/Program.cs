@@ -29,7 +29,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-if (app.Configuration.GetValue<bool>("SeedOnStartup"))
+if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("SeedOnStartup"))
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<MailCoreDbContext>();
