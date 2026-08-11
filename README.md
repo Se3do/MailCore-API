@@ -15,7 +15,7 @@ MailCore is a production-ready backend service for an email application. Built w
 - **Authentication:** JWT-based with rate-limited auth endpoints (10 req/min).
 - **API Versioning:** URL segment + header-based versioning.
 - **Validation:** FluentValidation pipeline via MediatR behaviors.
-- **Swagger:** Full OpenAPI docs with XML comments, response schemas, and example values (enabled in all environments).
+- **Swagger:** Full OpenAPI docs with XML comments, response schemas, and example values (enabled in Development).
 - **Dev Seeding:** Auto-seeds demo data (2 users, labels, threads, emails, drafts) in Development.
 
 ## Architecture
@@ -149,10 +149,10 @@ CI/CD configured via GitHub Actions:
 
 Set these GitHub secrets for deployment:
 - `MONSTERASP_MSDEPLOY_URL`, `MONSTERASP_USERNAME`, `MONSTERASP_PASSWORD`
-- `WEBSITE_NAME`, `SERVER_COMPUTER_NAME`, `SERVER_USERNAME`, `SERVER_PASSWORD`
 - `CONNECTIONSTRINGS__DEFAULTCONNECTION`
 - `JWT__SECRET`, `JWT__ISSUER`, `JWT__AUDIENCE`
 - `SMTP__HOST`, `SMTP__USERNAME`, `SMTP__PASSWORD`, `SMTP__FROMADDRESS`, `SMTP__FROMNAME`
+- `CORS__ALLOWEDORIGINS` (comma-separated)
 - `FILESTORAGE__ROOTPATH`
 
 ## License

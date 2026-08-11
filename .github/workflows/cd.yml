@@ -46,6 +46,7 @@ jobs:
           $config.Jwt.Issuer = "$env:JWT__ISSUER"
           $config.Jwt.Audience = "$env:JWT__AUDIENCE"
           $config.FileStorage.RootPath = "$env:FILESTORAGE__ROOTPATH"
+          $config.Cors.AllowedOrigins = "$env:CORS__ALLOWEDORIGINS".Split(',') | ForEach-Object { $_.Trim() }
           $config.Smtp.Host = "$env:SMTP__HOST"
           $config.Smtp.Username = "$env:SMTP__USERNAME"
           $config.Smtp.Password = "$env:SMTP__PASSWORD"
@@ -59,6 +60,7 @@ jobs:
           JWT__ISSUER: ${{ secrets.JWT__ISSUER }}
           JWT__AUDIENCE: ${{ secrets.JWT__AUDIENCE }}
           FILESTORAGE__ROOTPATH: ${{ secrets.FILESTORAGE__ROOTPATH }}
+          CORS__ALLOWEDORIGINS: ${{ secrets.CORS__ALLOWEDORIGINS }}
           SMTP__HOST: ${{ secrets.SMTP__HOST }}
           SMTP__USERNAME: ${{ secrets.SMTP__USERNAME }}
           SMTP__PASSWORD: ${{ secrets.SMTP__PASSWORD }}

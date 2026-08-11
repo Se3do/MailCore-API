@@ -179,11 +179,8 @@ namespace MailCore.API
                     if (origins.Length > 0)
                         policy.WithOrigins(origins)
                               .AllowAnyHeader()
-                              .AllowAnyMethod();
-                    else
-                        policy.AllowAnyOrigin()
-                              .AllowAnyHeader()
-                              .AllowAnyMethod();
+                              .AllowAnyMethod()
+                              .AllowCredentials();
                 });
             });
 
