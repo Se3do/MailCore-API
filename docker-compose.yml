@@ -1,6 +1,6 @@
 services:
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build: docker/sqlserver-fts
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "MailCore_Dev123!"
