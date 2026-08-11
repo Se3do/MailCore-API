@@ -1,5 +1,6 @@
 services:
   sqlserver:
+    container_name: mailcore-sqlserver
     build: docker/sqlserver-fts
     environment:
       ACCEPT_EULA: "Y"
@@ -15,12 +16,14 @@ services:
       retries: 10
 
   mailhog:
+    container_name: mailcore-mailhog
     image: mailhog/mailhog
     ports:
       - "1025:1025"
       - "8025:8025"
 
   api:
+    container_name: mailcore-api
     build: .
     ports:
       - "5237:8080"
